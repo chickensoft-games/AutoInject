@@ -3,6 +3,9 @@ namespace Chickensoft.AutoInject;
 using System;
 using Godot;
 using SuperNodes.Types;
+#pragma warning disable CS8019
+using Chickensoft.AutoInject;
+#pragma warning restore CS8019
 
 /// <summary>
 /// Represents a node that provides a value to its descendant nodes.

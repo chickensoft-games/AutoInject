@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Godot;
 using SuperNodes.Types;
+#pragma warning disable CS8019
+using Chickensoft.AutoInject;
+#pragma warning restore CS8019
 
 /// <summary>
 /// When a SuperNode applies the Dependent PowerUp, it inherits this interface

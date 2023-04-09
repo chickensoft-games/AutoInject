@@ -1,0 +1,73 @@
+<Project>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <OutputPath>../nupkg</OutputPath>
+
+    <IsPackable>true</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>contentFiles</ContentTargetFolders>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <NoWarn>CS8021</NoWarn>
+    <NoBuild>true</NoBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+
+    <Title>AutoInject</Title>
+    <Version>0.0.0</Version>
+    <Description>Node-based dependency for C# Godot scripts — without reflection!</Description>
+    <Copyright>© 2023 Chickensoft</Copyright>
+    <Authors>Chickensoft</Authors>
+    <Company>Chickensoft</Company>
+
+    <PackageId>Chickensoft.AutoInject</PackageId>
+    <PackageReleaseNotes>Chickensoft.AutoInject release.</PackageReleaseNotes>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageTags />
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl></PackageProjectUrl>
+
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl></RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="\" />
+    <None Include="../LICENSE" Pack="true" PackagePath="\" />
+    <None Include="./icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Dependencies go here. -->
+    <PackageReference Include="GodotSharp" Version="4.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="@(Compile)">
+      <Pack>true</Pack>
+      <PackagePath>$(ContentTargetFolders)\cs\any\$(PackageId)%(RecursiveDir)</PackagePath>
+    </Compile>
+    <EmbeddedResource Update="@(EmbeddedResource)">
+      <Pack>true</Pack>
+      <PackagePath>$(ContentTargetFolders)\any\any\$(PackageId)\%(RecursiveDir)\</PackagePath>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Don't actually include dependencies in project that imports this -->
+    <!-- source-only package. -->
+    <PackageReference Remove="@(PackageReference)" />
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Target Name="Compile" />
+  <Target Name="CopyFilesToOutputDirectory" />
+</Project>

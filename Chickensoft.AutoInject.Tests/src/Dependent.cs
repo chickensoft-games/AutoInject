@@ -260,6 +260,8 @@ public static class DependencyResolver {
   /// <exception cref="ProviderNotFoundException">Thrown if the provider for
   /// the requested value could not be found and when no fallback value is
   /// specified.</exception>
+  /// <exception cref="ProviderNotInitializedException">Thrown if a dependency
+  /// is accessed before the provider has called Provide().</exception>
   public static TValue DependOn<TValue>(
     IDependent dependent, Func<TValue>? fallback = default
   ) where TValue : notnull {
@@ -267,6 +269,9 @@ public static class DependencyResolver {
         typeof(TValue), out var providerNode
       )
     ) {
+      if (!providerNode.ProviderState.IsInitialized) {
+        throw new ProviderNotInitializedException(typeof(TValue));
+      }
       if (providerNode is IProvide<TValue> provider) {
         return provider.Value();
       }
@@ -376,8 +381,10 @@ public static class DependencyResolver {
       }
     }
 
-    // Inform dependent that dependencies have been resolved.
-    dependent.OnResolved();
+    if (state.Pending.Count == 0) {
+      // Inform dependent that dependencies have been resolved.
+      dependent.OnResolved();
+    }
   }
 
   public class DefaultProvider : IProvider {

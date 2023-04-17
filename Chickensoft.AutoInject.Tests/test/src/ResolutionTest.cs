@@ -173,7 +173,27 @@ public class ResolutionTest : TestClass {
     provider.QueueFree();
   }
 
+  [Test]
+  public void AccessingDependencyBeforeProvidedEvenIfCreatedThrows() {
+    // Accessing a dependency that might already be available (but the provider
+    // hasn't called Provide() yet) should throw an exception.
+
+    var provider = new StringProvider();
+    var dependent = new StringDependent();
+
+    provider.AddChild(dependent);
+
+    dependent._Notification((int)Node.NotificationReady);
+    Should.Throw<ProviderNotInitializedException>(() => dependent.MyDependency);
+  }
+
   public class BadProvider : IProvider {
-    public ProviderState ProviderState => throw new System.NotImplementedException();
+    public ProviderState ProviderState { get; }
+
+    public BadProvider() {
+      ProviderState = new ProviderState {
+        IsInitialized = true
+      };
+    }
   }
 }

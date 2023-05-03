@@ -1,3 +1,4 @@
+#pragma warning disable
 namespace Chickensoft.AutoInject;
 
 using System;
@@ -28,3 +29,4 @@ public class ProviderNotInitializedException : InvalidOperationException {
     "once all of its dependencies have been initialized."
   ) { }
 }
+#pragma warning restore

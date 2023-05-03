@@ -1,3 +1,4 @@
+#pragma warning disable
 namespace Chickensoft.AutoInject;
 
 using System;
@@ -399,3 +400,4 @@ public static class DependencyResolver {
     public dynamic Value() => _value;
   }
 }
+#pragma warning restore

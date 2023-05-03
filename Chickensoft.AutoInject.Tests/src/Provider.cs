@@ -1,3 +1,4 @@
+#pragma warning disable
 namespace Chickensoft.AutoInject;
 
 using System;
@@ -111,3 +112,4 @@ public class ProviderState {
     provider.OnProvided();
   }
 }
+#pragma warning restore

@@ -1,3 +1,4 @@
+#pragma warning disable
 namespace Chickensoft.AutoInject;
 
 using System;
@@ -9,3 +10,4 @@ using System;
 /// </summary>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
 public class DependencyAttribute : Attribute { }
+#pragma warning restore

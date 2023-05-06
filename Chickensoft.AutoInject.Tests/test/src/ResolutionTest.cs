@@ -92,6 +92,12 @@ public class ResolutionTest : TestClass {
     var providerB = new IntProvider() { Value = 10 };
     var dependent = new StringDependent();
 
+    var onResolvedCalled = false;
+    void onResolved() =>
+      onResolvedCalled = true;
+
+    dependent.OnDependenciesResolved += onResolved;
+
     providerA.AddChild(providerB);
     providerB.AddChild(dependent);
 
@@ -100,6 +106,8 @@ public class ResolutionTest : TestClass {
     providerA._Notification((int)Node.NotificationReady);
     providerA.ProviderState.IsInitialized.ShouldBeTrue();
     providerA.OnProvidedCalled.ShouldBeTrue();
+
+    onResolvedCalled.ShouldBeTrue();
 
     providerB._Notification((int)Node.NotificationReady);
     providerB.ProviderState.IsInitialized.ShouldBeTrue();

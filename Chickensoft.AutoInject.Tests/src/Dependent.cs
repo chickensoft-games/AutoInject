@@ -16,13 +16,25 @@ using Chickensoft.AutoInject;
 /// </summary>
 public interface IDependent : ISuperNode {
   /// <summary>Dependent state used to manage dependencies.</summary>
-  public DependencyState DependentState { get; }
+  DependencyState DependentState { get; }
+
+  /// <summary>Event invoked when dependencies have been resolved.</summary>
+  event Action? OnDependenciesResolved;
 
   /// <summary>
   /// Method that is invoked when all of the dependent node's dependencies are
   /// resolved (after _Ready() but before _Process()).
   /// </summary>
-  public void OnResolved() { }
+  void OnResolved() { }
+
+  /// <summary>
+  /// <para>
+  /// Method used by the dependency resolution system to tell the dependent
+  /// node to announce that all of its dependencies have been resolved.
+  /// </para>
+  /// <para>Don't call this method.</para>
+  /// </summary>
+  void _AnnounceDependenciesResolved() { }
 }
 
 /// <summary>
@@ -70,6 +82,8 @@ public abstract partial class Dependent : Node, IDependent {
 
   #region AddedInstanceState
 
+  public event Action? OnDependenciesResolved;
+
   /// <summary>
   /// Dependent SuperNodes are all given a private dependency state which
   /// stores the dependency table and a flag indicating if dependencies are
@@ -105,6 +119,9 @@ public abstract partial class Dependent : Node, IDependent {
       this,
       _allDependencies.Value
     );
+
+  public void _AnnounceDependenciesResolved() =>
+    OnDependenciesResolved?.Invoke();
 
   /// <summary>
   /// Returns a dependency that was resolved from an ancestor provider node.
@@ -314,6 +331,11 @@ public static class DependencyResolver {
     var foundDependencies = new HashSet<ScriptPropertyOrField>();
     var providersInitializing = 0;
 
+    void resolve() {
+      dependent.OnResolved();
+      dependent._AnnounceDependenciesResolved();
+    }
+
     void onProviderInitialized(IProvider provider) {
       providersInitializing--;
 
@@ -323,7 +345,7 @@ public static class DependencyResolver {
       }
 
       if (providersInitializing == 0) {
-        dependent.OnResolved();
+        resolve();
       }
     }
 
@@ -384,7 +406,7 @@ public static class DependencyResolver {
 
     if (state.Pending.Count == 0) {
       // Inform dependent that dependencies have been resolved.
-      dependent.OnResolved();
+      resolve();
     }
   }
 

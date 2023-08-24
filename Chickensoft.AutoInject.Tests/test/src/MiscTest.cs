@@ -46,9 +46,9 @@ public class MiscTest : TestClass {
 
     provider.ProviderState.OnInitialized += onInitialized;
 
-    var pending = new DependencyPending(provider, onInitialized);
+    var pending = new PendingProvider(provider, onInitialized);
 
-    pending.Cancel();
+    pending.Unsubscribe();
 
     provider.ProviderState.Announce(provider);
 

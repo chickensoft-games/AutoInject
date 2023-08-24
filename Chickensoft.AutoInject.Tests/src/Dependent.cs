@@ -162,12 +162,17 @@ public class DependencyState {
   /// their provided values. We use this in the rare event that we have to
   /// clean up subscriptions before providers ever finished initializing.
   /// </summary>
-  public Dictionary<IProvider, DependencyPending> Pending { get; }
+  public Dictionary<IProvider, PendingProvider> Pending { get; }
     = new();
 }
 
-public record DependencyPending(IProvider Provider, Action<IProvider> Success) {
-  public void Cancel() => Provider.ProviderState.OnInitialized -= Success;
+public record PendingProvider(
+  IProvider Provider,
+  Action<IProvider> Success
+) {
+  public void Unsubscribe() {
+    Provider.ProviderState.OnInitialized -= Success;
+  }
 }
 
 /// <summary>
@@ -249,7 +254,7 @@ public static class DependencyResolver {
     if (what == Node.NotificationExitTree) {
       dependent.DependentState.ShouldResolveDependencies = true;
       foreach (var pending in dependent.DependentState.Pending.Values) {
-        pending.Cancel();
+        pending.Unsubscribe();
       }
       dependent.DependentState.Pending.Clear();
     }
@@ -340,7 +345,7 @@ public static class DependencyResolver {
       providersInitializing--;
 
       lock (dependent.DependentState.Pending) {
-        dependent.DependentState.Pending[provider].Cancel();
+        dependent.DependentState.Pending[provider].Unsubscribe();
         dependent.DependentState.Pending.Remove(provider);
       }
 
@@ -378,11 +383,12 @@ public static class DependencyResolver {
             // If the provider is not yet initialized, subscribe to its
             // initialization event and add it to the list of pending
             // subscriptions.
-            if (!provider.ProviderState.IsInitialized) {
-              state.Pending.Add(
-                key: provider,
-                value: new DependencyPending(provider, onProviderInitialized)
-              );
+            if (
+              !provider.ProviderState.IsInitialized &&
+              !state.Pending.ContainsKey(provider)
+            ) {
+              state.Pending[provider] =
+                new PendingProvider(provider, onProviderInitialized);
               provider.ProviderState.OnInitialized += onProviderInitialized;
               providersInitializing++;
             }

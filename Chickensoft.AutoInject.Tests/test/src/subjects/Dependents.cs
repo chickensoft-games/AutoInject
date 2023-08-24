@@ -57,3 +57,26 @@ public partial class IntDependent : Node {
     ResolvedValue = MyDependency;
   }
 }
+
+[SuperNode(typeof(Dependent))]
+public partial class MultiDependent : Node {
+  public override partial void _Notification(int what);
+
+  [Dependency]
+  public int IntDependency => DependOn<int>();
+
+  [Dependency]
+  public string StringDependency => DependOn<string>();
+
+  public bool OnResolvedCalled { get; private set; }
+  public int IntResolvedValue { get; set; }
+  public string StringResolvedValue { get; set; } = null!;
+  public bool ReadyCalled { get; set; }
+  public void OnReady() => ReadyCalled = true;
+
+  public void OnResolved() {
+    OnResolvedCalled = true;
+    IntResolvedValue = IntDependency;
+    StringResolvedValue = StringDependency;
+  }
+}

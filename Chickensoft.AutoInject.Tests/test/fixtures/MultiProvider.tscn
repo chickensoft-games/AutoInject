@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bby7an0ngn7l6"]
+
+[ext_resource type="Script" path="res://test/fixtures/MultiProvider.cs" id="1_gn2k1"]
+
+[node name="MultiProvider" type="Node2D"]
+script = ExtResource("1_gn2k1")

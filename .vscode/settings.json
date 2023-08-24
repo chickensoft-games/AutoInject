@@ -138,7 +138,6 @@
     "**/LICENSE"
   ],
   "omnisharp.enableEditorConfigSupport": true,
-  "omnisharp.enableImportCompletion": true,
   "omnisharp.enableMsBuildLoadProjectsOnDemand": false,
   "omnisharp.enableRoslynAnalyzers": true,
   "omnisharp.maxFindSymbolsItems": 3000,
@@ -162,5 +161,6 @@
       "icon": "terminal-powershell",
       "source": "PowerShell"
     }
-  }
+  },
+  "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true
 }

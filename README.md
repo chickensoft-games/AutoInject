@@ -191,6 +191,10 @@ By calling `Provide()` from `_Ready` in provider nodes, you ensure that the orde
 
 By following the `Provide()` on `_Ready` convention, you guarantee all dependent nodes receive an `OnResolved` callback before the first process invocation occurs, guaranteeing that nodes are setup before frame processing begins ✨.
 
+> If your provider is also a dependent, you can call `Provide` from `OnResolved` to allow it to provide dependencies to its subtree, which still guarantees that dependency resolution happens before frame processing begins. Just don't wait until processing has started to call `Provide` from your providers!
+>
+> In general, dependents should have access to their dependencies **before** frame processing callbacks are invoked on them.
+
 ---
 
 🐣 Package generated from a 🐤 Chickensoft Template — <https://chickensoft.games>

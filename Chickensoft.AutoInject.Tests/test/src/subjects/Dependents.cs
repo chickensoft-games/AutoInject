@@ -80,3 +80,12 @@ public partial class MultiDependent : Node {
     StringResolvedValue = StringDependency;
   }
 }
+
+[SuperNode(typeof(Dependent))]
+public partial class NoDependenciesDependent : Node {
+  public override partial void _Notification(int what);
+
+  public bool OnResolvedCalled { get; private set; }
+
+  public void OnResolved() => OnResolvedCalled = true;
+}

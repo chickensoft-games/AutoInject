@@ -195,6 +195,18 @@ public class ResolutionTest : TestClass {
     Should.Throw<ProviderNotInitializedException>(() => dependent.MyDependency);
   }
 
+  [Test]
+  public void DependentWithNoDependenciesHasOnResolvedCalled() {
+    var provider = new StringProvider();
+    var dependent = new NoDependenciesDependent();
+
+    provider.AddChild(dependent);
+
+    dependent._Notification((int)Node.NotificationReady);
+
+    dependent.OnResolvedCalled.ShouldBeTrue();
+  }
+
   public class BadProvider : IProvider {
     public ProviderState ProviderState { get; }
 

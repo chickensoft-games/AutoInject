@@ -414,6 +414,10 @@ public static class DependencyResolver {
       // Inform dependent that dependencies have been resolved.
       resolve();
     }
+
+    // We *could* check to see if a provider for every dependency was found
+    // and throw an exception if any were missing, but this would break support
+    // for fallback values.
   }
 
   public class DefaultProvider : IProvider {

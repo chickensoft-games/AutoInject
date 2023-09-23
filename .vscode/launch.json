@@ -10,7 +10,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${env:GODOT4}",
+      "program": "${env:GODOT}",
       "args": [
         "--headless",
         // These command line flags are used by GoDotTest to run tests.
@@ -25,7 +25,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${env:GODOT4}",
+      "program": "${env:GODOT}",
       "args": [
         "--headless",
         // These command line flags are used by GoDotTest to run tests.

@@ -27,7 +27,7 @@ Providing nodes "top-down" over sections of the game's scene tree has a few adva
 - ✅ The natural flow-of-data mimics the other patterns used throughout the Godot engine.
 - ✅ Dependent scripts can still be run in isolated scenes by providing default fallback values.
 - ✅ Scoping dependencies to the scene tree prevents the existence of values that are invalid above the provider node.
-- ✅ Resolution occurs in O(n), where `n` is the hight of the tree above the requesting dependent node (usually only a handful of nodes to search). For deep trees, "reflecting" dependencies by re-providing them further down the tree speeds things up further.
+- ✅ Resolution occurs in O(n), where `n` is the height of the tree above the requesting dependent node (usually only a handful of nodes to search). For deep trees, "reflecting" dependencies by re-providing them further down the tree speeds things up further.
 - ✅ Dependencies are resolved when the node enters the scene tree, allowing for O(1) access afterwards. Exiting and re-entering the scene tree triggers the dependency resolution process again.
 - ✅ Scripts can be both dependents and providers.
 

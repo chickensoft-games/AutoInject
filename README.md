@@ -35,7 +35,7 @@ Providing nodes "top-down" over sections of the game's scene tree has a few adva
 
 AutoInject is a source-only package that uses the [SuperNodes] source generator to generate the necessary dependency injection code at build-time. You'll need to include SuperNodes, the SuperNodes runtime types, and AutoInject in your project. All of the packages are extremely lightweight.
 
-Simply add the following to your project's `.csproj` file. Be sure to check the latest versions for each package on [Nuget].
+Simply add the following to your project's `.csproj` file. Be sure to check the latest versions for each package on [Nuget](https://www.nuget.org/packages?q=Chickensoft).
 
 ```xml
 <ItemGroup>

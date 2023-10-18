@@ -1,10 +1,10 @@
 {
   "version": "0.2.0",
   "configurations": [
-    // For these launch configurations to work, you need to setup a GODOT4
+    // For these launch configurations to work, you need to setup a GODOT
     // environment variable. On mac or linux, this can be done by adding
     // the following to your .zshrc, .bashrc, or .bash_profile file:
-    // export GODOT4="/Applications/Godot.app/Contents/MacOS/Godot"
+    // export GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
     {
       "name": "🧪 Debug Tests",
       "type": "coreclr",

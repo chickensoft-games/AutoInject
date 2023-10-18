@@ -155,6 +155,30 @@ You can provide fallback values to use when a provider can't be found. This can 
 public string MyDependency => DependOn<string>(() => "fallback_value");
 ```
 
+### Faking Dependencies
+
+Sometimes, when testing, you may wish to "fake" the value of a dependency. Faked dependencies take precedence over any providers that may exist above the dependent node, as well as any provided fallback value.
+
+```csharp
+  [Test]
+  public void FakesDependency() {
+    // Some dependent 
+    var dependent = new MyNode();
+
+    var fakeValue = "I'm fake!";
+    dependent.FakeDependency(fakeValue);
+
+    TestScene.AddChild(dependent);
+
+    dependent._Notification((int)Node.NotificationReady);
+
+    dependent.OnResolvedCalled.ShouldBeTrue();
+    dependent.MyDependency.ShouldBe(fakeValue);
+
+    TestScene.RemoveChild(dependent);
+  }
+```
+
 ## How AutoInject Works
 
 AutoInject uses a simple, specific algorithm to resolve dependencies.

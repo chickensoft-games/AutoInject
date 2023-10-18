@@ -35,6 +35,31 @@ public interface IDependent : ISuperNode {
   /// <para>Don't call this method.</para>
   /// </summary>
   void _AnnounceDependenciesResolved() { }
+
+  /// <summary>
+  /// Add a fake value to the dependency table. Adding a fake value allows a
+  /// unit test to override a dependency lookup with a fake value.
+  /// </summary>
+  /// <param name="value">Dependency value (probably a mock or a fake).</param>
+  /// <typeparam name="T">Dependency type.</typeparam>
+  void FakeDependency<T>(T value) where T : notnull;
+
+  /// <summary>
+  /// Returns a dependency that was resolved from an ancestor provider node.
+  /// </summary>
+  /// <typeparam name="TValue">The type of the value to resolve.</typeparam>
+  /// <param name="fallback">Fallback value to use if a provider for this type
+  /// wasn't found during dependency resolution.</param>
+  /// <returns>
+  /// The resolved dependency value, the fallback value, or throws an exception
+  /// if the provider wasn't found during dependency resolution and a fallback
+  /// value was not given
+  /// </returns>
+  /// <exception cref="ProviderNotFoundException">Thrown if the provider for
+  /// the requested value could not be found and when no fallback value is
+  /// specified.</exception>
+  TValue DependOn<TValue>(Func<TValue>? fallback = default)
+    where TValue : notnull;
 }
 
 /// <summary>
@@ -139,6 +164,18 @@ public abstract partial class Dependent : Node, IDependent {
   /// specified.</exception>
   public TValue DependOn<TValue>(Func<TValue>? fallback = default)
     where TValue : notnull => DependencyResolver.DependOn(this, fallback);
+
+
+  /// <summary>
+  /// Add a fake value to the dependency table. Adding a fake value allows a
+  /// unit test to override a dependency lookup with a fake value.
+  /// </summary>
+  /// <param name="value">Dependency value (probably a mock or a fake).</param>
+  /// <typeparam name="T">Dependency type.</typeparam>
+  public void FakeDependency<T>(T value) where T : notnull {
+    DependentState.ProviderFakes[typeof(T)] =
+      new DependencyResolver.DefaultProvider(value);
+  }
 }
 
 /// <summary>
@@ -164,6 +201,15 @@ public class DependencyState {
   /// </summary>
   public Dictionary<IProvider, PendingProvider> Pending { get; }
     = new();
+
+  /// <summary>
+  /// Overrides for providers keyed by dependency type. Overriding providers
+  /// allows nodes being unit-tested to provide fake providers during unit tests
+  /// that return mock or faked values.
+  /// </summary>
+  public Dictionary<Type, DependencyResolver.DefaultProvider> ProviderFakes {
+    get;
+  } = new();
 }
 
 public record PendingProvider(
@@ -288,6 +334,18 @@ public static class DependencyResolver {
   public static TValue DependOn<TValue>(
     IDependent dependent, Func<TValue>? fallback = default
   ) where TValue : notnull {
+    // First, check dependency fakes. Using a faked value takes priority over
+    // all the other dependency resolution methods.
+    if (dependent.DependentState.ProviderFakes.TryGetValue(
+        typeof(TValue), out var fakeProvider
+      )
+    ) {
+      return fakeProvider.Value();
+    }
+
+    // Lookup dependency, per usual, respecting any fallback values if there
+    // were no resolved providers for the requested type during dependency
+    // resolution.
     if (dependent.DependentState.Dependencies.TryGetValue(
         typeof(TValue), out var providerNode
       )

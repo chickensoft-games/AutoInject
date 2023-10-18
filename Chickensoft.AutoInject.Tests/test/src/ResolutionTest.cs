@@ -207,6 +207,23 @@ public class ResolutionTest : TestClass {
     dependent.OnResolvedCalled.ShouldBeTrue();
   }
 
+  [Test]
+  public void FakesDependency() {
+    var dependent = new FakedDependent();
+
+    var fakeValue = "I'm fake!";
+    dependent.FakeDependency(fakeValue);
+
+    TestScene.AddChild(dependent);
+
+    dependent._Notification((int)Node.NotificationReady);
+
+    dependent.OnResolvedCalled.ShouldBeTrue();
+    dependent.MyDependency.ShouldBe(fakeValue);
+
+    TestScene.RemoveChild(dependent);
+  }
+
   public class BadProvider : IProvider {
     public ProviderState ProviderState { get; }
 

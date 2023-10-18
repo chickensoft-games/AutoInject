@@ -22,6 +22,22 @@ public partial class StringDependent : Node {
 }
 
 [SuperNode(typeof(Dependent))]
+public partial class FakedDependent : Node {
+  public override partial void _Notification(int what);
+
+  [Dependency]
+  public string MyDependency => DependOn(() => "fallback");
+
+  public bool OnResolvedCalled { get; private set; }
+  public string ResolvedValue { get; set; } = "";
+
+  public void OnResolved() {
+    OnResolvedCalled = true;
+    ResolvedValue = MyDependency;
+  }
+}
+
+[SuperNode(typeof(Dependent))]
 public partial class StringDependentFallback : Node {
   public override partial void _Notification(int what);
 

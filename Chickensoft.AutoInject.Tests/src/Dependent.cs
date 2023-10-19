@@ -22,6 +22,21 @@ public interface IDependent : ISuperNode {
   event Action? OnDependenciesResolved;
 
   /// <summary>
+  /// True if the node is being unit-tested. When unit-tested, setup callbacks
+  /// will not be invoked.
+  /// </summary>
+  bool IsTesting { get; set; }
+
+  /// <summary>
+  /// Called after dependencies are resolved, but before
+  /// <see cref="OnResolved" /> is called if (and only if)
+  /// <see cref="IsTesting" /> is false. This allows you to initialize
+  /// properties that depend on dependencies separate from using those
+  /// properties to facilitate easier testing.
+  /// </summary>
+  void Setup() { }
+
+  /// <summary>
   /// Method that is invoked when all of the dependent node's dependencies are
   /// resolved (after _Ready() but before _Process()).
   /// </summary>
@@ -53,7 +68,7 @@ public interface IDependent : ISuperNode {
   /// <returns>
   /// The resolved dependency value, the fallback value, or throws an exception
   /// if the provider wasn't found during dependency resolution and a fallback
-  /// value was not given
+  /// value was not given.
   /// </returns>
   /// <exception cref="ProviderNotFoundException">Thrown if the provider for
   /// the requested value could not be found and when no fallback value is
@@ -72,6 +87,12 @@ public abstract partial class Dependent : Node, IDependent {
   #region SuperNodesStaticReflectionStubs
   // These static stubs don't need to be copied over because we'll be copied
   // into a SuperNode that declares these.
+
+  /// <summary>
+  /// True if the node is being unit-tested. When unit-tested, setup callbacks
+  /// will not be invoked.
+  /// </summary>
+  public bool IsTesting { get; set; } = false;
 
   [PowerUpIgnore]
   public static ImmutableDictionary<string, ScriptPropertyOrField>
@@ -395,6 +416,9 @@ public static class DependencyResolver {
     var providersInitializing = 0;
 
     void resolve() {
+      if (!dependent.IsTesting) {
+        dependent.Setup();
+      }
       dependent.OnResolved();
       dependent._AnnounceDependenciesResolved();
     }

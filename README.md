@@ -39,9 +39,9 @@ Simply add the following to your project's `.csproj` file. Be sure to check the 
 
 ```xml
 <ItemGroup>
-    <PackageReference Include="Chickensoft.SuperNodes" Version="1.2.0" PrivateAssets="all" OutputItemType="analyzer" />
-    <PackageReference Include="Chickensoft.SuperNodes.Types" Version="1.2.0" />
-    <PackageReference Include="Chickensoft.AutoInject" Version="1.0.0" PrivateAssets="all" />
+    <PackageReference Include="Chickensoft.SuperNodes" Version="1.8.0" PrivateAssets="all" OutputItemType="analyzer" />
+    <PackageReference Include="Chickensoft.SuperNodes.Types" Version="1.8.0" />
+    <PackageReference Include="Chickensoft.AutoInject" Version="1.6.0" PrivateAssets="all" />
 </ItemGroup>
 ```
 

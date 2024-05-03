@@ -1,6 +1,6 @@
 <Project Sdk="Godot.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
@@ -14,9 +14,14 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Chickensoft.GoDotTest" Version="1.1.7" />
-    <PackageReference Include="GodotTestDriver" Version="2.1.0" />
+    <Compile Include="../Chickensoft.AutoInject/src/**/*.cs" Link="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Chickensoft.GoDotTest" Version="1.4.0" />
+    <PackageReference Include="Chickensoft.GodotTestDriver" Version="3.0.0" />
     <!-- Bring your own assertion library for tests! -->
     <!-- We're using Shouldly for this example, but you can use anything. -->
     <PackageReference Include="Shouldly" Version="4.1.0" />
@@ -24,8 +29,8 @@
     <PackageReference Include="LightMock.Generator" Version="1.2.2" />
     <!-- LightMoq is a Chickensoft package which makes it more like Moq. -->
     <PackageReference Include="LightMoq" Version="0.1.0" />
-    <PackageReference Include="Chickensoft.SuperNodes" Version="1.2.0" PrivateAssets="all" OutputItemType="analyzer" />
-    <PackageReference Include="Chickensoft.SuperNodes.Types" Version="1.2.0" />
+    <PackageReference Include="Chickensoft.SuperNodes" Version="1.8.0" PrivateAssets="all" OutputItemType="analyzer" />
+    <PackageReference Include="Chickensoft.SuperNodes.Types" Version="1.8.0" />
     <!-- Include project to test. -->
     <!-- <PackageReference Include="Chickensoft.AutoInject" Version="1.0.0" PrivateAssets="all" /> -->
   </ItemGroup>

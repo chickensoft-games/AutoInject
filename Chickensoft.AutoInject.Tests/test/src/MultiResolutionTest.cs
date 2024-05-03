@@ -16,9 +16,9 @@ public class MultiResolutionTest : TestClass {
   public MultiResolutionTest(Node testScene) : base(testScene) { }
 
   [Setup]
-  public async Task Setup() {
+  public void Setup() {
     _fixture = new Fixture(TestScene.GetTree());
-    _provider = await _fixture.LoadAndAddScene<MultiProvider>(
+    _provider = _fixture.LoadScene<MultiProvider>(
       "res://test/fixtures/MultiProvider.tscn"
     );
   }
@@ -28,8 +28,9 @@ public class MultiResolutionTest : TestClass {
 
   [Test]
   public async Task MultiDependentSubscribesToMultiProviderCorrectly() {
+    await _fixture.AddToRoot(_provider);
+    await _provider.WaitForEvents();
     _provider.Child.ReadyCalled.ShouldBeTrue();
-    await TestScene.ProcessFrame(2);
     _provider.Child.OnResolvedCalled.ShouldBeTrue();
   }
 }

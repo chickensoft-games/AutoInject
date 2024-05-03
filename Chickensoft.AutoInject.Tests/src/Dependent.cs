@@ -411,7 +411,8 @@ public static class DependencyResolver {
     var shouldResolve = true;
     var remainingDependencies =
       new HashSet<ScriptPropertyOrField>(dependenciesToResolve.Values);
-    var node = (Node)dependent;
+
+    var node = ((Node)dependent).GetParent();
     var foundDependencies = new HashSet<ScriptPropertyOrField>();
     var providersInitializing = 0;
 

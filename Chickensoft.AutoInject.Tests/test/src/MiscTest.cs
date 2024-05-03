@@ -42,7 +42,7 @@ public class MiscTest : TestClass {
   public void DependencyPendingCancels() {
     var provider = new StringProvider();
     var initialized = false;
-    var onInitialized = void (IProvider provider) => initialized = true;
+    void onInitialized(IProvider provider) => initialized = true;
 
     provider.ProviderState.OnInitialized += onInitialized;
 

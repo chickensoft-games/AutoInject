@@ -1,9 +1,9 @@
 {
   "[csharp]": {
     "editor.codeActionsOnSave": {
-      "source.addMissingImports": true,
-      "source.fixAll": true,
-      "source.organizeImports": true
+      "source.addMissingImports": "explicit",
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
     },
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
@@ -137,12 +137,6 @@
   "markdownlint.ignore": [
     "**/LICENSE"
   ],
-  "omnisharp.enableEditorConfigSupport": true,
-  "omnisharp.enableMsBuildLoadProjectsOnDemand": false,
-  "omnisharp.enableRoslynAnalyzers": true,
-  "omnisharp.maxFindSymbolsItems": 3000,
-  "omnisharp.organizeImportsOnFormat": true,
-  "omnisharp.useModernNet": true,
   // Remove these if you're happy with your terminal profiles.
   "terminal.integrated.defaultProfile.windows": "Git Bash",
   "terminal.integrated.profiles.windows": {

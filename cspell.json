@@ -13,6 +13,9 @@
     "Chickensoft.AutoInject/nupkg/**/*.*"
   ],
   "words": [
+    "devbuild",
+    "mktemp",
+    "skipautoprops",
     "assemblyfilters",
     "automerge",
     "branchcoverage",

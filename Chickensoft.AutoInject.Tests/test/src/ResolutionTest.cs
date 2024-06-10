@@ -5,9 +5,7 @@ using Chickensoft.GoDotTest;
 using Godot;
 using Shouldly;
 
-public class ResolutionTest : TestClass {
-  public ResolutionTest(Node testScene) : base(testScene) { }
-
+public class ResolutionTest(Node testScene) : TestClass(testScene) {
   [Test]
   public void Provides() {
     var value = "Hello, world!";
@@ -23,105 +21,102 @@ public class ResolutionTest : TestClass {
   [Test]
   public void ProviderResetsOnTreeExit() {
     var value = "Hello, world!";
-    var provider = new StringProvider() { Value = value };
+    var obj = new StringProvider() { Value = value };
+    var provider = obj as IBaseProvider;
 
     ((IProvide<string>)provider).Value().ShouldBe(value);
 
-    provider._Notification((int)Node.NotificationReady);
-
+    obj._Notification((int)Node.NotificationReady);
     provider.ProviderState.IsInitialized.ShouldBeTrue();
 
-    provider._Notification((int)Node.NotificationExitTree);
-
+    obj._Notification((int)Node.NotificationExitTree);
     provider.ProviderState.IsInitialized.ShouldBeFalse();
   }
 
   [Test]
   public void ResolvesDependencyWhenProviderIsAlreadyInitialized() {
     var value = "Hello, world!";
-    var provider = new StringProvider() { Value = value };
+    var obj = new StringProvider() { Value = value };
+    var provider = obj as IBaseProvider;
     var dependent = new StringDependent();
 
-    provider.AddChild(dependent);
+    obj.AddChild(dependent);
 
     ((IProvide<string>)provider).Value().ShouldBe(value);
 
-    provider._Notification((int)Node.NotificationReady);
+    obj._Notification((int)Node.NotificationReady);
     provider.ProviderState.IsInitialized.ShouldBeTrue();
-    provider.OnProvidedCalled.ShouldBeTrue();
+    obj.OnProvidedCalled.ShouldBeTrue();
 
     dependent._Notification((int)Node.NotificationReady);
 
     dependent.OnResolvedCalled.ShouldBeTrue();
     dependent.ResolvedValue.ShouldBe(value);
 
-    provider.RemoveChild(dependent);
+    obj.RemoveChild(dependent);
     dependent.QueueFree();
-    provider.QueueFree();
+    obj.QueueFree();
   }
 
   [Test]
   public void ResolvesDependencyAfterProviderIsResolved() {
     var value = "Hello, world!";
-    var provider = new StringProvider() { Value = value };
+    var obj = new StringProvider() { Value = value };
+    var provider = obj as IBaseProvider;
     var dependent = new StringDependent();
 
-    provider.AddChild(dependent);
+    obj.AddChild(dependent);
 
     ((IProvide<string>)provider).Value().ShouldBe(value);
 
     dependent._Notification((int)Node.NotificationReady);
 
-    provider._Notification((int)Node.NotificationReady);
+    obj._Notification((int)Node.NotificationReady);
     provider.ProviderState.IsInitialized.ShouldBeTrue();
-    provider.OnProvidedCalled.ShouldBeTrue();
+    obj.OnProvidedCalled.ShouldBeTrue();
 
     dependent.OnResolvedCalled.ShouldBeTrue();
     dependent.ResolvedValue.ShouldBe(value);
-    dependent.DependentState.Pending.ShouldBeEmpty();
+    ((IDependent)dependent).DependentState.Pending.ShouldBeEmpty();
 
-    provider.RemoveChild(dependent);
+    obj.RemoveChild(dependent);
     dependent.QueueFree();
-    provider.QueueFree();
+    obj.QueueFree();
   }
 
   [Test]
   public void FindsDependenciesAcrossAncestors() {
     var value = "Hello, world!";
-    var providerA = new StringProvider() { Value = value };
-    var providerB = new IntProvider() { Value = 10 };
-    var dependent = new StringDependent();
 
-    var onResolvedCalled = false;
-    void onResolved() =>
-      onResolvedCalled = true;
+    var objA = new StringProvider() { Value = value };
+    var providerA = objA as IBaseProvider;
+    var objB = new IntProvider() { Value = 10 };
+    var providerB = objB as IBaseProvider;
+    var depObj = new StringDependent();
+    var dependent = depObj as IDependent;
 
-    dependent.OnDependenciesResolved += onResolved;
+    objA.AddChild(objB);
+    objA.AddChild(depObj);
 
-    providerA.AddChild(providerB);
-    providerB.AddChild(dependent);
+    depObj._Notification((int)Node.NotificationReady);
 
-    dependent._Notification((int)Node.NotificationReady);
-
-    providerA._Notification((int)Node.NotificationReady);
+    objA._Notification((int)Node.NotificationReady);
     providerA.ProviderState.IsInitialized.ShouldBeTrue();
-    providerA.OnProvidedCalled.ShouldBeTrue();
+    objA.OnProvidedCalled.ShouldBeTrue();
 
-    onResolvedCalled.ShouldBeTrue();
-
-    providerB._Notification((int)Node.NotificationReady);
+    objB._Notification((int)Node.NotificationReady);
     providerB.ProviderState.IsInitialized.ShouldBeTrue();
-    providerB.OnProvidedCalled.ShouldBeTrue();
+    objB.OnProvidedCalled.ShouldBeTrue();
 
-    dependent.OnResolvedCalled.ShouldBeTrue();
-    dependent.ResolvedValue.ShouldBe(value);
+    depObj.OnResolvedCalled.ShouldBeTrue();
+    depObj.ResolvedValue.ShouldBe(value);
     dependent.DependentState.Pending.ShouldBeEmpty();
 
-    providerA.RemoveChild(providerB);
-    providerB.RemoveChild(dependent);
-    dependent.QueueFree();
-    providerB.QueueFree();
-    providerA.QueueFree();
+    objA.RemoveChild(objB);
+    objB.RemoveChild(depObj);
+    depObj.QueueFree();
+    objB.QueueFree();
+    objA.QueueFree();
   }
 
   [Test]
@@ -148,36 +143,38 @@ public class ResolutionTest : TestClass {
   [Test]
   public void ThrowsOnDependencyTableThatWasTamperedWith() {
     var fallback = "Hello, world!";
-    var dependent = new StringDependentFallback {
+    var depObj = new StringDependentFallback {
       FallbackValue = fallback
     };
+    var dependent = depObj as IDependent;
 
-    dependent._Notification((int)Node.NotificationReady);
+    depObj._Notification((int)Node.NotificationReady);
 
     dependent.DependentState.Dependencies[typeof(string)] = new BadProvider();
 
     Should.Throw<ProviderNotFoundException>(
-      () => dependent.MyDependency.ShouldBe(fallback)
+      () => depObj.MyDependency.ShouldBe(fallback)
     );
   }
 
   [Test]
   public void DependentCancelsPendingIfRemovedFromTree() {
     var provider = new StringProvider();
-    var dependent = new StringDependent();
+    var depObj = new StringDependent();
+    var dependent = depObj as IDependent;
 
-    provider.AddChild(dependent);
+    provider.AddChild(depObj);
 
-    dependent._Notification((int)Node.NotificationReady);
+    depObj._Notification((int)Node.NotificationReady);
 
     dependent.DependentState.Pending.ShouldNotBeEmpty();
 
-    dependent._Notification((int)Node.NotificationExitTree);
+    depObj._Notification((int)Node.NotificationExitTree);
 
     dependent.DependentState.Pending.ShouldBeEmpty();
 
-    provider.RemoveChild(dependent);
-    dependent.QueueFree();
+    provider.RemoveChild(depObj);
+    depObj.QueueFree();
     provider.QueueFree();
   }
 
@@ -224,7 +221,7 @@ public class ResolutionTest : TestClass {
     TestScene.RemoveChild(dependent);
   }
 
-  public class BadProvider : IProvider {
+  public class BadProvider : IBaseProvider {
     public ProviderState ProviderState { get; }
 
     public BadProvider() {

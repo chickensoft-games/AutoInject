@@ -6,7 +6,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
-    <OutputPath>../nupkg</OutputPath>
+    <OutputPath>./nupkg</OutputPath>
 
     <IsPackable>true</IsPackable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -20,8 +20,8 @@
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
 
     <Title>AutoInject</Title>
-    <Version>1.6.0</Version>
-    <Description>Node-based dependency for C# Godot scripts — without reflection!</Description>
+    <Version>0.0.0-devbuild</Version>
+    <Description>Node-based dependency injection for C# Godot scripts — without reflection!</Description>
     <Copyright>© 2023 Chickensoft</Copyright>
     <Authors>Chickensoft</Authors>
     <Company>Chickensoft</Company>
@@ -29,13 +29,13 @@
     <PackageId>Chickensoft.AutoInject</PackageId>
     <PackageReleaseNotes>Chickensoft.AutoInject release.</PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageTags />
+    <PackageTags>dependency injection; di; godot; chickensoft; nodes</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl></PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/chickensoft-games/AutoInject</PackageProjectUrl>
 
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl></RepositoryUrl>
+    <RepositoryUrl>https://github.com/chickensoft-games/AutoInject</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -45,8 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Dependencies go here. -->
-    <PackageReference Include="GodotSharp" Version="4.0.2" />
   </ItemGroup>
 
   <ItemGroup>

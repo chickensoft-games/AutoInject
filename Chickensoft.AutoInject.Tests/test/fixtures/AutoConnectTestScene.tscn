@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://bc0rrd0etom5k"]
+
+[ext_resource type="Script" path="res://test/fixtures/AutoConnectTestScene.cs" id="1_ego6e"]
+
+[node name="AutoConnectTestScene" type="Node2D"]
+script = ExtResource("1_ego6e")
+
+[node name="Path" type="Node2D" parent="."]
+
+[node name="To" type="Node2D" parent="Path"]
+
+[node name="MyNode" type="Node2D" parent="Path/To"]
+
+[node name="MyUniqueNode" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="OtherUniqueName" type="Node2D" parent="."]
+unique_name_in_owner = true

@@ -8,12 +8,9 @@ using GodotTestDriver;
 using GodotTestDriver.Util;
 using Shouldly;
 
-#pragma warning disable CA1001
-public class MultiResolutionTest : TestClass {
+public class MultiResolutionTest(Node testScene) : TestClass(testScene) {
   private Fixture _fixture = default!;
   private MultiProvider _provider = default!;
-
-  public MultiResolutionTest(Node testScene) : base(testScene) { }
 
   [Setup]
   public void Setup() {
@@ -34,4 +31,3 @@ public class MultiResolutionTest : TestClass {
     _provider.Child.OnResolvedCalled.ShouldBeTrue();
   }
 }
-#pragma warning restore CA1001

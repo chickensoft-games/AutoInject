@@ -2,12 +2,12 @@ namespace Chickensoft.AutoInject.Tests.Fixtures;
 
 using Chickensoft.AutoInject;
 using Chickensoft.AutoInject.Tests.Subjects;
+using Chickensoft.Introspection;
 using Godot;
-using SuperNodes.Types;
 
-[SuperNode(typeof(Provider))]
+[Meta(typeof(IAutoOn), typeof(IProvider))]
 public partial class MultiProvider : Node2D, IProvide<int>, IProvide<string> {
-  public override partial void _Notification(int what);
+  public override void _Notification(int what) => this.Notify(what);
 
   int IProvide<int>.Value() => IntValue;
   string IProvide<string>.Value() => StringValue;
@@ -18,7 +18,7 @@ public partial class MultiProvider : Node2D, IProvide<int>, IProvide<string> {
     Child = new MultiDependent();
     AddChild(Child);
 
-    Provide();
+    this.Provide();
   }
 
   public bool OnProvidedCalled { get; private set; }

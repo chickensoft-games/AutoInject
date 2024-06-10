@@ -29,6 +29,7 @@
     "issuecomment",
     "lcov",
     "linecoverage",
+    "Metatype",
     "methodcoverage",
     "missingall",
     "msbuild",
@@ -42,6 +43,8 @@
     "OPTOUT",
     "paramref",
     "pascalcase",
+    "Postinitialize",
+    "Predelete",
     "renovatebot",
     "reportgenerator",
     "reporttypes",
@@ -54,6 +57,7 @@
     "typeparam",
     "typeparamref",
     "ulong",
+    "Unparented",
     "Xunit"
   ]
 }

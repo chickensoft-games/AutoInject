@@ -1,5 +1,3 @@
-Chickensoft.AutoInject/nupkg/
-
 Chickensoft.AutoInject.Tests/coverage/*
 !Chickensoft.AutoInject.Tests/coverage/.gdignore
 
@@ -9,5 +7,5 @@ obj/
 .generated/
 .vs/
 .DS_Store
-nupkg/*
-!nupkg/.gitkeep
+# Chickensoft.AutoInject/nupkg/
+!Chickensoft.AutoInject/nupkg/.gitkeep

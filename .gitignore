@@ -7,5 +7,5 @@ obj/
 .generated/
 .vs/
 .DS_Store
-# Chickensoft.AutoInject/nupkg/
+Chickensoft.AutoInject/nupkg/
 !Chickensoft.AutoInject/nupkg/.gitkeep

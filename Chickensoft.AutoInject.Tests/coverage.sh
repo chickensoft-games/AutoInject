@@ -33,7 +33,8 @@ coverlet \
   --exclude-by-file "**/test/**/*.cs" \
   --exclude-by-file "**/*Microsoft.NET.Test.Sdk.Program.cs" \
   --exclude-by-file "**/Godot.SourceGenerators/**/*.cs" \
-  --exclude-assemblies-without-sources "missingall"
+  --exclude-assemblies-without-sources "missingall" \
+  --skipautoprops
 
 # Projects included via <ProjectReference> will be collected in code coverage.
 # If you want to exclude them, replace the string below with the names of
@@ -45,7 +46,7 @@ reportgenerator \
   -reports:"./coverage/coverage.xml" \
   -targetdir:"./coverage/report" \
   "-assemblyfilters:$ASSEMBLIES_TO_REMOVE" \
-  "-classfilters:-GodotPlugins.Game.Main;-Chickensoft.AutoInject.Tests.*;-Chickensoft.AutoInject.IDependent;-Chickensoft.AutoInject.Dependent;-Chickensoft.AutoInject.IProvider;-Chickensoft.AutoInject.Provider" \
+  "-classfilters:-TypeRegistry;-GodotPlugins.Game.Main;-Chickensoft.AutoInject.Tests.*;-Chickensoft.AutoInject.IDependent;-Chickensoft.AutoInject.Dependent;-Chickensoft.AutoInject.IProvider;-Chickensoft.AutoInject.Provider" \
   -reporttypes:"Html;Badges"
 
 # Copy badges into their own folder. The badges folder should be included in

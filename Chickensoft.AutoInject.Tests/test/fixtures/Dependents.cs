@@ -1,14 +1,14 @@
 namespace Chickensoft.AutoInject.Tests.Subjects;
 
+using Chickensoft.Introspection;
 using Godot;
-using SuperNodes.Types;
 
-[SuperNode(typeof(Dependent))]
+[Meta(typeof(IAutoOn), typeof(IDependent))]
 public partial class StringDependent : Node {
-  public override partial void _Notification(int what);
+  public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
-  public string MyDependency => DependOn<string>();
+  public string MyDependency => this.DependOn<string>();
 
   public bool OnResolvedCalled { get; private set; }
   public string ResolvedValue { get; set; } = "";
@@ -21,12 +21,12 @@ public partial class StringDependent : Node {
   }
 }
 
-[SuperNode(typeof(Dependent))]
+[Meta(typeof(IAutoOn), typeof(IDependent))]
 public partial class FakedDependent : Node {
-  public override partial void _Notification(int what);
+  public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
-  public string MyDependency => DependOn(() => "fallback");
+  public string MyDependency => this.DependOn(() => "fallback");
 
   public bool OnResolvedCalled { get; private set; }
   public string ResolvedValue { get; set; } = "";
@@ -37,12 +37,12 @@ public partial class FakedDependent : Node {
   }
 }
 
-[SuperNode(typeof(Dependent))]
+[Meta(typeof(IAutoOn), typeof(IDependent))]
 public partial class StringDependentFallback : Node {
-  public override partial void _Notification(int what);
+  public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
-  public string MyDependency => DependOn(() => FallbackValue);
+  public string MyDependency => this.DependOn(() => FallbackValue);
 
   public string FallbackValue { get; set; } = "";
   public bool OnResolvedCalled { get; private set; }
@@ -56,12 +56,12 @@ public partial class StringDependentFallback : Node {
   }
 }
 
-[SuperNode(typeof(Dependent))]
+[Meta(typeof(IAutoOn), typeof(IDependent))]
 public partial class IntDependent : Node {
-  public override partial void _Notification(int what);
+  public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
-  public int MyDependency => DependOn<int>();
+  public int MyDependency => this.DependOn<int>();
 
   public bool OnResolvedCalled { get; private set; }
   public int ResolvedValue { get; set; }
@@ -74,15 +74,15 @@ public partial class IntDependent : Node {
   }
 }
 
-[SuperNode(typeof(Dependent))]
+[Meta(typeof(IAutoOn), typeof(IDependent))]
 public partial class MultiDependent : Node {
-  public override partial void _Notification(int what);
+  public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
-  public int IntDependency => DependOn<int>();
+  public int IntDependency => this.DependOn<int>();
 
   [Dependency]
-  public string StringDependency => DependOn<string>();
+  public string StringDependency => this.DependOn<string>();
 
   public bool OnResolvedCalled { get; private set; }
   public int IntResolvedValue { get; set; }
@@ -97,9 +97,9 @@ public partial class MultiDependent : Node {
   }
 }
 
-[SuperNode(typeof(Dependent))]
+[Meta(typeof(IAutoOn), typeof(IDependent))]
 public partial class NoDependenciesDependent : Node {
-  public override partial void _Notification(int what);
+  public override void _Notification(int what) => this.Notify(what);
 
   public bool OnResolvedCalled { get; private set; }
 

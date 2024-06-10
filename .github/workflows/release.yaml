@@ -1,0 +1,138 @@
+name: "📦 Release"
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "version bump method: major, minor, patch"
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+        required: true
+        default: patch
+
+jobs:
+  publish:
+    name: 📦 Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🧾 Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_BASIC }}
+          lfs: true
+          submodules: "recursive"
+          fetch-depth: 0 # So we can get all tags.
+
+      - name: 🔎 Read Current Project Version
+        id: current-version
+        uses: WyriHaximus/github-action-get-previous-tag@v1
+        with:
+          fallback: "0.0.0-devbuild"
+
+      - name: 🖨 Print Current Version
+        run: |
+          echo "Current Version: ${{ steps.current-version.outputs.tag }}"
+
+      - name: 🧮 Compute Next Version
+        uses: chickensoft-games/next-godot-csproj-version@v1
+        id: next-version
+        with:
+          project-version: ${{ steps.current-version.outputs.tag }}
+          godot-version: global.json
+          bump: ${{ inputs.bump }}
+
+      - name: ✨ Print Next Version
+        run: |
+          echo "Next Version: ${{ steps.next-version.outputs.version }}"
+
+      # Write version to file so .NET will build correct version.
+      - name: 📝 Write Version to File
+        uses: jacobtomlinson/gha-find-replace@v3
+        with:
+          find: "0.0.0-devbuild"
+          replace: ${{ steps.next-version.outputs.version }}
+          regex: false
+          include: Chickensoft.AutoInject/Chickensoft.AutoInject.csproj
+
+      - name: 🖨 Copy Source to Source-Only package
+        run: |
+          # Copy source files from Chickensoft.AutoInject.Tests/src/**/*.cs
+          # to Chickensoft.AutoInject/src/**/*.cs
+          #
+          # Because source-only packages are hard to develop and test, we
+          # actually keep the source that goes in the source-only package inside
+          # the test project to make it easier to develop and test.
+          #
+          # we can always copy it right before publishing the package.
+
+          mkdir -p Chickensoft.AutoInject/src
+          cp -v -r Chickensoft.AutoInject.Tests/src/* Chickensoft.AutoInject/src/
+
+      - name: 🤐 Suppress Warnings From Files
+        run: |
+          # Define the multiline prefix and suffix
+          PREFIX="#pragma warning disable
+          #nullable enable
+          "
+          SUFFIX="
+          #nullable restore
+          #pragma warning restore"
+
+          # Function to add prefix and suffix to a file
+          add_prefix_suffix() {
+              local file="$1"
+              # Create a temporary file
+              tmp_file=$(mktemp)
+
+              # Add prefix, content of the file, and suffix to the temporary file
+              {
+                  echo "$PREFIX"
+                  cat "$file"
+                  echo "$SUFFIX"
+              } > "$tmp_file"
+
+              # Move the temporary file to the original file
+              mv "$tmp_file" "$file"
+          }
+
+          # Export the function and variables so they can be used by find
+          export -f add_prefix_suffix
+          export PREFIX
+          export SUFFIX
+
+          # Find all files and apply the function
+          find Chickensoft.AutoInject/src -type f -name "*.cs" -exec bash -c 'add_prefix_suffix "$0"' {} \;
+
+      - name: 💽 Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          # Use the .NET SDK from global.json in the root of the repository.
+          global-json-file: global.json
+
+      - name: 🛠 Build Source-Only Package
+        working-directory: Chickensoft.AutoInject
+        run: |
+          dotnet build -c Release
+
+      - name: 🔎 Get Package Path
+        id: package-path
+        run: |
+          package=$(find ./Chickensoft.AutoInject/nupkg -name "*.nupkg")
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "📦 Found package: $package"
+
+      - name: ✨ Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_BASIC }}
+        run: |
+          version="${{ steps.next-version.outputs.version }}"
+          gh release create --title "v$version" --generate-notes "$version" \
+            "${{ steps.package-path.outputs.package }}"
+
+      - name: 🛜 Publish to Nuget
+        run: |
+          dotnet nuget push "${{ steps.package-path.outputs.package }}" \
+            --api-key "${{ secrets.NUGET_API_KEY }}" \
+            --source "https://api.nuget.org/v3/index.json" --skip-duplicate

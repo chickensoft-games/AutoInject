@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://gvbk8s4ox36p"]
+
+[ext_resource type="Script" path="res://test/fixtures/AutoConnectMissingTestScene.cs" id="1_5ywa5"]
+
+[node name="AutoConnectMissingTestScene" type="Node2D"]
+script = ExtResource("1_5ywa5")

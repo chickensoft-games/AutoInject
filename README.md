@@ -2,7 +2,7 @@
 
 [![Chickensoft Badge][chickensoft-badge]][chickensoft-website] [![Discord][discord-badge]][discord] [![Read the docs][read-the-docs-badge]][docs] ![line coverage][line-coverage] ![branch coverage][branch-coverage]
 
-Node-based dependency injection for C# Godot scripts at build-time.
+Node-based dependency injection for C# Godot scripts at build-time, including utilities for automatic node-binding, additional lifecycle hooks, and .net-inspired notification callbacks.
 
 ---
 
@@ -31,47 +31,97 @@ Providing nodes "top-down" over sections of the game's scene tree has a few adva
 - ✅ Dependencies are resolved when the node enters the scene tree, allowing for O(1) access afterwards. Exiting and re-entering the scene tree triggers the dependency resolution process again.
 - ✅ Scripts can be both dependents and providers.
 
+## 📼 About Mixins
+
+The [Introspection] generator that AutoInject uses allows you to add [mixins] to an existing C# class. Mixins are similar to interfaces, but they allow a node to gain additional instance state, as well as allow the node to know which mixins are applied to it and invoke mixin handler methods — all without reflection.
+
+In addition, AutoInject provides a few extra utilities to make working with node scripts even easier:
+
+- 🎮 `IAutoOn`: allow node scripts to implement .NET-style handler methods for Godot notifications: i.e., `OnReady`, `OnProcess`, etc.
+- 🪢 `IAutoConnect`: automatically bind properties marked with `[Node]` to a node in the scene tree — also provides access to nodes via their interfaces using [GodotNodeInterfaces].
+- 🛠 `IAutoInit`: adds an additional lifecycle method that is called before `_Ready` if (and only if) the node's `IsTesting` property is set to false. The additional lifecycle method for production code enables you to more easily unit test code by separating initialization logic from the engine lifecycle.
+- 🎁 `IProvider`: a node that provides one or more dependencies to its descendants. Providers must implement `IProvide<T>` for each type of value they provide.
+- 🔗 `IDependent`: a node that depends on one or more dependencies from its ancestors. Dependent nodes must mark their dependencies with the `[Dependency]` attribute and call `this.DependOn<T>()` to retrieve the value.
+- 🐤 `IAutoNode`: a mixin that applies all of the above mixins to a node script at once.
+
+Want all the functionality that AutoInject provides? Simply add this to your Godot node:
+
+```csharp
+using Chickensoft.AutoInject;
+using Chickensoft.Introspection;
+using Godot;
+
+// Apply all of the AutoInject mixins at once:
+[Meta(typeof(IAutoNode))]
+public partial class MyNode : Node { }
+```
+
+Alternatively, you can use just the mixins you need from this project.
+
+```csharp
+[Meta(
+  typeof(IAutoOn),
+  typeof(IAutoConnect),
+  typeof(IAutoInit),
+  typeof(IProvider),
+  typeof(IDependent)
+)]
+public partial class MyNode : Node { }
+```
+
+> [!IMPORTANT]
+> For the mixins to work, you must override `_Notification` in your node script and call `this.Notify(what)` from it. This is necessary for the mixins to know when to invoke their handler methods. Unfortunately, there is no way around this since Godot must see the `_Notification` method in your script to generate handlers for it.
+>
+> ```csharp
+> public override void _Notification(int what) => this.Notify(what);
+> ```
+
 ## 📦 Installation
 
-AutoInject is a source-only package that uses the [SuperNodes] source generator to generate the necessary dependency injection code at build-time. You'll need to include SuperNodes, the SuperNodes runtime types, and AutoInject in your project. All of the packages are extremely lightweight.
+AutoInject is a source-only package that uses the [Introspection] source generator. AutoInject provides two mixins: `IDependent` and `IProvider` that must be applied with the Introspection generator's `[Meta]`.
 
-Simply add the following to your project's `.csproj` file. Be sure to check the latest versions for each package on [Nuget](https://www.nuget.org/packages?q=Chickensoft).
+You'll need to include `Chickensoft.Introspection`, `Chickensoft.Introspection.Generator`, and `Chickensoft.AutoInject` in your project. All of the packages are extremely lightweight.
+
+Simply add the following to your project's `.csproj` file. Be sure to specify the appropriate versions for each package by checking on [Nuget](https://www.nuget.org/packages?q=Chickensoft).
 
 ```xml
 <ItemGroup>
-    <PackageReference Include="Chickensoft.SuperNodes" Version="1.8.0" PrivateAssets="all" OutputItemType="analyzer" />
-    <PackageReference Include="Chickensoft.SuperNodes.Types" Version="1.8.0" />
-    <PackageReference Include="Chickensoft.AutoInject" Version="1.6.0" PrivateAssets="all" />
+    <PackageReference Include="Chickensoft.Introspection" Version="..." />
+    <PackageReference Include="Chickensoft.Introspection.Generator" Version="..." PrivateAssets="all" OutputItemType="analyzer" />
+    <PackageReference Include="Chickensoft.AutoInject" Version="..." PrivateAssets="all" />
 </ItemGroup>
 ```
 
-## 🐔 Providers
+> [!TIP]
+> Want to see AutoInject in action? Check out the Chickensoft [Game Demo].
 
-To provide values to descendant nodes, add the `Provider` [PowerUp] to your node script and implement `IProvide<T>` for each value you'd like to make available.
+## 🎁 Providers
 
-Once providers have initialized the values they provide, they must call the `Provide` method to inform AutoInject that their provided values are now available.
+To provide values to descendant nodes, add the `IProvider` mixin to your node script and implement `IProvide<T>` for each value you'd like to make available.
 
-The example below shows a node script that provides a `string` value to its descendants.
+Once providers have initialized the values they provide, they must call the `this.Provide()` extension method to inform AutoInject that the provided values are now available.
+
+The example below shows a node script that provides a `string` value to its descendants. Values are always provided by their type.
 
 ```csharp
 namespace MyGameProject;
 
 using Chickensoft.AutoInject;
+using Chickensoft.Introspection;
 using Godot;
-using SuperNodes.Types;
 
-[SuperNode(typeof(Provider))]
+[Meta(typeof(IAutoNode))]
 public partial class MyProvider : Node, IProvide<string> {
-  public override partial void _Notification(int what);
+  public override void _Notification(int what) => this.Notify(what);
 
   string IProvide<string>.Value() => "Value"
 
-  // Call the Provide() method once your dependencies have been initialized.
-  public void OnReady() => Provide();
+  // Call the this.Provide() method once your dependencies have been initialized.
+  public void OnReady() => this.Provide();
 
   public void OnProvided() {
     // You can optionally implement this method. It gets called once you call
-    // Provide() to inform AutoInject that the provided values are now 
+    // this.Provide() to inform AutoInject that the provided values are now 
     // available.
   }
 }
@@ -79,22 +129,22 @@ public partial class MyProvider : Node, IProvide<string> {
 
 ## 🐣 Dependents
 
-To use a provided value in a descendant node somewhere, add the `Dependent` PowerUp to your descendent node script and mark each dependency with the `[Dependency]` attribute. SuperNodes will automatically tell AutoInject when your node is ready and begin the dependency resolution process.
+To use a provided value in a descendant node somewhere, add the `IDependent` mixin to your descendent node script and mark each dependency with the `[Dependency]` attribute. The notification method override is used to automatically tell the mixins when your node is ready and begin the dependency resolution process.
 
-Once all of the dependencies in your dependent node are resolved, the `OnResolved` method of your dependent node will be called (if overridden).
+Once all of the dependencies in your dependent node are resolved, the `OnResolved()` method of your dependent node will be called (if overridden).
 
 ```csharp
 namespace MyGameProject;
 
+using Chickensoft.Introspection;
 using Godot;
-using SuperNodes.Types;
 
-[SuperNode(typeof(Dependent))]
+[Meta(typeof(IAutoNode))]
 public partial class StringDependent : Node {
-  public override partial void _Notification(int what);
+  public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
-  public string MyDependency => DependOn<string>();
+  public string MyDependency => this.DependOn<string>();
 
   public void OnResolved() {
     // All of my dependencies are now available! Do whatever you want with 
@@ -103,7 +153,7 @@ public partial class StringDependent : Node {
 }
 ```
 
-The `OnResolved` method will be called after `_Ready/OnReady`, but before the first frame if (and only if) all the providers it depends on call `Provide()` before the first frame.
+The `OnResolved` method will be called after `_Ready/OnReady`, but before the first frame if (and only if) all the providers it depends on call `this.Provide()` before the first frame.
 
 Essentially, `OnResolved` is called when the slowest provider has finished
 providing dependencies. For the best experience, do not wait until processing occurs to call `Provide` from your providers.
@@ -123,12 +173,12 @@ For best results, keep dependency trees simple and free from asynchronous initia
 Instead of subscribing to a parent node's events, consider subscribing to events emitted by the dependency values themselves.
 
 ```csharp
-[SuperNode(typeof(Dependent))]
+[Meta(typeof(IAutoNode))]
 public partial class MyDependent : Node {
-  public override partial void _Notification(int what);
+  public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
-  public MyValue Value => DependOn<MyValue>();
+  public MyValue Value => this.DependOn<MyValue>();
 
   public void OnResolved() {
     // Setup subscriptions once dependencies are valid.
@@ -152,7 +202,7 @@ You can provide fallback values to use when a provider can't be found. This can 
 
 ```csharp
 [Dependency]
-public string MyDependency => DependOn<string>(() => "fallback_value");
+public string MyDependency => this.DependOn<string>(() => "fallback_value");
 ```
 
 ### Faking Dependencies
@@ -179,22 +229,21 @@ Sometimes, when testing, you may wish to "fake" the value of a dependency. Faked
   }
 ```
 
-## How AutoInject Works
+## ❓ How AutoInject Works
 
 AutoInject uses a simple, specific algorithm to resolve dependencies.
 
-- When the Dependent PowerUp is added to a SuperNode, the SuperNodes generator will copy the code from the Dependent PowerUp into the node it was applied to.
-- A node script with the Dependent PowerUp observes its lifecycle. When it notices the `Node.NotificationReady` signal, it will begin the dependency resolution process without you having to write any code in your node script.
+- When the Dependent mixin is added to an introspective node, the Introspection generator will generate metadata about the type which allows AutoInject to determine what properties the type has, as well as see their attributes.
+- A node script with the Dependent mixin observes its lifecycle. When it notices the `Node.NotificationReady` signal, it will begin the dependency resolution process without you having to write any code in your node script.
 - The dependency process works as follows:
-  - All properties of the node script are inspected using SuperNode's static reflection table generation. This allows the script to introspect itself without having to resort to C#'s runtime reflection calls. Properties with the `[Dependency]` attribute are collected into the set of required dependencies.
+  - All properties of the node script are inspected using the metadata generated by the Introspection generator. This allows the script to introspect itself without having to resort to C#'s runtime reflection calls. Properties with the `[Dependency]` attribute are collected into the set of required dependencies.
   - All required dependencies are added to the remaining dependencies set.
   - The dependent node begins searching its ancestors, beginning with itself, then its parent, and so on up the tree.
     - If the current search node implements `IProvide` for any of the remaining dependencies, the individual resolution process begins.
-      - The dependency stores the provider in a dictionary property on your node script which was copied over from the Dependent PowerUp.
+      - The dependency stores the provider in a dictionary property in the node script.
       - The dependency is added to the set of found dependencies.
       - If the provider search node has not already provided its dependencies, the dependent subscribes to the `OnInitialized` event of the provider.
       - Pending dependency provider callbacks track a counter for the dependent node that also remove that provider's dependency from the remaining dependencies set and initiate the OnResolved process if nothing is left.
-      - Subscribing to an event on the provider node and tracking whether or not the provider is initialized is made possible by SuperNodes, which copies the code from the Provider PowerUp into the provider's node script.
     - After checking all the remaining dependencies, the set of found dependencies are removed from the remaining dependencies set and the found dependencies set is cleared for the next search node.
     - If all the dependencies are found, the dependent initiates the OnResolved process and finishes the search.
     - Otherwise, the search node's parent becomes the next parent to search.
@@ -202,9 +251,9 @@ AutoInject uses a simple, specific algorithm to resolve dependencies.
 
 There are some natural consequences to this algorithm, such as `OnResolved` not being invoked on a dependent until all providers have provided a value. This is intentional — providers are expected to synchronously initialize their provided values after `_Ready` has been invoked on them.
 
-AutoInject primarily exists to to locate providers from dependents and subscribe to the providers just long enough for their own `_Ready` method to be invoked — waiting longer than that to call `Provide` from a provider can introduce dependency resolution deadlock or other undesirable circumstances that are indicative of anti-patterns.
+AutoInject primarily exists to to locate providers from dependents and subscribe to the providers just long enough for their own `_Ready` method to be invoked — waiting longer than that to call `Provide` from a provider can introduce dependency resolution deadlock or other undesirable circumstances that are indicative of an anti-pattern.
 
-By calling `Provide()` from `_Ready` in provider nodes, you ensure that the order of execution unfolds as follows, synchronously:
+By calling `this.Provide()` from `_Ready` in provider nodes, you ensure that the order of execution unfolds as follows, synchronously:
 
   1. Dependent node `_Ready` (descendant of the provider, deepest nodes ready-up first).
   2. Provider node `_Ready` (which calls `Provide`).
@@ -213,11 +262,194 @@ By calling `Provide()` from `_Ready` in provider nodes, you ensure that the orde
   5. Frame 2 `_Process`
   6. Etc.
 
-By following the `Provide()` on `_Ready` convention, you guarantee all dependent nodes receive an `OnResolved` callback before the first process invocation occurs, guaranteeing that nodes are setup before frame processing begins ✨.
+By following the `this.Provide()` on `_Ready` convention, you guarantee all dependent nodes receive an `OnResolved` callback before the first process invocation occurs, guaranteeing that nodes are setup before frame processing begins ✨.
 
-> If your provider is also a dependent, you can call `Provide` from `OnResolved` to allow it to provide dependencies to its subtree, which still guarantees that dependency resolution happens before frame processing begins. Just don't wait until processing has started to call `Provide` from your providers!
+> [!TIP]
+> If your provider is also a dependent, you can call `this.Provide()` from `OnResolved()` to allow it to provide dependencies to its subtree, which still guarantees that dependency resolution happens before the next frame is processed.
 >
 > In general, dependents should have access to their dependencies **before** frame processing callbacks are invoked on them.
+
+## 🪢 IAutoConnect
+
+The `IAutoConnect` mixin automatically connects properties in your script to a declared node path or unique node name in the scene tree whenever the scene is instantiated, without reflection. It can also be used to connect nodes as interfaces.
+
+Simply apply the `[Node]` attribute to any field or property in your script that you want to automatically connect to a node in your scene.
+
+If you don't specify a node path in the `[Node]` attribute, the name of the field or property will be converted to a [unique node identifier][unique-nodes] name in PascalCase. For example, the field name below `_my_unique_node` is converted to the unique node path name `%MyUniqueNode` by converting the property name to PascalCase and prefixing the percent sign indicator. Likewise, the property name `MyUniqueNode` is converted to `%MyUniqueNode`, which isn't much of a conversion since the property name is already in PascalCase.
+
+For best results, use PascalCase for your node names in the scene tree (which Godot tends to do by default, anyways).
+
+In the example below, we're using [GodotNodeInterfaces] to reference nodes as their interfaces instead of their concrete Godot types. This allows us to write a unit test where we fake the nodes in the scene tree by substituting mock nodes, allowing us to test a single node script at a time without polluting our test coverage.
+
+```csharp
+using Chickensoft.GodotNodeInterfaces;
+using Chickensoft.AutoInject;
+using Chickensoft.Introspection;
+using Godot;
+
+[Meta(typeof(IAutoConnect))]
+public partial class MyNode : Node2D {
+  public override void _Notification(int what) => this.Notify(what);
+
+  [Node("Path/To/SomeNode")]
+  public INode2D SomeNode { get; set; } = default!;
+
+  [Node] // Connects to "%MyUniqueNode" since no path was specified.
+  public INode2D MyUniqueNode { get; set; } = default!;
+
+  [Node("%OtherUniqueName")]
+  public INode2D DifferentName { get; set; } = default!;
+}
+```
+
+> [!TIP]
+> `IAutoConnect` can only bind properties to nodes, not fields.
+
+### 🧪 Testing
+
+AutoConnect integrates seamlessly with [GodotNodeInterfaces] to facilitate unit testing Godot node scripts by allowing you to fake the node tree during testing.
+
+We can easily write a test for the example above by substituting mock nodes:
+
+```csharp
+namespace Chickensoft.AutoInject.Tests;
+
+using System.Threading.Tasks;
+using Chickensoft.GodotNodeInterfaces;
+using Chickensoft.GoDotTest;
+using Chickensoft.AutoInject.Tests.Fixtures;
+using Godot;
+using GodotTestDriver;
+using Moq;
+using Shouldly;
+
+#pragma warning disable CA1001
+public class MyNodeTest(Node testScene) : TestClass(testScene) {
+  private Fixture _fixture = default!;
+  private MyNode _scene = default!;
+
+  private Mock<INode2D> _someNode = default!;
+  private Mock<INode2D> _myUniqueNode = default!;
+  private Mock<INode2D> _otherUniqueNode = default!;
+
+  [Setup]
+  public async Task Setup() {
+    _fixture = new(TestScene.GetTree());
+
+    _someNode = new();
+    _myUniqueNode = new();
+    _otherUniqueNode = new();
+
+    _scene = new MyNode();
+    _scene.FakeNodeTree(new() {
+      ["Path/To/SomeNode"] = _someNode.Object,
+      ["%MyUniqueNode"] = _myUniqueNode.Object,
+      ["%OtherUniqueName"] = _otherUniqueNode.Object,
+    });
+
+    await _fixture.AddToRoot(_scene);
+  }
+
+  [Cleanup]
+  public async Task Cleanup() => await _fixture.Cleanup();
+
+  [Test]
+  public void UsesFakeNodeTree() {
+    // Making a new instance of a node without instantiating a scene doesn't
+    // trigger NotificationSceneInstantiated, so if we want to make sure our
+    // AutoNodes get hooked up and use the FakeNodeTree, we need to do it manually.
+    _scene._Notification((int)Node.NotificationSceneInstantiated);
+
+    _scene.SomeNode.ShouldBe(_someNode.Object);
+    _scene.MyUniqueNode.ShouldBe(_myUniqueNode.Object);
+    _scene.DifferentName.ShouldBe(_otherUniqueNode.Object);
+    _scene._my_unique_node.ShouldBe(_myUniqueNode.Object);
+  }
+}
+```
+
+## 🛠 IAutoInit
+
+The `IAutoInit` will conditionally call the `void Initialize()` method your node script has from `_Ready` if (and only if) the `IsTesting` field that it adds to your node is false. Conditionally calling the `Initialize()` method allows you to split your node's late member initialization into two-phases, allowing nodes to be more easily unit tested.
+
+When writing tests for your node, simply initialize any members that would need to be mocked in a test in your `Initialize()` method.
+
+```csharp
+using Chickensoft.AutoInject;
+using Chickensoft.Introspection;
+using Godot;
+
+[Meta(typeof(IAutoInit), typeof(IAutoOn))]
+public partial class MyNode : Node2D {
+  public override void _Notification(int what) => this.Notify(what);
+
+  public IMyObject Obj { get; set; } = default!;
+
+  public void Initialize() {
+    // Initialize is called from the Ready notification if our IsTesting
+    // property (added by IAutoInit) is false.
+
+    // Initialize values which would be mocked in a unit testing method.
+    Obj = new MyObject();
+  }
+
+  public void OnReady() {
+    // Guaranteed to be called after Initialize()
+
+    // Use object we setup in Initialize() method (or, if we're running in a
+    // unit test, this will use whatever the test supplied)
+    Obj.DoSomething();
+  }
+}
+```
+
+Likewise, when creating a node during a unit test, you can set the `IsTesting` property to `true` to prevent the `Initialize()` method from being called.
+
+```csharp
+var myNode = new MyNode() {
+  Obj = mock.Object
+};
+
+(myNode as IAutoInit).IsTesting = true;
+```
+
+For example tests, please see the [Game Demo] project.
+
+## 🔋 IAutoOn
+
+The `IAutoOn` mixin allows node scripts to implement .NET-style handler methods for Godot notifications, prefixed with `On`.
+
+```csharp
+using Chickensoft.AutoInject;
+using Chickensoft.Introspection;
+using Godot;
+
+[Meta(typeof(IAutoOn))]
+public partial class MyNode : Node2D {
+  public override void _Notification(int what) => this.Notify(what);
+
+  public void OnReady() {
+    // Called when the node enters the scene tree.
+  }
+
+  public void OnProcess(double delta) {
+    // Called every frame.
+  }
+}
+```
+
+## 🦾 IAutoNode
+
+The `IAutoNode` mixin simply applies all of the mixins provided by AutoInject to a node script at once.
+
+```csharp
+using Chickensoft.AutoInject;
+using Chickensoft.Introspection;
+using Godot;
+
+[Meta(typeof(IAutoNode))]
+public partial class MyNode : Node { }
+```
 
 ---
 
@@ -228,11 +460,14 @@ By following the `Provide()` on `_Ready` convention, you guarantee all dependent
 [discord-badge]: https://raw.githubusercontent.com/chickensoft-games/chickensoft_site/main/static/img/badges/discord_badge.svg
 [discord]: https://discord.gg/gSjaPgMmYW
 [read-the-docs-badge]: https://raw.githubusercontent.com/chickensoft-games/chickensoft_site/main/static/img/badges/read_the_docs_badge.svg
-[docs]: https://chickensoft.games/docsickensoft%20Discord-%237289DA.svg?style=flat&logo=discord&logoColor=white
+[docs]: https://chickensoft.games/docs
 [line-coverage]: Chickensoft.AutoInject.Tests/badges/line_coverage.svg
 [branch-coverage]: Chickensoft.AutoInject.Tests/badges/branch_coverage.svg
 
 [provider]: https://github.com/rrousselGit/provider
 [tree-order]: https://kidscancode.org/godot_recipes/4.x/basics/tree_ready_order/
-[SuperNodes]: https://github.com/chickensoft-games/SuperNodes
-[PowerUp]: https://chickensoft.games/docs/super_nodes/#-powerups
+[Introspection]: https://github.com/chickensoft-games/Introspection
+[mixins]: https://github.com/chickensoft-games/Introspection?tab=readme-ov-file#%EF%B8%8F-mixins
+[GodotNodeInterfaces]: https://github.com/chickensoft-games/GodotNodeInterfaces
+[Game Demo]: https://github.com/chickensoft-games/GameDemo
+[unique-nodes]: https://docs.godotengine.org/en/stable/tutorials/scripting/scene_unique_nodes.html

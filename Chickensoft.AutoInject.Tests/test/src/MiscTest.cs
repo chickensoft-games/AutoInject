@@ -3,46 +3,20 @@ namespace Chickensoft.AutoInject.Tests;
 using System;
 using Chickensoft.AutoInject.Tests.Subjects;
 using Chickensoft.GoDotTest;
+using Chickensoft.Introspection;
 using Godot;
 using Shouldly;
 
-public partial class TestDependent : Dependent { }
+[Meta(typeof(IAutoOn), typeof(IDependent))]
+public partial class TestDependent { }
 
-public class MiscTest : TestClass {
-  public MiscTest(Node testScene) : base(testScene) { }
-
-  [Test]
-  public void DependentStubs() {
-    Dependent.ScriptPropertiesAndFields.ShouldNotBeNull();
-    Dependent.ReceiveScriptPropertyOrFieldType<int>(
-      default!, default!
-    ).ShouldBe(default!);
-
-    var dependent = new TestDependent();
-
-    // dependent.AllDependencies
-
-    Should.Throw<NotImplementedException>(
-      () => dependent.PropertiesAndFields
-    );
-    Should.Throw<NotImplementedException>(
-      () => dependent.GetScriptPropertyOrFieldType<int>("a", default!)
-    );
-    Should.Throw<NotImplementedException>(
-      () => dependent.GetScriptPropertyOrField("a")
-    );
-    Should.Throw<NotImplementedException>(
-      () => dependent.SetScriptPropertyOrField("a", default!)
-    );
-
-    dependent.QueueFree();
-  }
-
+public class MiscTest(Node testScene) : TestClass(testScene) {
   [Test]
   public void DependencyPendingCancels() {
-    var provider = new StringProvider();
+    var obj = new StringProvider();
+    var provider = obj as IBaseProvider;
     var initialized = false;
-    void onInitialized(IProvider provider) => initialized = true;
+    void onInitialized(IBaseProvider provider) => initialized = true;
 
     provider.ProviderState.OnInitialized += onInitialized;
 
@@ -54,7 +28,7 @@ public class MiscTest : TestClass {
 
     initialized.ShouldBeFalse();
 
-    provider.QueueFree();
+    obj.QueueFree();
   }
 
   [Test]

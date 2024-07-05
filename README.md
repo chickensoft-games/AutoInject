@@ -86,6 +86,7 @@ Simply add the following to your project's `.csproj` file. Be sure to specify th
 
 ```xml
 <ItemGroup>
+    <PackageReference Include="Chickensoft.GodotNodeInterfaces" Version="..." />
     <PackageReference Include="Chickensoft.Introspection" Version="..." />
     <PackageReference Include="Chickensoft.Introspection.Generator" Version="..." PrivateAssets="all" OutputItemType="analyzer" />
     <PackageReference Include="Chickensoft.AutoInject" Version="..." PrivateAssets="all" />

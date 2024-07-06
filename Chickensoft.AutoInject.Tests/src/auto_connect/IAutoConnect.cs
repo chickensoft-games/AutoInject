@@ -31,7 +31,7 @@ public interface IAutoConnect : IMixin<IAutoConnect>, IFakeNodeTreeEnabled {
   void IMixin<IAutoConnect>.Handler() {
     var what = MixinState.Get<NotificationState>().Notification;
 
-    if (what == Node.NotificationSceneInstantiated) {
+    if (what == Node.NotificationEnterTree) {
       AutoConnector.ConnectNodes(Types.Graph.GetProperties(GetType()), this);
     }
   }

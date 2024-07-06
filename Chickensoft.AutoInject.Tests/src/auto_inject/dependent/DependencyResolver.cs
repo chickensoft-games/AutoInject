@@ -181,15 +181,28 @@ public static class DependencyResolver {
       GetDependenciesToResolve(properties)
     );
 
-    var node = ((Node)dependent).GetParent();
+    var self = (Node)dependent;
+    var node = self.GetParent();
     var foundDependencies = new HashSet<PropertyMetadata>();
     var providersInitializing = 0;
 
     void resolve() {
-      if (!dependent.IsTesting) {
-        dependent.Setup();
+      if (self.IsNodeReady()) {
+        // Godot node is already ready.
+        if (!dependent.IsTesting) {
+          dependent.Setup();
+        }
+        dependent.OnResolved();
+        return;
       }
-      dependent.OnResolved();
+
+      // Godot node is not ready yet, so we will wait for OnReady before
+      // calling Setup() and OnResolved().
+
+      if (!dependent.IsTesting) {
+        state.PleaseCallSetup = true;
+      }
+      state.PleaseCallOnResolved = true;
     }
 
     void onProviderInitialized(IBaseProvider provider) {

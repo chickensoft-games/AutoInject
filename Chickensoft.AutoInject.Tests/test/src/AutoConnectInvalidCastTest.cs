@@ -27,7 +27,29 @@ public class AutoConnectInvalidCastTest(Node testScene) : TestClass(testScene) {
     scene.FakeNodeTree(new() { ["Node3D"] = new Mock<INode3D>().Object });
 
     Should.Throw<InvalidOperationException>(
-      () => scene._Notification((int)Node.NotificationSceneInstantiated)
+      () => scene._Notification((int)Node.NotificationEnterTree)
+    );
+  }
+
+  [Test]
+  public void ThrowsIfNoNode() {
+    var scene = new AutoConnectInvalidCastTestScene();
+    Should.Throw<InvalidOperationException>(
+      () => scene._Notification((int)Node.NotificationEnterTree)
+    );
+  }
+
+  [Test]
+  public void ThrowsIfTypeIsWrong() {
+    var scene = new AutoConnectInvalidCastTestScene();
+
+    var node = new Control {
+      Name = "Node3D"
+    };
+    scene.AddChild(node);
+
+    Should.Throw<InvalidOperationException>(
+      () => scene._Notification((int)Node.NotificationEnterTree)
     );
   }
 }

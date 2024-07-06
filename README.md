@@ -416,6 +416,24 @@ var myNode = new MyNode() {
 
 For example tests, please see the [Game Demo] project.
 
+## 🌱 Enhanced Lifecycle
+
+AutoInject enhances the typical Godot node lifecycle by adding additional hooks that allow you to handle dependencies and initialization in a more controlled manner (primarily for making testing easier).
+
+This is the lifecycle of a dependent node in the game environment:
+
+```text
+Initialize() -> OnReady() -> Setup() -> OnResolved()
+```
+
+Note that this lifecycle is preserved regardless of how the node is added to the scene tree.
+
+And this is the lifecycle of a dependent node in a test environment:
+
+```text
+OnReady() -> OnResolved()
+```
+
 ## 🔋 IAutoOn
 
 The `IAutoOn` mixin allows node scripts to implement .NET-style handler methods for Godot notifications, prefixed with `On`.

@@ -1,7 +1,9 @@
 namespace Chickensoft.AutoInject.Tests;
 
+using System.Threading.Tasks;
 using Chickensoft.AutoInject.Tests.Subjects;
 using Chickensoft.GoDotTest;
+using Chickensoft.GodotTestDriver;
 using Godot;
 using Shouldly;
 
@@ -59,19 +61,18 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void ResolvesDependencyAfterProviderIsResolved() {
+  public async Task ResolvesDependencyAfterProviderIsResolved() {
     var value = "Hello, world!";
     var obj = new StringProvider() { Value = value };
     var provider = obj as IBaseProvider;
     var dependent = new StringDependent();
-
+    var fixture = new Fixture(TestScene.GetTree());
     obj.AddChild(dependent);
+
+    await fixture.AddToRoot(obj);
 
     ((IProvide<string>)provider).Value().ShouldBe(value);
 
-    dependent._Notification((int)Node.NotificationReady);
-
-    obj._Notification((int)Node.NotificationReady);
     provider.ProviderState.IsInitialized.ShouldBeTrue();
     obj.OnProvidedCalled.ShouldBeTrue();
 
@@ -79,13 +80,15 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
     dependent.ResolvedValue.ShouldBe(value);
     ((IDependent)dependent).DependentState.Pending.ShouldBeEmpty();
 
+    await fixture.Cleanup();
+
     obj.RemoveChild(dependent);
     dependent.QueueFree();
     obj.QueueFree();
   }
 
   [Test]
-  public void FindsDependenciesAcrossAncestors() {
+  public async Task FindsDependenciesAcrossAncestors() {
     var value = "Hello, world!";
 
     var objA = new StringProvider() { Value = value };
@@ -94,17 +97,16 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
     var providerB = objB as IBaseProvider;
     var depObj = new StringDependent();
     var dependent = depObj as IDependent;
+    var fixture = new Fixture(TestScene.GetTree());
 
     objA.AddChild(objB);
     objA.AddChild(depObj);
 
-    depObj._Notification((int)Node.NotificationReady);
+    await fixture.AddToRoot(objA);
 
-    objA._Notification((int)Node.NotificationReady);
     providerA.ProviderState.IsInitialized.ShouldBeTrue();
     objA.OnProvidedCalled.ShouldBeTrue();
 
-    objB._Notification((int)Node.NotificationReady);
     providerB.ProviderState.IsInitialized.ShouldBeTrue();
     objB.OnProvidedCalled.ShouldBeTrue();
 

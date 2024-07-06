@@ -33,6 +33,11 @@ public class DependentState {
   /// </summary>
   public bool ShouldResolveDependencies { get; set; } = true;
 
+  /// <summary>Set internally when Setup() should be called.</summary>
+  public bool PleaseCallSetup { get; set; }
+  /// <summary>Set internally when OnResolved() should be called.</summary>
+  public bool PleaseCallOnResolved { get; set; }
+
   /// <summary>
   /// Dictionary of providers we are listening to that are still initializing
   /// their provided values. We use this in the rare event that we have to

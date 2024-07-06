@@ -102,6 +102,12 @@ public interface IAutoOn : IMixin<IAutoOn> {
         autoNode.OnChildOrderChanged();
         break;
       case (int)Node.NotificationReady:
+        if (node is IReadyAware readyAware) {
+          readyAware.OnBeforeReady();
+          autoNode.OnReady();
+          readyAware.OnAfterReady();
+          break;
+        }
         autoNode.OnReady();
         break;
       case (int)Node.NotificationEditorPostSave:

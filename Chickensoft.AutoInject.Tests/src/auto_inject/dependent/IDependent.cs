@@ -6,6 +6,8 @@ using Godot;
 using Chickensoft.AutoInject;
 using Chickensoft.Introspection;
 using System.Globalization;
+using System;
+using System.Runtime.CompilerServices;
 
 
 /// <summary>
@@ -13,7 +15,7 @@ using System.Globalization;
 /// resolve dependencies marked with the [Dependency] attribute.
 /// </summary>
 [Mixin]
-public interface IDependent : IMixin<IDependent>, IAutoInit {
+public interface IDependent : IMixin<IDependent>, IAutoInit, IReadyAware {
   DependentState DependentState {
     get {
       AddStateIfNeeded();
@@ -36,6 +38,22 @@ public interface IDependent : IMixin<IDependent>, IAutoInit {
   /// </summary>
   void OnResolved() { }
 
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  void IReadyAware.OnBeforeReady() { }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  void IReadyAware.OnAfterReady() {
+    if (DependentState.PleaseCallSetup) {
+      Setup();
+      DependentState.PleaseCallSetup = false;
+    }
+    if (DependentState.PleaseCallOnResolved) {
+      OnResolved();
+      DependentState.PleaseCallOnResolved = false;
+    }
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
   private void AddStateIfNeeded() {
     if (MixinState.Has<DependentState>()) { return; }
 

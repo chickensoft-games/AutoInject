@@ -8,9 +8,18 @@ using Godot;
 public partial class AutoInitTestNode : Node2D {
   public override void _Notification(int what) => this.Notify(what);
 
-  public bool SetupCalled { get; set; }
+  public int Called { get; set; }
 
-  public void Initialize() => SetupCalled = true;
+  public void Initialize() => Called++;
+}
+
+[Meta(typeof(IAutoNode))]
+public partial class AutoInitTestAutoNode : Node2D {
+  public override void _Notification(int what) => this.Notify(what);
+
+  public int Called { get; set; }
+
+  public void Initialize() => Called++;
 }
 
 [Meta(typeof(IAutoInit))]

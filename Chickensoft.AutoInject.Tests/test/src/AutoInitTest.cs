@@ -15,7 +15,7 @@ public partial class AutoInitTest(Node testScene) : TestClass(testScene) {
 
     node._Notification((int)Node.NotificationReady);
 
-    node.SetupCalled.ShouldBeTrue();
+    node.Called.ShouldBe(1);
   }
 
   [Test]
@@ -29,6 +29,8 @@ public partial class AutoInitTest(Node testScene) : TestClass(testScene) {
   public void IsTestingCreatesStateIfSetFirst() {
     var node = new AutoInitTestNode();
     (node as IAutoInit).IsTesting = true;
+    // Should do nothing on a non-ready notification
+    node._Notification((int)Node.NotificationEnterTree);
   }
 
   [Test]
@@ -36,4 +38,13 @@ public partial class AutoInitTest(Node testScene) : TestClass(testScene) {
     var node = new NotAGodotNode();
     (node as IAutoInit).Handler();
   });
+
+  [Test]
+  public void AutoNodeMixinOnlyCallsInitializeOnce() {
+    var node = new AutoInitTestAutoNode();
+
+    node._Notification((int)Node.NotificationReady);
+
+    node.Called.ShouldBe(1);
+  }
 }

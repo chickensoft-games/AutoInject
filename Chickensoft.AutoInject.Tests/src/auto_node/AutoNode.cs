@@ -22,7 +22,7 @@ IAutoOn, IAutoConnect, IAutoInit, IProvider, IDependent {
   new void Handler() {
     // IAutoOn isn't called since its handler does nothing.
     (this as IAutoConnect).Handler();
-    (this as IAutoInit).Handler();
+    // IDependent invokes IAutoInit, so we don't invoke it directly.
     (this as IProvider).Handler();
     (this as IDependent).Handler();
   }

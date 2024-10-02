@@ -53,7 +53,9 @@ using Godot;
 
 // Apply all of the AutoInject mixins at once:
 [Meta(typeof(IAutoNode))]
-public partial class MyNode : Node { }
+public partial class MyNode : Node {
+  public override void _Notification(int what) => this.Notify(what);
+}
 ```
 
 Alternatively, you can use just the mixins you need from this project.
@@ -66,7 +68,9 @@ Alternatively, you can use just the mixins you need from this project.
   typeof(IProvider),
   typeof(IDependent)
 )]
-public partial class MyNode : Node { }
+public partial class MyNode : Node {
+  public override void _Notification(int what) => this.Notify(what);
+}
 ```
 
 > [!IMPORTANT]

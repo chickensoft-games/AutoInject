@@ -230,13 +230,13 @@ public static class DependencyResolver {
 
           // Use the generated introspection metadata to determine if
           // we have found the correct provider for the dependency.
-          property.GenericType.GenericTypeGetter(Validator);
+          property.TypeNode.GenericTypeGetter(Validator);
           var isCorrectProvider = Validator.Result;
 
           if (isCorrectProvider) {
             // Add the provider to our internal dependency table.
             state.Dependencies.Add(
-              property.GenericType.ClosedType, provider
+              property.TypeNode.ClosedType, provider
             );
 
             // Mark this dependency to be removed from the list of dependencies

@@ -48,7 +48,7 @@ public static class AutoConnector {
         // type.
         _checker.Value = fakeNode;
 
-        property.GenericType.GenericTypeGetter(_checker);
+        property.TypeNode.GenericTypeGetter(_checker);
 
         var satisfiesFakeType = _checker.Result;
 
@@ -56,7 +56,7 @@ public static class AutoConnector {
           e = new InvalidOperationException(
             $"Found a faked node at '{path}' of type " +
             $"'{fakeNode.GetType().Name}' that is not the expected type " +
-            $"'{property.GenericType.ClosedType}' for member " +
+            $"'{property.TypeNode.ClosedType}' for member " +
             $"'{property.Name}' on '{node.Name}'."
           );
           GD.PushError(e.Message);
@@ -77,7 +77,7 @@ public static class AutoConnector {
         e = new InvalidOperationException(
           $"AutoConnect: Node at '{path}' does not exist in either the real " +
           $"or fake subtree for '{node.Name}' member '{property.Name}' of " +
-          $"type '{property.GenericType.ClosedType}'."
+          $"type '{property.TypeNode.ClosedType}'."
         );
         GD.PushError(e.Message);
         throw e;
@@ -86,7 +86,7 @@ public static class AutoConnector {
       // see if the unchecked node satisfies the expected type of node from the
       // property type
       _checker.Value = child;
-      property.GenericType.GenericTypeGetter(_checker);
+      property.TypeNode.GenericTypeGetter(_checker);
       var originalNodeSatisfiesType = _checker.Result;
 
       if (originalNodeSatisfiesType) {
@@ -106,7 +106,7 @@ public static class AutoConnector {
       var adaptedChild = GodotInterfaces.AdaptNode(child);
       _checker.Value = adaptedChild;
 
-      property.GenericType.GenericTypeGetter(_checker);
+      property.TypeNode.GenericTypeGetter(_checker);
       var adaptedChildSatisfiesType = _checker.Result;
 
       if (adaptedChildSatisfiesType) {
@@ -119,7 +119,7 @@ public static class AutoConnector {
       // Tell user we can't connect the node to the property.
       e = new InvalidOperationException(
         $"Node at '{path}' of type '{child.GetType().Name}' does not " +
-        $"satisfy the expected type '{property.GenericType.ClosedType}' for " +
+        $"satisfy the expected type '{property.TypeNode.ClosedType}' for " +
         $"member '{property.Name}' on '{node.Name}'."
       );
       GD.PushError(e.Message);

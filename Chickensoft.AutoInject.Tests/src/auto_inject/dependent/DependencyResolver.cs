@@ -128,8 +128,9 @@ public static class DependencyResolver {
     // First, check dependency fakes. Using a faked value takes priority over
     // all the other dependency resolution methods.
     var state = dependent.MixinState.Get<DependentState>();
-    if (state.ProviderFakes.TryGetValue(typeof(TValue), out var fakeProvider)) {
-      return fakeProvider.Value();
+    if (state.ProviderFakes.TryGetValue(typeof(TValue), out var fakeProvider)
+      && fakeProvider is DefaultProvider<TValue> faker) {
+      return faker.Value();
     }
 
     // Lookup dependency, per usual, respecting any fallback values if there
@@ -145,15 +146,16 @@ public static class DependencyResolver {
       if (providerNode is IProvide<TValue> provider) {
         return provider.Value();
       }
-      else if (providerNode is DefaultProvider defaultProvider) {
+      else if (providerNode is DefaultProvider<TValue> defaultProvider) {
         return defaultProvider.Value();
       }
     }
     else if (fallback is not null) {
       // See if we were given a fallback.
-      var provider = new DefaultProvider(fallback());
+      var value = fallback();
+      var provider = new DefaultProvider<TValue>(value, fallback);
       state.Dependencies.Add(typeof(TValue), provider);
-      return (TValue)provider.Value();
+      return provider.Value();
     }
 
     throw new ProviderNotFoundException(typeof(TValue));
@@ -283,15 +285,43 @@ public static class DependencyResolver {
     // for fallback values.
   }
 
-  public class DefaultProvider : IBaseProvider {
-    private readonly dynamic _value;
+  public class DefaultProvider<TValue> : IBaseProvider {
+    private object _value;
+    private readonly Func<TValue>? _fallback;
     public ProviderState ProviderState { get; }
 
-    public DefaultProvider(dynamic value) {
-      _value = value;
+    // When working with reference types, we must wrap the value in a WeakReference<>()
+    // to allow the garbage collection to work when the assembly is being unloaded or reloaded;
+    // such as in the case of rebuilding within the Godot Editor if you've instantiated a node
+    // and run it as a tool script.
+    public DefaultProvider(object value, Func<TValue>? fallback = default) {
+      _fallback = fallback;
+
+      _value = value.GetType().IsValueType ? value : new WeakReference<object>(value);
       ProviderState = new() { IsInitialized = true };
     }
 
-    public dynamic Value() => _value;
+    public TValue Value() {
+      if (_value is WeakReference<object> weakReference) {
+        // Try to return a reference type.
+        if (weakReference.TryGetTarget(out var target)) {
+          return (TValue)target;
+        }
+        else {
+          // If value was garbage collected, make a new one.
+          if (_fallback == null) {
+            throw new InvalidOperationException("Fallback method is null.");
+          }
+
+          var value = _fallback() ?? throw new InvalidOperationException("Fallback cannot create a null value");
+          _value = new WeakReference<object>(value);
+          return value;
+        }
+      }
+      else {
+        // Return a value type.
+        return (TValue)_value;
+      }
+    }
   }
 }

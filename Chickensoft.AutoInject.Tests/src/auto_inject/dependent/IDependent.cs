@@ -98,6 +98,6 @@ public interface IDependent : IMixin<IDependent>, IAutoInit, IReadyAware {
   public void FakeDependency<T>(T value) where T : notnull {
     AddStateIfNeeded();
     MixinState.Get<DependentState>().ProviderFakes[typeof(T)] =
-      new DependencyResolver.DefaultProvider(value);
+      new DependencyResolver.DefaultProvider<T>(value);
   }
 }

@@ -131,7 +131,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void UsesFallbackValueWhenNoProviderFound() {
+  public void UsesValueFallbackValueWhenNoProviderFound() {
     var fallback = "Hello, world!";
     var dependent = new StringDependentFallback {
       FallbackValue = fallback
@@ -142,6 +142,20 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
     dependent.ResolvedValue.ShouldBe(fallback);
     dependent.MyDependency.ShouldBe(fallback);
   }
+
+  [Test]
+  public void UsesReferenceFallbackValueWhenNoProviderFound() {
+    var fallback = new Resource();
+    var dependent = new ReferenceDependentFallback {
+      FallbackValue = fallback
+    };
+
+    dependent._Notification((int)Node.NotificationReady);
+
+    dependent.ResolvedValue.ShouldBe(fallback);
+    dependent.MyDependency.ShouldBe(fallback);
+  }
+
   [Test]
   public void ThrowsOnDependencyTableThatWasTamperedWith() {
     var fallback = "Hello, world!";

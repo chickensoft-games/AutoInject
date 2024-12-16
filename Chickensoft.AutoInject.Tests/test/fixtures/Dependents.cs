@@ -57,6 +57,25 @@ public partial class StringDependentFallback : Node {
 }
 
 [Meta(typeof(IAutoOn), typeof(IDependent))]
+public partial class ReferenceDependentFallback : Node {
+  public override void _Notification(int what) => this.Notify(what);
+
+  [Dependency]
+  public object MyDependency => this.DependOn(() => FallbackValue);
+
+  public object FallbackValue { get; set; } = new Resource();
+  public bool OnResolvedCalled { get; private set; }
+  public object ResolvedValue { get; set; } = null!;
+
+  public void OnReady() { }
+
+  public void OnResolved() {
+    OnResolvedCalled = true;
+    ResolvedValue = MyDependency;
+  }
+}
+
+[Meta(typeof(IAutoOn), typeof(IDependent))]
 public partial class IntDependent : Node {
   public override void _Notification(int what) => this.Notify(what);
 

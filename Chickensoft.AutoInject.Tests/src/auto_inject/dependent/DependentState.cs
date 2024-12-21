@@ -51,7 +51,7 @@ public class DependentState {
   /// allows nodes being unit-tested to provide fake providers during unit tests
   /// that return mock or faked values.
   /// </summary>
-  public Dictionary<Type, DependencyResolver.DefaultProvider> ProviderFakes {
+  public DependencyResolver.DependencyTable ProviderFakes {
     get;
   } = [];
 }

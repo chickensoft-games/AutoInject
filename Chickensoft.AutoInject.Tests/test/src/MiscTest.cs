@@ -47,7 +47,7 @@ public class MiscTest(Node testScene) : TestClass(testScene) {
 
   [Test]
   public void DefaultProviderState() {
-    var defaultProvider = new DependencyResolver.DefaultProvider("hi");
+    var defaultProvider = new DependencyResolver.DefaultProvider<string>("hi");
     defaultProvider.ProviderState.ShouldNotBeNull();
   }
 }

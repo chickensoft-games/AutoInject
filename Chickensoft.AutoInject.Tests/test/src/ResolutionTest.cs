@@ -1,5 +1,7 @@
 namespace Chickensoft.AutoInject.Tests;
 
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Chickensoft.AutoInject.Tests.Subjects;
 using Chickensoft.GoDotTest;
@@ -131,9 +133,9 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void UsesFallbackValueWhenNoProviderFound() {
-    var fallback = "Hello, world!";
-    var dependent = new StringDependentFallback {
+  public void UsesReferenceFallbackValueWhenNoProviderFound() {
+    var fallback = new Resource();
+    var dependent = new ReferenceDependentFallback {
       FallbackValue = fallback
     };
 
@@ -142,6 +144,77 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
     dependent.ResolvedValue.ShouldBe(fallback);
     dependent.MyDependency.ShouldBe(fallback);
   }
+
+  [Test]
+  public void DependsOnValueType() {
+    var value = 10;
+    var depObj = new IntDependent() { FallbackValue = () => value };
+    var dependent = depObj as IDependent;
+
+    depObj._Notification((int)Node.NotificationReady);
+
+
+    depObj.OnResolvedCalled.ShouldBeTrue();
+    depObj.ResolvedValue.ShouldBe(value);
+
+    depObj._Notification((int)Node.NotificationExitTree);
+
+    dependent.DependentState.Pending.ShouldBeEmpty();
+
+    depObj.QueueFree();
+  }
+
+  [Test]
+  public void ThrowsIfFallbackProducesNullAfterPreviousValueIsGarbageCollected(
+  ) {
+    var currentFallback = 0;
+    var replacementValue = new object();
+    var fallbacks = new List<object?>() { new(), null, replacementValue };
+
+    var value = Utils.CreateWeakReference();
+
+    // Fallback will be called 3 times in this test. First will be non-null,
+    // second will be null, third will be non-null and different from the first.
+    var depObj = new WeakReferenceDependent() {
+      Fallback = () => fallbacks[currentFallback++]!
+    };
+
+    var dependent = depObj as IDependent;
+
+    depObj._Notification((int)Node.NotificationReady);
+
+    // Let's access the fallback value to ensure the default provider is setup.
+    depObj.MyDependency.ShouldNotBeNull();
+
+    // Simulate a garbage collected object. We support weak references to
+    // dependencies to avoid causing build issues when reloading the scene.
+    Utils.ClearWeakReference(value);
+
+    // To test this highly specific scenario, we have to clear ALL
+    // weak references to the object, including the one in the default provider
+    // that's generated behind-the-scenes for us.
+
+    // Let's dig out the weak ref used in the default provider from the
+    // dependent's internal state...
+    var underlyingDefaultProvider =
+      (DependencyResolver.DefaultProvider<object>)
+        depObj.MixinState.Get<DependentState>().Dependencies[typeof(object)];
+
+    var actualWeakRef = (WeakReference)underlyingDefaultProvider._value;
+
+    Utils.ClearWeakReference(actualWeakRef);
+
+    var e = Should.Throw<InvalidOperationException>(
+      () => depObj.MyDependency
+    );
+
+    e.Message.ShouldContain("cannot create a null value");
+
+    // Now that the fallback returns a valid value, the dependency should
+    // be resolved once again.
+    depObj.MyDependency.ShouldBeSameAs(replacementValue);
+  }
+
   [Test]
   public void ThrowsOnDependencyTableThatWasTamperedWith() {
     var fallback = "Hello, world!";
@@ -230,6 +303,19 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
       ProviderState = new ProviderState {
         IsInitialized = true
       };
+    }
+  }
+
+  public static class Utils {
+    public static WeakReference CreateWeakReference() => new(new object());
+
+    public static void ClearWeakReference(WeakReference weakReference) {
+      weakReference.Target = null;
+
+      while (weakReference.Target is not null) {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+      }
     }
   }
 }

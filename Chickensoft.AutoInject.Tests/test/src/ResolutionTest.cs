@@ -307,9 +307,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   public static class Utils {
-    public static WeakReference CreateWeakReference(Func<object>? factory = null) => new(
-      factory?.Invoke() ?? new object()
-    );
+    public static WeakReference CreateWeakReference() => new(new object());
 
     public static void ClearWeakReference(WeakReference weakReference) {
       weakReference.Target = null;

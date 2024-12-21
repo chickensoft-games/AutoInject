@@ -286,42 +286,44 @@ public static class DependencyResolver {
   }
 
   public class DefaultProvider<TValue> : IBaseProvider {
-    private object _value;
-    private readonly Func<TValue>? _fallback;
+    internal object _value;
+    private readonly Func<TValue?> _fallback;
     public ProviderState ProviderState { get; }
 
-    // When working with reference types, we must wrap the value in a WeakReference<>()
-    // to allow the garbage collection to work when the assembly is being unloaded or reloaded;
-    // such as in the case of rebuilding within the Godot Editor if you've instantiated a node
+    // When working with reference types, we must wrap the value in a
+    // WeakReference() to allow the garbage collection to work when the
+    // assembly is being unloaded or reloaded; such as in the case of
+    // rebuilding within the Godot Editor if you've instantiated a node
     // and run it as a tool script.
-    public DefaultProvider(object value, Func<TValue>? fallback = default) {
-      _fallback = fallback;
+    public DefaultProvider(object value, Func<TValue?>? fallback = default) {
+      _fallback = fallback ?? (() => (TValue?)value);
 
-      _value = value.GetType().IsValueType ? value : new WeakReference<object>(value);
+      _value = value.GetType().IsValueType
+        ? value
+        : new WeakReference(value);
+
       ProviderState = new() { IsInitialized = true };
     }
 
     public TValue Value() {
-      if (_value is WeakReference<object> weakReference) {
+      if (_value is WeakReference weakReference) {
         // Try to return a reference type.
-        if (weakReference.TryGetTarget(out var target)) {
-          return (TValue)target;
+        if (weakReference.Target is TValue target) {
+          return target;
         }
-        else {
-          // If value was garbage collected, make a new one.
-          if (_fallback == null) {
-            throw new InvalidOperationException("Fallback method is null.");
-          }
 
-          var value = _fallback() ?? throw new InvalidOperationException("Fallback cannot create a null value");
-          _value = new WeakReference<object>(value);
-          return value;
-        }
+        var value = _fallback() ??
+          throw new InvalidOperationException(
+            "Fallback cannot create a null value"
+          );
+
+        _value = new WeakReference(value);
+
+        return value;
+
       }
-      else {
-        // Return a value type.
-        return (TValue)_value;
-      }
+      // Return a value type.
+      return (TValue)_value;
     }
   }
 }

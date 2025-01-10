@@ -28,7 +28,7 @@ jobs:
       - name: 🔎 Read Current Project Version
         id: current-version
         run: |
-          echo "tag=$(git tag --sort=v:refname | tail -1)" >> "$GITHUB_OUTPUT"
+          echo "tag=$(git tag --sort=v:refname | grep -E '^[^v]' | tail -1)" >> "$GITHUB_OUTPUT"
 
       - name: 🖨 Print Current Version
         run: |

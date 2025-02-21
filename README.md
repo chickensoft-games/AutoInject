@@ -97,6 +97,19 @@ Simply add the following to your project's `.csproj` file. Be sure to specify th
 </ItemGroup>
 ```
 
+> [!WARNING]
+> We strongly recommend treating warning `CS9057` as an error to catch possible compiler-mismatch issues with the Introspection generator. (See the [Introspection] README for more details.) To do so, add a `WarningsAsErrors` line to your `.csproj` file's `PropertyGroup`:
+>
+> ```xml
+> <PropertyGroup>
+>   <TargetFramework>net8.0</TargetFramework>
+>   ...
+>   <!-- Catch compiler-mismatch issues with the Introspection generator -->
+>   <WarningsAsErrors>CS9057</WarningsAsErrors>
+>   ...
+> </PropertyGroup>
+> ```
+
 > [!TIP]
 > Want to see AutoInject in action? Check out the Chickensoft [Game Demo].
 
@@ -126,7 +139,7 @@ public partial class MyProvider : Node, IProvide<string> {
 
   public void OnProvided() {
     // You can optionally implement this method. It gets called once you call
-    // this.Provide() to inform AutoInject that the provided values are now 
+    // this.Provide() to inform AutoInject that the provided values are now
     // available.
   }
 }
@@ -152,7 +165,7 @@ public partial class StringDependent : Node {
   public string MyDependency => this.DependOn<string>();
 
   public void OnResolved() {
-    // All of my dependencies are now available! Do whatever you want with 
+    // All of my dependencies are now available! Do whatever you want with
     // them here.
   }
 }
@@ -217,7 +230,7 @@ Sometimes, when testing, you may wish to "fake" the value of a dependency. Faked
 ```csharp
   [Test]
   public void FakesDependency() {
-    // Some dependent 
+    // Some dependent
     var dependent = new MyNode();
 
     var fakeValue = "I'm fake!";

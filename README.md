@@ -1,6 +1,6 @@
 # 💉 AutoInject
 
-[![Chickensoft Badge][chickensoft-badge]][chickensoft-website] [![Discord][discord-badge]][discord] [![Read the docs][read-the-docs-badge]][docs] ![line coverage][line-coverage] ![branch coverage][branch-coverage]
+[![Chickensoft Badge][chickensoft-badge]][chickensoft-website] [![Discord][discord-badge]][discord] ![line coverage][line-coverage] ![branch coverage][branch-coverage]
 
 Node-based dependency injection for C# Godot scripts at build-time, including utilities for automatic node-binding, additional lifecycle hooks, and .net-inspired notification callbacks.
 
@@ -491,12 +491,10 @@ public partial class MyNode : Node { }
 
 🐣 Package generated from a 🐤 Chickensoft Template — <https://chickensoft.games>
 
-[chickensoft-badge]: https://raw.githubusercontent.com/chickensoft-games/chickensoft_site/main/static/img/badges/chickensoft_badge.svg
+[chickensoft-badge]: https://chickensoft.games/img/badges/chickensoft_badge.svg
 [chickensoft-website]: https://chickensoft.games
-[discord-badge]: https://raw.githubusercontent.com/chickensoft-games/chickensoft_site/main/static/img/badges/discord_badge.svg
 [discord]: https://discord.gg/gSjaPgMmYW
-[read-the-docs-badge]: https://raw.githubusercontent.com/chickensoft-games/chickensoft_site/main/static/img/badges/read_the_docs_badge.svg
-[docs]: https://chickensoft.games/docs
+[discord-badge]: https://chickensoft.games/img/badges/discord_badge.svg
 [line-coverage]: Chickensoft.AutoInject.Tests/badges/line_coverage.svg
 [branch-coverage]: Chickensoft.AutoInject.Tests/badges/branch_coverage.svg
 

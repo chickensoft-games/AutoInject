@@ -14,7 +14,7 @@ public static class NotificationExtensions {
   public static void Notify(this GodotObject obj, int what) {
     obj.__SetupNotificationStateIfNeeded();
 
-    if (obj is not IIntrospective introspective) {
+    if (obj is not IIntrospectiveRef introspective) {
       return;
     }
 
@@ -35,7 +35,7 @@ public static class NotificationExtensions {
 #pragma warning disable IDE1006
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
   public static void __SetupNotificationStateIfNeeded(this GodotObject obj) {
-    if (obj is not IIntrospective introspective) {
+    if (obj is not IIntrospectiveRef introspective) {
       return;
     }
 

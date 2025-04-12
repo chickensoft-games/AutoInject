@@ -1,8 +1,8 @@
 namespace Chickensoft.AutoInject.Tests;
 using Chickensoft.GoDotTest;
+using Chickensoft.Introspection;
 using Godot;
 using Shouldly;
-using Chickensoft.Introspection;
 
 public partial class AutoNodeTest(Node testScene) : TestClass(testScene) {
   [Meta(typeof(IAutoNode))]
@@ -23,7 +23,7 @@ public partial class AutoNodeTest(Node testScene) : TestClass(testScene) {
 
     node.__SetupNotificationStateIfNeeded();
 
-    IIntrospective introspective = node;
+    IIntrospectiveRef introspective = node;
 
     // Some mixins need this data.
     node.MixinState.Get<NotificationState>().Notification = -1;

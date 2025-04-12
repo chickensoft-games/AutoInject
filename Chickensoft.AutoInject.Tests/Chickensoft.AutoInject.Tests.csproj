@@ -1,6 +1,6 @@
 <Project Sdk="Godot.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
@@ -26,7 +26,7 @@
     <PackageReference Include="Chickensoft.GoDotTest" Version="1.5.3" />
     <PackageReference Include="Chickensoft.GodotTestDriver" Version="3.0.0" />
     <PackageReference Include="Chickensoft.GodotNodeInterfaces" Version="2.2.4" />
-    <PackageReference Include="Chickensoft.Introspection" Version="2.0.0" />
-    <PackageReference Include="Chickensoft.Introspection.Generator" Version="2.0.0" PrivateAssets="all" OutputItemType="analyzer" />
+    <PackageReference Include="Chickensoft.Introspection" Version="3.0.0" />
+    <PackageReference Include="Chickensoft.Introspection.Generator" Version="3.0.0" PrivateAssets="all" OutputItemType="analyzer" />
   </ItemGroup>
 </Project>

@@ -74,7 +74,8 @@ public interface IDependent : IMixin<IDependent>, IAutoInit, IReadyAware {
     AddStateIfNeeded();
 
     if (
-      this is IIntrospective introspective &&
+      this is IIntrospectiveRef
+       introspective &&
       !introspective.HasMixin(typeof(IAutoInit))
     ) {
       // Developer didn't give us the IAutoInit mixin, but all dependents are

@@ -16,6 +16,7 @@ jobs:
   publish:
     name: 📦 Release
     runs-on: ubuntu-latest
+    if: github.repository == 'chickensoft-games/AutoInject'
     steps:
       - name: 🧾 Checkout
         uses: actions/checkout@v4

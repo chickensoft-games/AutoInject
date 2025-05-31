@@ -121,7 +121,7 @@ jobs:
           find Chickensoft.AutoInject/src -type f -name "*.cs" -exec bash -c 'add_prefix_suffix "$0"' {} \;
 
       - name: 💽 Setup .NET SDK
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           # Use the .NET SDK from global.json in the root of the repository.
           global-json-file: global.json

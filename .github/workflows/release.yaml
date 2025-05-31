@@ -11,7 +11,22 @@ on:
           - patch
         required: true
         default: patch
-
+  # Make a release whenever we're told to by another workflow.
+  workflow_call:
+    secrets:
+      NUGET_API_KEY:
+        description: "API key for Nuget"
+        required: true
+      GH_BASIC:
+        description: "Personal access token (PAT) for GitHub"
+        required: true
+    # Input unifies with the workflow dispatch since it's identical.
+    inputs:
+      bump:
+        type: string
+        description: "major, minor, or patch"
+        required: true
+        default: "patch"
 jobs:
   publish:
     name: 📦 Release

@@ -6,6 +6,16 @@ bin/
 obj/
 .generated/
 .vs/
+.idea/
 .DS_Store
-Chickensoft.AutoInject/nupkg/
+nupkg/
 !Chickensoft.AutoInject/nupkg/.gitkeep
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs

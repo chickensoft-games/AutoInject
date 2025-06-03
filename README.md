@@ -97,6 +97,14 @@ Simply add the following to your project's `.csproj` file. Be sure to specify th
 </ItemGroup>
 ```
 
+You can also add `Chickensoft.AutoInject.Analyzers` to your project to get additional checks and code fixes for AutoInject, such as ensuring that you override `_Notification` and call `this.Provide()` from your provider nodes.
+
+```xml
+<ItemGroup>
+    <PackageReference Include="Chickensoft.AutoInject.Analyzers" Version="..." PrivateAssets="all" OutputItemType="analyzer" />
+</ItemGroup>
+```
+
 > [!WARNING]
 > We strongly recommend treating warning `CS9057` as an error to catch possible compiler-mismatch issues with the Introspection generator. (See the [Introspection] README for more details.) To do so, add a `WarningsAsErrors` line to your `.csproj` file's `PropertyGroup`:
 >

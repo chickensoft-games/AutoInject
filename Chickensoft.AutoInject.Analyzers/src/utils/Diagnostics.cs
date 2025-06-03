@@ -7,7 +7,7 @@ public static class Diagnostics {
   private const string ERR_CATEGORY = "Chickensoft.AutoInject.Analyzers";
 
   public static DiagnosticDescriptor MissingAutoInjectNotifyOverrideDescriptor { get; } = new(
-    id: $"{ERR_PREFIX}_001",
+    id: $"{ERR_PREFIX}001",
     title: $"Missing \"_Notification\" method override",
     messageFormat: $"Missing override of \"_Notification\" in AutoInject class implementation `{{0}}`",
     category: ERR_CATEGORY,
@@ -21,7 +21,7 @@ public static class Diagnostics {
   ) => Diagnostic.Create(MissingAutoInjectNotifyOverrideDescriptor, location, name);
 
   public static DiagnosticDescriptor MissingAutoInjectNotifyDescriptor { get; } = new(
-    id: $"{ERR_PREFIX}_002",
+    id: $"{ERR_PREFIX}002",
     title: $"Missing \"{Constants.NOTIFY_METHOD_NAME}\" method call",
     messageFormat: $"Missing \"{Constants.NOTIFY_METHOD_NAME}\" in AutoInject class implementation `{{0}}`",
     category: ERR_CATEGORY,
@@ -35,7 +35,7 @@ public static class Diagnostics {
   ) => Diagnostic.Create(MissingAutoInjectNotifyDescriptor, location, name);
 
   public static DiagnosticDescriptor MissingAutoInjectProvideDescriptor { get; } = new(
-    id: $"{ERR_PREFIX}_003",
+    id: $"{ERR_PREFIX}003",
     title: $"Missing \"{Constants.PROVIDE_METHOD_NAME}\" call in provider class",
     messageFormat: $"Missing \"{Constants.PROVIDE_METHOD_NAME}\" call in provider class implementation `{{0}}`",
     category: ERR_CATEGORY,

@@ -40,8 +40,10 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
       CodeAction.Create(
         title: "Add \"this.Notify(what);\" to existing \"_Notification\" override",
         createChangedDocument: c => AddAutoInjectNotifyCallAsync(context.Document, typeDeclaration, c),
-        equivalenceKey: nameof(AutoInjectNotifyOverrideFixProvider)),
-      diagnostic);
+        equivalenceKey: nameof(AutoInjectNotifyOverrideFixProvider)
+      ),
+      diagnostic
+    );
   }
 
   private static async Task<Document> AddAutoInjectNotifyCallAsync(Document document,
@@ -86,7 +88,8 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
             SyntaxFactory.SingletonSeparatedList(
                 SyntaxFactory.Argument(SyntaxFactory.IdentifierName(actualParameterName))
             )
-        ))
+        )
+    )
     ).WithAdditionalAnnotations(Formatter.Annotation);
 
     // Add the statement to the method body

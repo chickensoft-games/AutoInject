@@ -15,7 +15,7 @@ using Microsoft.CodeAnalysis.Simplification;
 using Utils;
 
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AutoInjectNotifyOverrideFixProvider)), Shared]
-public class AutoInjectNotifyOverrideFixProvider : CodeFixProvider {
+public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
   public sealed override ImmutableArray<string> FixableDiagnosticIds =>
     [Diagnostics.MissingAutoInjectNotifyOverrideDescriptor.Id];
 

@@ -11,8 +11,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 #pragma warning disable RS1038 // This is safe to disable as Microsoft.CodeAnalysis.Workspaces is only referenced in code fixes and not in the analyzer itself.
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 #pragma warning restore RS1038
-public class AutoInjectNotifyAnalyzer : DiagnosticAnalyzer
-{
+public class AutoInjectNotifyAnalyzer : DiagnosticAnalyzer {
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics {
     get;
   } = [Diagnostics.MissingAutoInjectNotifyDescriptor, Diagnostics.MissingAutoInjectNotifyOverrideDescriptor];
@@ -79,7 +78,8 @@ public class AutoInjectNotifyAnalyzer : DiagnosticAnalyzer
           classDeclaration.Identifier.ValueText
         )
       );
-    } else {
+    }
+    else {
       // Report missing Notify call, _Notification override does not exist.
       context.ReportDiagnostic(
         Diagnostics.MissingAutoInjectNotify(

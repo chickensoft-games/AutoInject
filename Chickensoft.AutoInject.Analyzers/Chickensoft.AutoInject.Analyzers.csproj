@@ -4,9 +4,9 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>preview</LangVersion>
     <RootNamespace>Chickensoft.AutoInject.Analyzers</RootNamespace>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NoWarn>NU5128</NoWarn>
     <OutputPath>./nupkg</OutputPath>
     <IsRoslynComponent>true</IsRoslynComponent>
@@ -16,7 +16,7 @@
 
     <Title>AutoInject Analyzers</Title>
     <Version>0.0.0-devbuild</Version>
-    <Description>AutoInject analyzers.</Description>
+    <Description>Analyzers and code fixes for Chickensoft.AutoInject.</Description>
     <Copyright>© 2025 Chickensoft</Copyright>
     <Authors>Chickensoft</Authors>
     <Company>Chickensoft</Company>

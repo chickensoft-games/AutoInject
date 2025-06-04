@@ -1,4 +1,4 @@
-namespace Chickensoft.AutoInject.Analyzers.fixes;
+namespace Chickensoft.AutoInject.Analyzers.Fixes;
 
 using System.Collections.Immutable;
 using System.Composition;

@@ -14,10 +14,10 @@ using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Simplification;
 using Utils;
 
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AutoInjectNotifyOverrideFixProvider)), Shared]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AutoInjectNotificationOverrideFixProvider)), Shared]
 public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
   public sealed override ImmutableArray<string> FixableDiagnosticIds =>
-    [Diagnostics.MissingAutoInjectNotifyOverrideDescriptor.Id];
+    [Diagnostics.MissingAutoInjectNotificationOverrideDescriptor.Id];
 
   public sealed override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
@@ -40,12 +40,12 @@ public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
     context.RegisterCodeFix(
       CodeAction.Create(
         title: "Add \"public override void _Notification(int what) => this.Notify(what);\" method",
-        createChangedDocument: c => AddAutoInjectNotifyOverrideAsync(context.Document, typeDeclaration, c),
-        equivalenceKey: nameof(AutoInjectNotifyOverrideFixProvider)),
+        createChangedDocument: c => AddAutoInjectNotificationOverrideAsync(context.Document, typeDeclaration, c),
+        equivalenceKey: nameof(AutoInjectNotificationOverrideFixProvider)),
       diagnostic);
   }
 
-  private static async Task<Document> AddAutoInjectNotifyOverrideAsync(Document document,
+  private static async Task<Document> AddAutoInjectNotificationOverrideAsync(Document document,
     TypeDeclarationSyntax typeDeclaration, CancellationToken cancellationToken)
   {
 

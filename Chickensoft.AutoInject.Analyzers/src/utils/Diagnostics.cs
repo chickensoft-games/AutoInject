@@ -6,7 +6,7 @@ public static class Diagnostics {
   private const string ERR_PREFIX = "AUTO_INJECT";
   private const string ERR_CATEGORY = "Chickensoft.AutoInject.Analyzers";
 
-  public static DiagnosticDescriptor MissingAutoInjectNotifyOverrideDescriptor { get; } = new(
+  public static DiagnosticDescriptor MissingAutoInjectNotificationOverrideDescriptor { get; } = new(
     id: $"{ERR_PREFIX}001",
     title: $"Missing \"_Notification\" method override",
     messageFormat: $"Missing override of \"_Notification\" in AutoInject class implementation `{{0}}`",
@@ -16,9 +16,9 @@ public static class Diagnostics {
     description: "Overriding the _Notification method is required to pass the lifecycle of the Godot node to AutoInject. Without this, all AutoInject functionality will not work as expected."
   );
 
-  public static Diagnostic MissingAutoInjectNotifyOverride(
+  public static Diagnostic MissingAutoInjectNotificationOverride(
     Location location, string name
-  ) => Diagnostic.Create(MissingAutoInjectNotifyOverrideDescriptor, location, name);
+  ) => Diagnostic.Create(MissingAutoInjectNotificationOverrideDescriptor, location, name);
 
   public static DiagnosticDescriptor MissingAutoInjectNotifyDescriptor { get; } = new(
     id: $"{ERR_PREFIX}002",

@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 public class AutoInjectNotifyAnalyzer : DiagnosticAnalyzer {
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics {
     get;
-  } = [Diagnostics.MissingAutoInjectNotifyDescriptor, Diagnostics.MissingAutoInjectNotifyOverrideDescriptor];
+  } = [Diagnostics.MissingAutoInjectNotifyDescriptor, Diagnostics.MissingAutoInjectNotificationOverrideDescriptor];
 
   public override void Initialize(AnalysisContext context) {
     context.EnableConcurrentExecution();
@@ -73,7 +73,7 @@ public class AutoInjectNotifyAnalyzer : DiagnosticAnalyzer {
     if (!hasNotificationOverride) {
       // Report missing Notify call, _Notification override already exists.
       context.ReportDiagnostic(
-        Diagnostics.MissingAutoInjectNotifyOverride(
+        Diagnostics.MissingAutoInjectNotificationOverride(
           attributes[0].GetLocation(),
           classDeclaration.Identifier.ValueText
         )

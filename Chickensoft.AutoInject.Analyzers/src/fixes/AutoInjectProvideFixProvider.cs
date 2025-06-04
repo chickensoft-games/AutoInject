@@ -1,20 +1,23 @@
 namespace Chickensoft.AutoInject.Analyzers.fixes;
 
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Simplification;
 using Utils;
 
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AutoInjectProvideFixProvider)), Shared]
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AutoInjectProvideFixProvider))]
+[Shared]
 public class AutoInjectProvideFixProvider : CodeFixProvider {
   public sealed override ImmutableArray<string> FixableDiagnosticIds =>
     [Diagnostics.MissingAutoInjectProvideDescriptor.Id];
@@ -37,86 +40,91 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
       return;
     }
 
-    var hasSetupMethod = typeDeclaration.Members
+    // Register code fixes for either creating or modifying methods that call `this.Provide()`.
+
+    // Setup() Method Fixes
+    RegisterMethodFixesAsync(
+      context, typeDeclaration, diagnostic,
+      "Setup",
+      m => m.Identifier.Text == "Setup" &&
+           m.Modifiers.Any(SyntaxKind.PublicKeyword),
+      SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+    );
+
+    // OnReady() Method Fixes
+    RegisterMethodFixesAsync(
+      context, typeDeclaration, diagnostic,
+      "OnReady",
+      m => m.Identifier.Text == "OnReady" &&
+           m.Modifiers.Any(SyntaxKind.PublicKeyword),
+      SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+    );
+
+    // _Ready() Method Fixes
+    RegisterMethodFixesAsync(
+      context, typeDeclaration, diagnostic,
+      "_Ready",
+      m => m.Identifier.Text == "_Ready" &&
+           m.Modifiers.Any(SyntaxKind.PublicKeyword) &&
+           m.Modifiers.Any(SyntaxKind.OverrideKeyword),
+      SyntaxFactory.TokenList(
+        SyntaxFactory.Token(SyntaxKind.PublicKeyword),
+        SyntaxFactory.Token(SyntaxKind.OverrideKeyword)
+      )
+    );
+  }
+
+  /// <summary>
+  ///   Registers code fixes for a method that either adds a call to an existing method if it exists
+  ///   or creates a new method with the call.
+  /// </summary>
+  /// <param name="context">Code fix context</param>
+  /// <param name="typeDeclaration">Type declaration of parent class</param>
+  /// <param name="diagnostic">Diagnostic that triggered this</param>
+  /// <param name="methodName">Method name to create</param>
+  /// <param name="findPredicate">Predicate to find existing method</param>
+  /// <param name="creationModifiers">Method modifiers to add to created method</param>
+  private static void RegisterMethodFixesAsync(
+    CodeFixContext context,
+    TypeDeclarationSyntax typeDeclaration,
+    Diagnostic diagnostic,
+    string methodName,
+    Func<MethodDeclarationSyntax, bool> findPredicate,
+    IEnumerable<SyntaxToken> creationModifiers
+  ) {
+    var existingMethod = typeDeclaration.Members
       .OfType<MethodDeclarationSyntax>()
-      .Any(m => m.Identifier.Text == "Setup" && m.Modifiers.Any(SyntaxKind.PublicKeyword));
+      .FirstOrDefault(findPredicate);
 
-    var hasOnReadyMethod = typeDeclaration.Members
-      .OfType<MethodDeclarationSyntax>()
-      .Any(m => m.Identifier.Text == "OnReady" && m.Modifiers.Any(SyntaxKind.PublicKeyword));
-
-    var hasOnReadyOverride = typeDeclaration.Members
-      .OfType<MethodDeclarationSyntax>()
-      .Any(m => m.Identifier.Text == "_Ready" && m.Modifiers.Any(SyntaxKind.PublicKeyword) &&
-                m.Modifiers.Any(SyntaxKind.OverrideKeyword));
-
-    // If they have Setup(), suggest adding this.Provide() at the end of it.
-    if (hasSetupMethod) {
-      var setupMethod = typeDeclaration.Members
-        .OfType<MethodDeclarationSyntax>()
-        .First(m => m.Identifier.Text == "Setup" && m.Modifiers.Any(SyntaxKind.PublicKeyword));
-
+    if (existingMethod is not null) {
+      // Method exists, offer to add a call to it
       context.RegisterCodeFix(
         CodeAction.Create(
-          title: "Add \"this.Provide();\" to existing \"Setup()\" method",
-          createChangedDocument: c => MethodModifier.AddCallToMethod(context.Document, typeDeclaration, setupMethod, "Provide", c),
-          equivalenceKey: nameof(AutoInjectProvideFixProvider)),
-        diagnostic);
-    } else {
-      // If they don't have Setup(), suggest creating one with this.Provide() in it.
-      context.RegisterCodeFix(
-        CodeAction.Create(
-          title: "Create \"Setup()\" method that calls \"this.Provide();\"",
-          createChangedDocument: c => AddNewMethodAsync(context.Document, typeDeclaration, "Setup", c),
-          equivalenceKey: nameof(AutoInjectProvideFixProvider)),
+          $"Add \"this.Provide();\" to existing \"{methodName}()\" method",
+          c =>
+            MethodModifier.AddCallToMethod(context.Document, typeDeclaration, existingMethod, "Provide", c),
+          $"{nameof(AutoInjectProvideFixProvider)}_AddCallTo_{methodName}"),
         diagnostic);
     }
-
-    // If they have OnReady(), suggest adding this.Provide() at the end of it.
-    if (hasOnReadyMethod) {
-      var onReadyMethod = typeDeclaration.Members
-        .OfType<MethodDeclarationSyntax>()
-        .First(m => m.Identifier.Text == "OnReady" && m.Modifiers.Any(SyntaxKind.PublicKeyword));
-
+    else {
+      // Method does not exist, offer to create it
       context.RegisterCodeFix(
         CodeAction.Create(
-          title: "Add \"this.Provide();\" to existing \"OnReady()\" method",
-          createChangedDocument: c => MethodModifier.AddCallToMethod(context.Document, typeDeclaration, onReadyMethod, "Provide", c),
-          equivalenceKey: nameof(AutoInjectProvideFixProvider)),
-        diagnostic);
-    } else {
-      // If they don't have OnReady(), suggest creating one with this.Provide() in it.
-      context.RegisterCodeFix(
-        CodeAction.Create(
-          title: "Create \"OnReady()\" method that calls \"this.Provide();\"",
-          createChangedDocument: c => AddNewMethodAsync(context.Document, typeDeclaration, "OnReady", c),
-          equivalenceKey: nameof(AutoInjectProvideFixProvider)),
-        diagnostic);
-    }
-
-    // If they have _Ready(), suggest adding this.Provide() at the end of it.
-    if (hasOnReadyOverride) {
-      var onReadyOverrideMethod = typeDeclaration.Members
-        .OfType<MethodDeclarationSyntax>()
-        .First(m => m.Identifier.Text == "_Ready" && m.Modifiers.Any(SyntaxKind.PublicKeyword) &&
-                    m.Modifiers.Any(SyntaxKind.OverrideKeyword));
-
-      context.RegisterCodeFix(
-        CodeAction.Create(
-          title: "Add \"this.Provide();\" to existing \"_Ready()\" method",
-          createChangedDocument: c => MethodModifier.AddCallToMethod(context.Document, typeDeclaration, onReadyOverrideMethod, "Provide", c),
-          equivalenceKey: nameof(AutoInjectProvideFixProvider)),
+          $"Create \"{methodName}()\" method that calls \"this.Provide()\"",
+          c => AddNewMethodAsync(
+            context.Document, typeDeclaration, methodName, creationModifiers, c),
+          $"{nameof(AutoInjectProvideFixProvider)}_CreateNew_{methodName}"),
         diagnostic);
     }
   }
 
-  private static async Task<Document> AddNewMethodAsync(Document document, TypeDeclarationSyntax typeDeclaration, string identifier,
+  private static async Task<Document> AddNewMethodAsync(Document document, TypeDeclarationSyntax typeDeclaration,
+    string identifier, IEnumerable<SyntaxToken> creationModifiers,
     CancellationToken cancellationToken) {
-
     // Create the new method
     var mewMethod = SyntaxFactory
       .MethodDeclaration(SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)), identifier)
-      .WithModifiers(SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword)))
+      .WithModifiers(SyntaxFactory.TokenList(creationModifiers))
       .WithBody(SyntaxFactory.Block(
         SyntaxFactory.SingletonList(
           SyntaxFactory.ParseStatement(Constants.PROVIDE_NEW_METHOD_BODY)

@@ -8,13 +8,11 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-#pragma warning disable RS1038 // This is safe to disable as Microsoft.CodeAnalysis.Workspaces is only referenced in code fixes and not in the analyzer itself.
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-#pragma warning restore RS1038
-public class AutoInjectNotifyAnalyzer : DiagnosticAnalyzer {
+public class AutoInjectNotificationOverrideMissingAnalyzer : DiagnosticAnalyzer {
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics {
     get;
-  } = [Diagnostics.MissingAutoInjectNotifyDescriptor, Diagnostics.MissingAutoInjectNotificationOverrideDescriptor];
+  } = [Diagnostics.MissingAutoInjectNotificationOverrideDescriptor];
 
   public override void Initialize(AnalysisContext context) {
     context.EnableConcurrentExecution();
@@ -47,19 +45,6 @@ public class AutoInjectNotifyAnalyzer : DiagnosticAnalyzer {
       return;
     }
 
-    // Check if the class calls "this.Notify()" anywhere.
-    var hasNotify = classDeclaration
-      .DescendantNodes()
-      .OfType<InvocationExpressionSyntax>()
-      .Any(invocation =>
-        invocation.Expression is MemberAccessExpressionSyntax {
-          Name.Identifier.ValueText: "Notify", Expression: ThisExpressionSyntax
-        });
-
-    if (hasNotify) {
-      return;
-    }
-
     // Check if the class has a _Notification override method.
     var hasNotificationOverride = classDeclaration
       .Members
@@ -74,15 +59,6 @@ public class AutoInjectNotifyAnalyzer : DiagnosticAnalyzer {
       // Report missing Notify call, _Notification override already exists.
       context.ReportDiagnostic(
         Diagnostics.MissingAutoInjectNotificationOverride(
-          attributes[0].GetLocation(),
-          classDeclaration.Identifier.ValueText
-        )
-      );
-    }
-    else {
-      // Report missing Notify call, _Notification override does not exist.
-      context.ReportDiagnostic(
-        Diagnostics.MissingAutoInjectNotify(
           attributes[0].GetLocation(),
           classDeclaration.Identifier.ValueText
         )

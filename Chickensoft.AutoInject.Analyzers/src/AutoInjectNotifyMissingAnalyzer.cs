@@ -1,0 +1,83 @@
+namespace Chickensoft.AutoInject.Analyzers;
+
+using System.Collections.Immutable;
+using System.Linq;
+using Chickensoft.AutoInject.Analyzers.Utils;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public class AutoInjectNotifyMissingAnalyzer : DiagnosticAnalyzer {
+  public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics {
+    get;
+  } = [Diagnostics.MissingAutoInjectNotifyDescriptor];
+
+  public override void Initialize(AnalysisContext context) {
+    context.EnableConcurrentExecution();
+
+    context.ConfigureGeneratedCodeAnalysis(
+      GeneratedCodeAnalysisFlags.Analyze |
+      GeneratedCodeAnalysisFlags.ReportDiagnostics
+    );
+
+    context.RegisterSyntaxNodeAction(
+      AnalyzeClassDeclaration,
+      SyntaxKind.ClassDeclaration
+    );
+  }
+
+  private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context) {
+    var classDeclaration = (ClassDeclarationSyntax)context.Node;
+
+    var attributes = classDeclaration.AttributeLists.SelectMany(list => list.Attributes
+    ).Where(attribute => attribute.Name.ToString() == Constants.META_ATTRIBUTE_NAME
+       // Check that Meta attribute has an AutoInject type (ex: [Meta(typeof(IAutoNode))])
+       && attribute.ArgumentList?.Arguments.Any(arg =>
+          arg.Expression is TypeOfExpressionSyntax { Type: IdentifierNameSyntax identifierName } &&
+         Constants.AutoInjectTypeNames.Contains(identifierName.Identifier.ValueText)
+       ) == true
+    )
+    .ToList();
+
+    if (attributes.Count == 0) {
+      return;
+    }
+
+    // Check if the class has a _Notification override method.
+    // If it doesn't, the NotificationOverrideMissing analyzer will get it.
+    var hasNotificationOverride = classDeclaration
+      .Members
+      .OfType<MethodDeclarationSyntax>()
+      .Any(
+        method =>
+          method.Identifier.ValueText == "_Notification"
+            && method.Modifiers.Any(SyntaxKind.OverrideKeyword)
+            && method.ParameterList.Parameters.Count == 1
+      );
+
+    if (hasNotificationOverride) {
+      // Check if the class calls "this.Notify()" in the _Notification override.
+      var hasNotify = classDeclaration
+        .DescendantNodes()
+        .OfType<InvocationExpressionSyntax>()
+        .Any(invocation =>
+          invocation.Expression is MemberAccessExpressionSyntax {
+            Name.Identifier.ValueText: "Notify",
+            Expression: ThisExpressionSyntax
+          }
+        );
+
+      if (!hasNotify) {
+        // Report missing Notify call, _Notification override does not exist.
+        context.ReportDiagnostic(
+          Diagnostics.MissingAutoInjectNotify(
+            attributes[0].GetLocation(),
+            classDeclaration.Identifier.ValueText
+          )
+        );
+      }
+    }
+  }
+}

@@ -3,11 +3,11 @@ namespace Chickensoft.AutoInject.Analyzers.Tests;
 using System.Threading.Tasks;
 using Chickensoft.AutoInject.Analyzers.Utils;
 using Xunit;
-using VerifyCS = Verifiers.CSharpCodeFixVerifier<AutoInjectNotifyAnalyzer, Fixes.AutoInjectNotificationOverrideFixProvider>;
+using VerifyCS = Verifiers.CSharpCodeFixVerifier<AutoInjectNotificationOverrideMissingAnalyzer, Fixes.AutoInjectNotificationOverrideFixProvider>;
 
 public class AutoInjectNotificationOverrideFixProviderTest {
   [Fact]
-  public async Task DoesNotOfferDiagnosticIfNotificationOverrideExistsAndCallsNotify() {
+  public async Task DoesNotOfferDiagnosticIfNotificationOverrideExists() {
     var diagnosticID = Diagnostics
       .MissingAutoInjectNotificationOverrideDescriptor
       .Id;
@@ -20,7 +20,7 @@ public class AutoInjectNotificationOverrideFixProviderTest {
     [Meta(typeof(IAutoNode))]
     partial class MyNode : Node
     {
-        public override void _Notification(int what) { this.Notify(what); }
+        public override void _Notification(int what) { }
     }
     """;
 

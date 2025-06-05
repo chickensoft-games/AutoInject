@@ -31,10 +31,7 @@ public static partial class CSharpAnalyzerVerifier<TAnalyzer>
       => CSharpAnalyzerVerifier<TAnalyzer, DefaultVerifier>
         .Diagnostic(descriptor);
 
-  /// <inheritdoc cref="AnalyzerVerifier{TAnalyzer, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
-  public static async Task VerifyAnalyzerAsync(
-      string source,
-      params DiagnosticResult[] expected) {
+  public static Test CreateTest(string source) {
     var test = new Test {
       TestCode = source,
     };
@@ -54,6 +51,15 @@ public static partial class CSharpAnalyzerVerifier<TAnalyzer>
           godotAssemblyPath,
         ]
       );
+
+    return test;
+  }
+
+  /// <inheritdoc cref="AnalyzerVerifier{TAnalyzer, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
+  public static async Task VerifyAnalyzerAsync(
+      string source,
+      params DiagnosticResult[] expected) {
+    var test = CreateTest(source);
 
     test.ExpectedDiagnostics.AddRange(expected);
     await test.RunAsync(CancellationToken.None);

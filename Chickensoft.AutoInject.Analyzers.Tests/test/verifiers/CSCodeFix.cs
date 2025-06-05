@@ -1,14 +1,11 @@
 namespace Chickensoft.AutoInject.Analyzers.Tests.Verifiers;
 
-using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Chickensoft.AutoInject.Analyzers.Tests.Util;
 using Godot;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
@@ -36,44 +33,14 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
       CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>
         .Diagnostic(descriptor);
 
-  /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
-  public static async Task VerifyAnalyzerAsync(
-      string source,
-      params DiagnosticResult[] expected) {
+  public static Test CreateTest(string source, string? fixedSource = null) {
     var test = new Test {
       TestCode = source,
     };
 
-    test.ExpectedDiagnostics.AddRange(expected);
-    await test.RunAsync(CancellationToken.None);
-  }
-
-  /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, string)"/>
-  public static async Task VerifyCodeFixAsync(
-      string source,
-      string fixedSource) =>
-      await VerifyCodeFixAsync(
-        source,
-        DiagnosticResult.EmptyDiagnosticResults,
-        fixedSource
-      );
-
-  /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult, string)"/>
-  public static async Task VerifyCodeFixAsync(
-      string source,
-      DiagnosticResult expected,
-      string fixedSource) =>
-    await VerifyCodeFixAsync(source, [expected], fixedSource);
-
-  /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult[], string)"/>
-  public static async Task VerifyCodeFixAsync(
-      string source,
-      DiagnosticResult[] expected,
-      string fixedSource) {
-    var test = new Test {
-      TestCode = source,
-      FixedCode = fixedSource,
-    };
+    if (fixedSource is not null) {
+      test.FixedCode = fixedSource;
+    }
 
     var autoInjectAssemblyPath =
       AssemblyHelper.GetAssemblyPath(typeof(IAutoNode));
@@ -90,6 +57,56 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
           godotAssemblyPath,
         ]
       );
+
+    return test;
+  }
+
+  /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
+  public static async Task VerifyAnalyzerAsync(
+      string source,
+      params DiagnosticResult[] expected) {
+    var test = CreateTest(source);
+
+    test.ExpectedDiagnostics.AddRange(expected);
+    await test.RunAsync(CancellationToken.None);
+  }
+
+  /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, string)"/>
+  public static async Task VerifyCodeFixAsync(
+      string source,
+      string fixedSource,
+      string? codeFixEquivalenceKey = null) =>
+    await VerifyCodeFixAsync(
+      source,
+      DiagnosticResult.EmptyDiagnosticResults,
+      fixedSource,
+      codeFixEquivalenceKey
+    );
+
+  /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult, string)"/>
+  public static async Task VerifyCodeFixAsync(
+      string source,
+      DiagnosticResult expected,
+      string fixedSource,
+      string? codeFixEquivalenceKey = null) =>
+    await VerifyCodeFixAsync(
+      source,
+      [expected],
+      fixedSource,
+      codeFixEquivalenceKey
+    );
+
+  /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult[], string)"/>
+  public static async Task VerifyCodeFixAsync(
+      string source,
+      DiagnosticResult[] expected,
+      string fixedSource,
+      string? codeFixEquivalenceKey) {
+    var test = CreateTest(source, fixedSource);
+
+    if (codeFixEquivalenceKey is not null) {
+      test.CodeActionEquivalenceKey = codeFixEquivalenceKey;
+    }
 
     test.ExpectedDiagnostics.AddRange(expected);
     await test.RunAsync(CancellationToken.None);

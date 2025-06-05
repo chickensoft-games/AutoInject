@@ -7,7 +7,30 @@ using VerifyCS = Verifiers.CSharpCodeFixVerifier<AutoInjectNotifyAnalyzer, Fixes
 
 public class AutoInjectNotificationOverrideFixProviderTest {
   [Fact]
-  public async Task ReportsMissingNotificationOverride() {
+  public async Task DoesNotOfferDiagnosticIfNotificationOverrideExistsAndCallsNotify() {
+    var diagnosticID = Diagnostics
+      .MissingAutoInjectNotificationOverrideDescriptor
+      .Id;
+
+    var testCode = $$"""
+    using Chickensoft.AutoInject;
+    using Chickensoft.Introspection;
+    using Godot;
+
+    [Meta(typeof(IAutoNode))]
+    partial class MyNode : Node
+    {
+        public override void _Notification(int what) { this.Notify(what); }
+    }
+    """;
+
+    await VerifyCS.VerifyAnalyzerAsync(
+      testCode.ReplaceLineEndings()
+    );
+  }
+
+  [Fact]
+  public async Task FixesMissingNotificationOverrideByAddingOverrideWithNotify() {
     var diagnosticID = Diagnostics
       .MissingAutoInjectNotificationOverrideDescriptor
       .Id;

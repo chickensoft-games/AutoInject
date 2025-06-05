@@ -1,9 +1,14 @@
 namespace Chickensoft.AutoInject.Analyzers.Tests.Verifiers;
 
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Chickensoft.AutoInject.Analyzers.Tests.Util;
+using Godot;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
@@ -69,6 +74,22 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
       TestCode = source,
       FixedCode = fixedSource,
     };
+
+    var autoInjectAssemblyPath =
+      AssemblyHelper.GetAssemblyPath(typeof(IAutoNode));
+    var introspectionAssemblyPath =
+      AssemblyHelper.GetAssemblyPath(typeof(Introspection.MetaAttribute));
+    var godotAssemblyPath =
+      AssemblyHelper.GetAssemblyPath(typeof(Node));
+
+    test.ReferenceAssemblies = ReferenceAssemblies.Net.Net80
+      .AddAssemblies(
+        [
+          autoInjectAssemblyPath,
+          introspectionAssemblyPath,
+          godotAssemblyPath,
+        ]
+      );
 
     test.ExpectedDiagnostics.AddRange(expected);
     await test.RunAsync(CancellationToken.None);

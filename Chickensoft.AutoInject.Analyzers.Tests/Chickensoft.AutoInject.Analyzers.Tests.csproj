@@ -9,21 +9,29 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
+  <!-- Prevent Godot source generators from complaining -->
+  <PropertyGroup>
+    <!-- normally defined by the Godot.NET.Sdk -->
+    <GodotProjectDir>$(MSBuildProjectDirectory)</GodotProjectDir>
+    <GodotProjectDirBase64 Condition=" $([MSBuild]::VersionGreaterThanOrEquals($(MSBuildAssemblyVersion), '17.3')) ">$([MSBuild]::ConvertToBase64('$(GodotProjectDir)'))</GodotProjectDirBase64>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="NuGet.Resolver" Version="6.14.0" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
     <PackageReference Include="Microsoft.CodeAnalysis" Version="4.14.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeRefactoring.Testing" Version="1.1.2" />
-    <PackageReference Include="xunit.analyzers" Version="1.21.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="xunit" Version="2.5.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+
+    <!-- These are necessary to compile test code -->
+    <PackageReference Include="Chickensoft.Introspection" Version="3.0.1" />
+    <PackageReference Include="GodotSharp" Version="4.4.1" />
+
+    <PackageReference Include="Godot.SourceGenerators" Version="4.4.1" />
   </ItemGroup>
 
   <ItemGroup>

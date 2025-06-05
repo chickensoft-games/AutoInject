@@ -53,5 +53,26 @@
         "clear": false
       }
     },
+    {
+      "label": "test-analyzers",
+      "group": "test",
+      "command": "dotnet",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/Chickensoft.AutoInject.Analyzers.Tests",
+      },
+      "args": [
+        "test"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": "$msCompile"
+    },
   ]
 }

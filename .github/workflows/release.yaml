@@ -70,6 +70,7 @@ jobs:
           replace: ${{ steps.next-version.outputs.version }}
           regex: false
           include: Chickensoft.AutoInject/Chickensoft.AutoInject.csproj
+          include: Chickensoft.AutoInject.Analyzers/Chickensoft.AutoInject.Analyzers.csproj
 
       - name: 🖨 Copy Source to Source-Only package
         run: |
@@ -131,10 +132,22 @@ jobs:
         run: |
           dotnet build -c Release
 
+      - name: 🛠 Build Analyzers
+        working-directory: Chickensoft.AutoInject.Analyzers
+        run: |
+          dotnet build -c Release
+
       - name: 🔎 Get Package Path
         id: package-path
         run: |
           package=$(find ./Chickensoft.AutoInject/nupkg -name "*.nupkg")
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "📦 Found package: $package"
+
+      - name: 🔎 Get Analyzer Package Path
+        id: analyzer-package-path
+        run: |
+          package=$(find ./Chickensoft.AutoInject.Analyzers/nupkg -name "*.nupkg")
           echo "package=$package" >> "$GITHUB_OUTPUT"
           echo "📦 Found package: $package"
 
@@ -144,10 +157,20 @@ jobs:
         run: |
           version="${{ steps.next-version.outputs.version }}"
           gh release create --title "v$version" --generate-notes "$version" \
-            "${{ steps.package-path.outputs.package }}"
+            "${{ steps.package-path.outputs.package }}" \
+            "${{ steps.analyzer-package-path.outputs.package }}"
 
       - name: 🛜 Publish to Nuget
         run: |
           dotnet nuget push "${{ steps.package-path.outputs.package }}" \
+            --api-key "${{ secrets.NUGET_API_KEY }}" \
+            --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+
+      - name: 🛜 Publish to Nuget
+        run: |
+          dotnet nuget push "${{ steps.package-path.outputs.package }}" \
+            --api-key "${{ secrets.NUGET_API_KEY }}" \
+            --source "https://api.nuget.org/v3/index.json" --skip-duplicate
+          dotnet nuget push "${{ steps.analyzer-package-path.outputs.package }}" \
             --api-key "${{ secrets.NUGET_API_KEY }}" \
             --source "https://api.nuget.org/v3/index.json" --skip-duplicate

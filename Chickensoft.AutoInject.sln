@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chickensoft.AutoInject.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chickensoft.AutoInject.Analyzers", "Chickensoft.AutoInject.Analyzers\Chickensoft.AutoInject.Analyzers.csproj", "{70A5327C-5874-428E-BF51-C6854A1608F5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chickensoft.AutoInject.Analyzers.Tests", "Chickensoft.AutoInject.Analyzers.Tests\Chickensoft.AutoInject.Analyzers.Tests.csproj", "{AF663183-3114-406E-8A2E-8535132FEBB7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{70A5327C-5874-428E-BF51-C6854A1608F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70A5327C-5874-428E-BF51-C6854A1608F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70A5327C-5874-428E-BF51-C6854A1608F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF663183-3114-406E-8A2E-8535132FEBB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF663183-3114-406E-8A2E-8535132FEBB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF663183-3114-406E-8A2E-8535132FEBB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF663183-3114-406E-8A2E-8535132FEBB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

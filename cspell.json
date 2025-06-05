@@ -17,10 +17,12 @@
     "automerge",
     "branchcoverage",
     "brandedoutcast",
+    "buildtransitive",
     "camelcase",
     "chickenpackage",
     "Chickensoft",
     "classfilters",
+    "contentfiles",
     "CYGWIN",
     "devbuild",
     "endregion",
@@ -42,6 +44,7 @@
     "NOLOGO",
     "nupkg",
     "Omnisharp",
+    "onready",
     "opencover",
     "OPTOUT",
     "paramref",
@@ -62,6 +65,7 @@
     "typeparamref",
     "ulong",
     "Unparented",
+    "warnaserror",
     "Xunit"
   ]
 }

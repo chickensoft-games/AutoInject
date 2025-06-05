@@ -2,19 +2,17 @@ namespace Chickensoft.AutoInject.Analyzers;
 
 using System.Collections.Immutable;
 using System.Linq;
-using Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Utils;
 
 /// <summary>
 /// When inheriting IProvide, the class must call this.Provide() somewhere in the setup.
 /// This analyzer checks that the class does not forget to call this.Provide().
 /// </summary>
-#pragma warning disable RS1038 // This is safe to disable as Microsoft.CodeAnalysis.Workspaces is only referenced in code fixes and not in the analyzer itself.
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-#pragma warning restore RS1038
 public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics {
     get;

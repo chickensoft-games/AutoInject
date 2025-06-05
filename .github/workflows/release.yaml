@@ -69,8 +69,7 @@ jobs:
           find: "0.0.0-devbuild"
           replace: ${{ steps.next-version.outputs.version }}
           regex: false
-          include: Chickensoft.AutoInject/Chickensoft.AutoInject.csproj
-          include: Chickensoft.AutoInject.Analyzers/Chickensoft.AutoInject.Analyzers.csproj
+          include: Chickensoft.AutoInject*/Chickensoft.AutoInject*.csproj
 
       - name: 🖨 Copy Source to Source-Only package
         run: |

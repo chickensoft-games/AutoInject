@@ -24,9 +24,9 @@
     <PackageReference Include="Shouldly" Version="4.3.0" />
 
     <PackageReference Include="Chickensoft.GoDotTest" Version="1.7.0" />
-    <PackageReference Include="Chickensoft.GodotTestDriver" Version="3.1.16" />
-    <PackageReference Include="Chickensoft.GodotNodeInterfaces" Version="2.4.19" />
-    <PackageReference Include="Chickensoft.Introspection" Version="3.0.1" />
-    <PackageReference Include="Chickensoft.Introspection.Generator" Version="3.0.1" PrivateAssets="all" OutputItemType="analyzer" />
+    <PackageReference Include="Chickensoft.GodotTestDriver" Version="3.1.17" />
+    <PackageReference Include="Chickensoft.GodotNodeInterfaces" Version="2.4.20" />
+    <PackageReference Include="Chickensoft.Introspection" Version="3.0.2" />
+    <PackageReference Include="Chickensoft.Introspection.Generator" Version="3.0.2" PrivateAssets="all" OutputItemType="analyzer" />
   </ItemGroup>
 </Project>

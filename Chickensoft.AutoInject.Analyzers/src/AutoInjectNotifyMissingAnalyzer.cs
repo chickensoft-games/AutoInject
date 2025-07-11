@@ -18,8 +18,7 @@ public class AutoInjectNotifyMissingAnalyzer : DiagnosticAnalyzer {
     context.EnableConcurrentExecution();
 
     context.ConfigureGeneratedCodeAnalysis(
-      GeneratedCodeAnalysisFlags.Analyze |
-      GeneratedCodeAnalysisFlags.ReportDiagnostics
+      GeneratedCodeAnalysisFlags.None
     );
 
     context.RegisterSyntaxNodeAction(

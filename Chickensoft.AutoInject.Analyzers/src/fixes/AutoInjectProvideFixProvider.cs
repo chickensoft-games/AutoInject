@@ -19,12 +19,15 @@ using Utils;
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AutoInjectProvideFixProvider))]
 [Shared]
 public class AutoInjectProvideFixProvider : CodeFixProvider {
+  private static readonly ImmutableArray<string> _fixableDiagnosticIds =
+    [Diagnostics.MissingAutoInjectProvideDescriptor.Id];
+
   public const string SETUP_METHOD_NAME = "Setup";
   public const string ONREADY_METHOD_NAME = "OnReady";
   public const string READY_OVERRIDE_METHOD_NAME = "_Ready";
 
   public sealed override ImmutableArray<string> FixableDiagnosticIds =>
-    [Diagnostics.MissingAutoInjectProvideDescriptor.Id];
+    _fixableDiagnosticIds;
 
   public sealed override FixAllProvider GetFixAllProvider() =>
     WellKnownFixAllProviders.BatchFixer;

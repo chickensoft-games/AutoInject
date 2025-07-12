@@ -22,8 +22,11 @@ using Utils;
   Shared
 ]
 public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
-  public sealed override ImmutableArray<string> FixableDiagnosticIds =>
+  private static readonly ImmutableArray<string> _fixableDiagnosticIds =
     [Diagnostics.MissingAutoInjectNotificationOverrideDescriptor.Id];
+
+  public sealed override ImmutableArray<string> FixableDiagnosticIds =>
+    _fixableDiagnosticIds;
 
   public sealed override FixAllProvider GetFixAllProvider() =>
     WellKnownFixAllProviders.BatchFixer;

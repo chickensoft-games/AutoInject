@@ -14,9 +14,11 @@ using Utils;
 /// </summary>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
-  public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics {
-    get;
-  } = [Diagnostics.MissingAutoInjectProvideDescriptor];
+  private static readonly ImmutableArray<DiagnosticDescriptor> _supportedDiagnostics =
+    [Diagnostics.MissingAutoInjectProvideDescriptor];
+
+  public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    _supportedDiagnostics;
 
   public override void Initialize(AnalysisContext context) {
     context.EnableConcurrentExecution();

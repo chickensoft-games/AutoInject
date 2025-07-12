@@ -10,9 +10,11 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class AutoInjectNotificationOverrideMissingAnalyzer : DiagnosticAnalyzer {
-  public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics {
-    get;
-  } = [Diagnostics.MissingAutoInjectNotificationOverrideDescriptor];
+  private static readonly ImmutableArray<DiagnosticDescriptor> _supportedDiagnostics =
+    [Diagnostics.MissingAutoInjectNotificationOverrideDescriptor];
+
+  public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    _supportedDiagnostics;
 
   public override void Initialize(AnalysisContext context) {
     context.EnableConcurrentExecution();

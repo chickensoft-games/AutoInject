@@ -131,7 +131,6 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
     // Add the statement to the method body
     return await MethodModifier.AddStatementToMethodBodyAsync(
         document,
-        typeDeclaration,
         originalMethodNode,
         statementToAdd,
         cancellationToken

@@ -116,7 +116,7 @@ public class AutoInjectProvideFixProviderTest {
       testCode.ReplaceLineEndings(),
       fixedCode.ReplaceLineEndings(),
       AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
-        AutoInjectProvideFixProvider.SETUP_METHOD_NAME,
+        Constants.SETUP_METHOD_NAME,
         false
       )
     );
@@ -192,7 +192,7 @@ public class AutoInjectProvideFixProviderTest {
       testCode.ReplaceLineEndings(),
       fixedCode.ReplaceLineEndings(),
       AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
-        AutoInjectProvideFixProvider.ONREADY_METHOD_NAME,
+        Constants.ONREADY_METHOD_NAME,
         false
       )
     );
@@ -268,7 +268,7 @@ public class AutoInjectProvideFixProviderTest {
       testCode.ReplaceLineEndings(),
       fixedCode.ReplaceLineEndings(),
       AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
-        AutoInjectProvideFixProvider.READY_OVERRIDE_METHOD_NAME,
+        Constants.READY_METHOD_NAME,
         false
       )
     );
@@ -277,7 +277,7 @@ public class AutoInjectProvideFixProviderTest {
 
   #region ImprovingExistingMethods
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingSetup() {
+  public async Task FixesMissingProvideCallByImprovingExistingEmptySetup() {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -345,14 +345,174 @@ public class AutoInjectProvideFixProviderTest {
       testCode.ReplaceLineEndings(),
       fixedCode.ReplaceLineEndings(),
       AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
-        AutoInjectProvideFixProvider.SETUP_METHOD_NAME,
+        Constants.SETUP_METHOD_NAME,
         true
       )
     );
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingOnReady() {
+  public async Task FixesMissingProvideCallByImprovingExistingNonEmptySetup() {
+    var diagnosticID = Diagnostics
+      .MissingAutoInjectProvideDescriptor
+      .Id;
+
+    var testCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [{|{{diagnosticID}}:Meta(typeof(IProvider))|}]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public void Setup()
+        {
+            DoSomething(); // do something
+        }
+        public void DoSomething() { }
+    }
+    """;
+
+    var fixedCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [Meta(typeof(IProvider))]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public void Setup()
+        {
+            DoSomething(); // do something
+            this.Provide();
+        }
+        public void DoSomething() { }
+    }
+    """;
+
+    await VerifyCS.VerifyCodeFixAsync(
+      testCode.ReplaceLineEndings(),
+      fixedCode.ReplaceLineEndings(),
+      AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
+        Constants.SETUP_METHOD_NAME,
+        true
+      )
+    );
+  }
+
+  [Fact]
+  public async Task FixesMissingProvideCallByImprovingExistingExpressionBodiedSetup() {
+    var diagnosticID = Diagnostics
+      .MissingAutoInjectProvideDescriptor
+      .Id;
+
+    var testCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [{|{{diagnosticID}}:Meta(typeof(IProvider))|}]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public void Setup() => DoSomething(); // do something
+        public void DoSomething() { }
+    }
+    """;
+
+    var fixedCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [Meta(typeof(IProvider))]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public void Setup()
+        {
+            DoSomething(); // do something
+            this.Provide();
+        }
+
+        public void DoSomething() { }
+    }
+    """;
+
+    await VerifyCS.VerifyCodeFixAsync(
+      testCode.ReplaceLineEndings(),
+      fixedCode.ReplaceLineEndings(),
+      AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
+        Constants.SETUP_METHOD_NAME,
+        true
+      )
+    );
+  }
+
+  [Fact]
+  public async Task FixesMissingProvideCallByImprovingExistingEmptyOnReady() {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -420,14 +580,173 @@ public class AutoInjectProvideFixProviderTest {
       testCode.ReplaceLineEndings(),
       fixedCode.ReplaceLineEndings(),
       AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
-        AutoInjectProvideFixProvider.ONREADY_METHOD_NAME,
+        Constants.ONREADY_METHOD_NAME,
         true
       )
     );
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingReadyOverride() {
+  public async Task FixesMissingProvideCallByImprovingExistingNonEmptyOnReady() {
+    var diagnosticID = Diagnostics
+      .MissingAutoInjectProvideDescriptor
+      .Id;
+
+    var testCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [{|{{diagnosticID}}:Meta(typeof(IProvider))|}]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public void OnReady() {
+            DoSomething(); // do something
+        }
+        public void DoSomething() { }
+    }
+    """;
+
+    var fixedCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [Meta(typeof(IProvider))]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public void OnReady()
+        {
+            DoSomething(); // do something
+            this.Provide();
+        }
+        public void DoSomething() { }
+    }
+    """;
+
+    await VerifyCS.VerifyCodeFixAsync(
+      testCode.ReplaceLineEndings(),
+      fixedCode.ReplaceLineEndings(),
+      AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
+        Constants.ONREADY_METHOD_NAME,
+        true
+      )
+    );
+  }
+
+  [Fact]
+  public async Task FixesMissingProvideCallByImprovingExistingExpressionBodiedOnReady() {
+    var diagnosticID = Diagnostics
+      .MissingAutoInjectProvideDescriptor
+      .Id;
+
+    var testCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [{|{{diagnosticID}}:Meta(typeof(IProvider))|}]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public void OnReady() => DoSomething(); // do something
+        public void DoSomething() { }
+    }
+    """;
+
+    var fixedCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [Meta(typeof(IProvider))]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public void OnReady()
+        {
+            DoSomething(); // do something
+            this.Provide();
+        }
+
+        public void DoSomething() { }
+    }
+    """;
+
+    await VerifyCS.VerifyCodeFixAsync(
+      testCode.ReplaceLineEndings(),
+      fixedCode.ReplaceLineEndings(),
+      AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
+        Constants.ONREADY_METHOD_NAME,
+        true
+      )
+    );
+  }
+
+  [Fact]
+  public async Task FixesMissingProvideCallByImprovingExistingEmptyReadyOverride() {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -495,7 +814,167 @@ public class AutoInjectProvideFixProviderTest {
       testCode.ReplaceLineEndings(),
       fixedCode.ReplaceLineEndings(),
       AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
-        AutoInjectProvideFixProvider.READY_OVERRIDE_METHOD_NAME,
+        Constants.READY_METHOD_NAME,
+        true
+      )
+    );
+  }
+
+  [Fact]
+  public async Task FixesMissingProvideCallByImprovingExistingNonEmptyReadyOverride() {
+    var diagnosticID = Diagnostics
+      .MissingAutoInjectProvideDescriptor
+      .Id;
+
+    var testCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [{|{{diagnosticID}}:Meta(typeof(IProvider))|}]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public override void _Ready()
+        {
+            DoSomething(); // do something
+        }
+        public void DoSomething() { }
+    }
+    """;
+
+    var fixedCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [Meta(typeof(IProvider))]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public override void _Ready()
+        {
+            DoSomething(); // do something
+            this.Provide();
+        }
+        public void DoSomething() { }
+    }
+    """;
+
+    await VerifyCS.VerifyCodeFixAsync(
+      testCode.ReplaceLineEndings(),
+      fixedCode.ReplaceLineEndings(),
+      AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
+        Constants.READY_METHOD_NAME,
+        true
+      )
+    );
+  }
+
+  [Fact]
+  public async Task FixesMissingProvideCallByImprovingExistingExpressionBodiedReadyOverride() {
+    var diagnosticID = Diagnostics
+      .MissingAutoInjectProvideDescriptor
+      .Id;
+
+    var testCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [{|{{diagnosticID}}:Meta(typeof(IProvider))|}]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public override void _Ready() => DoSomething(); // do something
+        public void DoSomething() { }
+    }
+    """;
+
+    var fixedCode = $$"""
+    using Chickensoft.Introspection;
+    using Godot;
+
+    interface IProvide<T>
+    {
+        T Value();
+    }
+
+    interface IProvider;
+
+    public static class MyNodeExtensions
+    {
+        public static void Notify(this MyNode node, int what) { }
+        public static void Provide(this MyNode node) { }
+    }
+
+    class Provision;
+
+    [Meta(typeof(IProvider))]
+    public partial class MyNode : Node, IProvide<Provision>
+    {
+        Provision IProvide<Provision>.Value() => new Provision();
+        public override void _Notification(int what) => this.Notify(what);
+        public override void _Ready()
+        {
+            DoSomething(); // do something
+            this.Provide();
+        }
+
+        public void DoSomething() { }
+    }
+    """;
+
+    await VerifyCS.VerifyCodeFixAsync(
+      testCode.ReplaceLineEndings(),
+      fixedCode.ReplaceLineEndings(),
+      AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
+        Constants.READY_METHOD_NAME,
         true
       )
     );

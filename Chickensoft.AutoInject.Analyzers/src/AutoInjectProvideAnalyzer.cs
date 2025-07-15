@@ -54,29 +54,20 @@ public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
     }
 
     // Check that Meta attribute has an AutoInject Provider type (ex: [Meta(typeof(IAutoNode))])
-    var attributes = classDeclaration.AttributeLists.SelectMany(list => list.Attributes
-      ).Where(attribute => attribute.Name.ToString() == Constants.META_ATTRIBUTE_NAME
-         && attribute.ArgumentList?.Arguments.Any(arg =>
-           arg.Expression is TypeOfExpressionSyntax { Type: IdentifierNameSyntax identifierName } &&
-           Constants.ProviderMetaNames.Contains(identifierName.Identifier.ValueText)
-         ) == true
-      )
-      .ToList();
+    var attribute = AnalyzerTools.GetAutoInjectMetaAttribute(
+      classDeclaration,
+      Constants.ProviderMetaNames.Contains
+    );
 
-    if (attributes.Count == 0) {
+    if (attribute is null) {
       return;
     }
 
-    const string provideMethodName = "Provide";
-
     // Check if the class calls "this.Provide()" anywhere
-    var hasProvide = classDeclaration
-      .DescendantNodes()
-      .OfType<InvocationExpressionSyntax>()
-      .Any(invocation =>
-        invocation.Expression is MemberAccessExpressionSyntax {
-          Name.Identifier.ValueText: provideMethodName, Expression: ThisExpressionSyntax
-        });
+    var hasProvide = AnalyzerTools.HasThisCall(
+      classDeclaration,
+      Constants.PROVIDE_METHOD_NAME
+    );
 
     if (hasProvide) {
       return;
@@ -85,7 +76,7 @@ public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
     // No provide call found, report the diagnostic
     context.ReportDiagnostic(
       Diagnostics.MissingAutoInjectProvide(
-        attributes[0].GetLocation(),
+        attribute.GetLocation(),
         classDeclaration.Identifier.ValueText
       )
     );

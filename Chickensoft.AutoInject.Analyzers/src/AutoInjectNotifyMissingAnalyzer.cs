@@ -32,49 +32,34 @@ public class AutoInjectNotifyMissingAnalyzer : DiagnosticAnalyzer {
   private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context) {
     var classDeclaration = (ClassDeclarationSyntax)context.Node;
 
-    var attributes = classDeclaration.AttributeLists.SelectMany(list => list.Attributes
-    ).Where(attribute => attribute.Name.ToString() == Constants.META_ATTRIBUTE_NAME
-       // Check that Meta attribute has an AutoInject type (ex: [Meta(typeof(IAutoNode))])
-       && attribute.ArgumentList?.Arguments.Any(arg =>
-          arg.Expression is TypeOfExpressionSyntax { Type: IdentifierNameSyntax identifierName } &&
-         Constants.AutoInjectTypeNames.Contains(identifierName.Identifier.ValueText)
-       ) == true
-    )
-    .ToList();
+    var attribute = AnalyzerTools.GetAutoInjectMetaAttribute(
+      classDeclaration,
+      Constants.AutoInjectMetaNames.Contains
+    );
 
-    if (attributes.Count == 0) {
+    if (attribute is null) {
       return;
     }
 
     // Check if the class has a _Notification override method.
     // If it doesn't, the NotificationOverrideMissing analyzer will get it.
-    var hasNotificationOverride = classDeclaration
-      .Members
-      .OfType<MethodDeclarationSyntax>()
-      .Any(
-        method =>
-          method.Identifier.ValueText == "_Notification"
-            && method.Modifiers.Any(SyntaxKind.OverrideKeyword)
-            && method.ParameterList.Parameters.Count == 1
+    var notificationOverride = AnalyzerTools.GetMethodOverride(
+      classDeclaration,
+      Constants.NOTIFICATION_METHOD_NAME
+    );
+
+    if (notificationOverride is not null) {
+      // Check if the class calls "this.Notify()" in the _Notification override.
+      var hasNotify = AnalyzerTools.HasThisCall(
+        notificationOverride,
+        Constants.NOTIFY_METHOD_NAME
       );
 
-    if (hasNotificationOverride) {
-      // Check if the class calls "this.Notify()" in the _Notification override.
-      var hasNotify = classDeclaration
-        .DescendantNodes()
-        .OfType<InvocationExpressionSyntax>()
-        .Any(invocation =>
-          invocation.Expression is MemberAccessExpressionSyntax {
-            Name.Identifier.ValueText: "Notify",
-            Expression: ThisExpressionSyntax
-          }
-        );
-
       if (!hasNotify) {
-        // Report missing Notify call, _Notification override does not exist.
+        // Report missing Notify call
         context.ReportDiagnostic(
           Diagnostics.MissingAutoInjectNotify(
-            attributes[0].GetLocation(),
+            attribute.GetLocation(),
             classDeclaration.Identifier.ValueText
           )
         );

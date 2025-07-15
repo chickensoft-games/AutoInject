@@ -74,5 +74,33 @@
       },
       "problemMatcher": "$msCompile"
     },
+    {
+      "label": "analyzers-performance",
+      "group": "test",
+      "command": "dotnet",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}/Chickensoft.AutoInject.Analyzers.PerformanceTests",
+      },
+      "args": [
+        "run",
+        "-c",
+        "Release",
+        "--project",
+        "Chickensoft.AutoInject.Analyzers.PerformanceTests.csproj",
+        "--",
+        "--memory",
+        "--filter",
+        "'*'"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+    },
   ]
 }

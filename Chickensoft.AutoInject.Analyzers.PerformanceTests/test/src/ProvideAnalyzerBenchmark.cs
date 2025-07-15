@@ -8,7 +8,7 @@ using BenchmarkDotNet.Attributes;
 using Chickensoft.AutoInject.Analyzers.PerformanceTests.Utils;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-public class AutoInjectNotificationOverrideMissingAnalyzerBenchmark {
+public class ProvideAnalyzerBenchmark {
   private static CompilationWithAnalyzers _baselineCompilation = default!;
   private static CompilationWithAnalyzers _compilation = default!;
 
@@ -21,10 +21,10 @@ public class AutoInjectNotificationOverrideMissingAnalyzerBenchmark {
         (
           name,
           $$"""
-          [Meta(typeof(IAutoNode))]
-          public class {{name}}
+          [Meta(typeof(IProvider))]
+          public class {{name}} : IProvide<int>
           {
-              public override void _Notification(int what) => this.Notify(what);
+              public void OnResolved() => this.Provide();
           }
           """
         )
@@ -41,11 +41,11 @@ public class AutoInjectNotificationOverrideMissingAnalyzerBenchmark {
       throw new InvalidOperationException("Got null compilation");
     }
     _baselineCompilation = compilation.WithAnalyzers([new BaselineAnalyzer()], options);
-    _compilation = compilation.WithAnalyzers([new AutoInjectNotificationOverrideMissingAnalyzer()], options);
+    _compilation = compilation.WithAnalyzers([new AutoInjectProvideAnalyzer()], options);
   }
 
   [Benchmark(Baseline = true)]
-  public async Task Baseline() {
+  public async Task ProvideNoDiagnosticsBaseline() {
     var analysisResult = await _baselineCompilation.GetAnalysisResultAsync(CancellationToken.None);
     if (analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {analysisResult.Analyzers.Length})");
@@ -60,7 +60,7 @@ public class AutoInjectNotificationOverrideMissingAnalyzerBenchmark {
   }
 
   [Benchmark]
-  public async Task NoDiagnostics() {
+  public async Task ProvideNoDiagnostics() {
     var analysisResult = await _compilation.GetAnalysisResultAsync(CancellationToken.None);
     if (analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {analysisResult.Analyzers.Length})");

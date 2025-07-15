@@ -8,7 +8,7 @@ using BenchmarkDotNet.Attributes;
 using Chickensoft.AutoInject.Analyzers.PerformanceTests.Utils;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-public class AutoInjectNotificationOverrideMissingAnalyzerBenchmarkWithViolations {
+public class NotifyAnalyzerBenchmark {
   private static CompilationWithAnalyzers _baselineCompilation = default!;
   private static CompilationWithAnalyzers _compilation = default!;
 
@@ -24,6 +24,7 @@ public class AutoInjectNotificationOverrideMissingAnalyzerBenchmarkWithViolation
           [Meta(typeof(IAutoNode))]
           public class {{name}}
           {
+              public override void _Notification(int what) => this.Notify(what);
           }
           """
         )
@@ -35,19 +36,16 @@ public class AutoInjectNotificationOverrideMissingAnalyzerBenchmarkWithViolation
       ("build_property._SupportedPlatformList", "Linux,Windows,macOS"),
     };
 
-    var (compilation, options) = Compilations
-      .CreateCompilation([.. sources], properties)
-      .GetAwaiter()
-      .GetResult();
+    var (compilation, options) = Compilations.CreateCompilation([.. sources], properties).GetAwaiter().GetResult();
     if (compilation is null) {
       throw new InvalidOperationException("Got null compilation");
     }
     _baselineCompilation = compilation.WithAnalyzers([new BaselineAnalyzer()], options);
-    _compilation = compilation.WithAnalyzers([new AutoInjectNotificationOverrideMissingAnalyzer()], options);
+    _compilation = compilation.WithAnalyzers([new AutoInjectNotifyMissingAnalyzer()], options);
   }
 
   [Benchmark(Baseline = true)]
-  public async Task Baseline() {
+  public async Task NotifyNoDiagnosticsBaseline() {
     var analysisResult = await _baselineCompilation.GetAnalysisResultAsync(CancellationToken.None);
     if (analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {analysisResult.Analyzers.Length})");
@@ -62,7 +60,7 @@ public class AutoInjectNotificationOverrideMissingAnalyzerBenchmarkWithViolation
   }
 
   [Benchmark]
-  public async Task Diagnostics() {
+  public async Task NotifyNoDiagnostics() {
     var analysisResult = await _compilation.GetAnalysisResultAsync(CancellationToken.None);
     if (analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {analysisResult.Analyzers.Length})");
@@ -71,8 +69,8 @@ public class AutoInjectNotificationOverrideMissingAnalyzerBenchmarkWithViolation
       throw new InvalidOperationException($"Baseline analysis should have 0 compiler diagnostics (got {analysisResult.CompilationDiagnostics.Count})");
     }
     var diagnostics = analysisResult.GetAllDiagnostics(analysisResult.Analyzers[0]);
-    if (diagnostics.Length != Constants.SOURCES_COUNT) {
-      throw new InvalidOperationException($"Baseline analysis should have {Constants.SOURCES_COUNT} analyzer diagnostics (got {diagnostics.Length})");
+    if (diagnostics.Length != 0) {
+      throw new InvalidOperationException($"Baseline analysis should have 0 analyzer diagnostics (got {diagnostics.Length})");
     }
   }
 }

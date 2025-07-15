@@ -91,7 +91,9 @@
         "--",
         "--memory",
         "--filter",
-        "'*'"
+        "'*'",
+        "--exporters",
+        "html",
       ],
       "presentation": {
         "echo": true,

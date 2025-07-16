@@ -36,12 +36,20 @@ public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
   private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context) {
     var classDeclaration = (ClassDeclarationSyntax)context.Node;
 
-    // Check that IProvide is implemented by the class, as these are the only classes that need to call Provide().
-    var classSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration, context.CancellationToken);
-    var implementsIProvide = classSymbol?.AllInterfaces
-      .Any(i => i.Name == Constants.PROVIDER_INTERFACE_NAME && i.IsGenericType) == true;
+    if (classDeclaration.BaseList is null) {
+      return;
+    }
 
-    if (!implementsIProvide) {
+    var iProvideBaseType = classDeclaration
+      .BaseList
+      .Types
+      .FirstOrDefault(
+        type =>
+          type.Type is GenericNameSyntax genericName
+            && genericName.Identifier.ValueText == Constants.PROVIDER_INTERFACE_NAME
+      );
+
+    if (iProvideBaseType is null) {
       return;
     }
 

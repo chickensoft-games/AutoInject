@@ -69,8 +69,8 @@ public class ProvideAnalyzerBenchmarkWithViolations {
       throw new InvalidOperationException($"Baseline analysis should have 0 compiler diagnostics (got {analysisResult.CompilationDiagnostics.Count})");
     }
     var diagnostics = analysisResult.GetAllDiagnostics(analysisResult.Analyzers[0]);
-    if (diagnostics.Length != 0) {
-      throw new InvalidOperationException($"Baseline analysis should have 0 analyzer diagnostics (got {diagnostics.Length})");
+    if (diagnostics.Length != Constants.ANALYZER_SOURCES_COUNT) {
+      throw new InvalidOperationException($"Baseline analysis should have {Constants.ANALYZER_SOURCES_COUNT} analyzer diagnostics (got {diagnostics.Length})");
     }
   }
 }

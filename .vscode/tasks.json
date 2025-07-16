@@ -90,6 +90,9 @@
         "Chickensoft.AutoInject.Analyzers.PerformanceTests.csproj",
         "--",
         "--memory",
+        "--join",
+        "--hide",
+        "Namespace",
       ],
       "presentation": {
         "echo": true,

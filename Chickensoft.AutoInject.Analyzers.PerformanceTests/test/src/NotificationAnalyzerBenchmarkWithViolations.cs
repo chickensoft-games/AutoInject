@@ -47,32 +47,32 @@ public class NotificationAnalyzerBenchmarkWithViolations {
   }
 
   [Benchmark(Baseline = true)]
-  public async Task NotificationDiagnosticsBaseline() {
+  public async Task NotificationWithViolationsBaseline() {
     var analysisResult = await _baselineCompilation.GetAnalysisResultAsync(CancellationToken.None);
     if (analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {analysisResult.Analyzers.Length})");
     }
     if (analysisResult.CompilationDiagnostics.Count != 0) {
-      throw new InvalidOperationException($"Baseline analysis should have 0 compiler diagnostics (got {analysisResult.CompilationDiagnostics.Count})");
+      throw new InvalidOperationException($"Analysis should have 0 compiler diagnostics (got {analysisResult.CompilationDiagnostics.Count})");
     }
     var diagnostics = analysisResult.GetAllDiagnostics(analysisResult.Analyzers[0]);
     if (diagnostics.Length != 0) {
-      throw new InvalidOperationException($"Baseline analysis should have 0 analyzer diagnostics (got {diagnostics.Length})");
+      throw new InvalidOperationException($"Analysis should have 0 analyzer diagnostics (got {diagnostics.Length})");
     }
   }
 
   [Benchmark]
-  public async Task NotificationDiagnostics() {
+  public async Task NotificationWithViolations() {
     var analysisResult = await _compilation.GetAnalysisResultAsync(CancellationToken.None);
     if (analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {analysisResult.Analyzers.Length})");
     }
     if (analysisResult.CompilationDiagnostics.Count != 0) {
-      throw new InvalidOperationException($"Baseline analysis should have 0 compiler diagnostics (got {analysisResult.CompilationDiagnostics.Count})");
+      throw new InvalidOperationException($"Analysis should have 0 compiler diagnostics (got {analysisResult.CompilationDiagnostics.Count})");
     }
     var diagnostics = analysisResult.GetAllDiagnostics(analysisResult.Analyzers[0]);
     if (diagnostics.Length != Constants.ANALYZER_SOURCES_COUNT) {
-      throw new InvalidOperationException($"Baseline analysis should have {Constants.ANALYZER_SOURCES_COUNT} analyzer diagnostics (got {diagnostics.Length})");
+      throw new InvalidOperationException($"Analysis should have {Constants.ANALYZER_SOURCES_COUNT} analyzer diagnostics (got {diagnostics.Length})");
     }
   }
 }

@@ -15,7 +15,7 @@ public class ProvideAnalyzerBenchmarkWithViolations {
   [IterationSetup]
   public static void CreateEnvironment() {
     var sources = new List<(string name, string content)>();
-    for (var i = 0; i < Constants.SOURCES_COUNT; ++i) {
+    for (var i = 0; i < Constants.ANALYZER_SOURCES_COUNT; ++i) {
       var name = $"Node{i}";
       sources.Add(
         (

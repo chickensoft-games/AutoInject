@@ -25,5 +25,8 @@ namespace Chickensoft.AutoInject.Analyzers.PerformanceTests.Utils;
 // SOFTWARE.
 
 public static class Constants {
-  public const int SOURCES_COUNT = 10000;
+  public const int FIX_SOURCES_COUNT = 100;
+  public const int ANALYZER_SOURCES_COUNT = 10000;
+  public const string PROJECT_NAME = "TestProject";
+  public const string SOURCE_FILE_PREFIX = "/0/Test";
 }

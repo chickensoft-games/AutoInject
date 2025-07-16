@@ -39,18 +39,31 @@ public static class Compilations {
     (string, string)[] sources,
     (string, string)[] globalOptions
   ) {
-    var (project, options) = CreateProject(
+    var (project, documents, options) = CreateProject(
+      sources,
+      globalOptions
+    );
+    return (await CreateCompilation(project), options);
+  }
+
+  public static async Task<Compilation?> CreateCompilation(
+    Project project
+  ) => await project.GetCompilationAsync().ConfigureAwait(false);
+
+  public static (Project, List<Document>, AnalyzerOptions) CreateProject(
+    (string, string)[] sources,
+    (string, string)[]? globalOptions
+  ) =>
+    CreateProject(
       sources,
       globalOptions,
-      "TestProject",
-      "/0/Test",
+      Constants.PROJECT_NAME,
+      Constants.SOURCE_FILE_PREFIX,
       new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
       new CSharpParseOptions(LanguageVersion.Default)
     );
-    return (await project.GetCompilationAsync().ConfigureAwait(false), options);
-  }
 
-  public static (Project, AnalyzerOptions) CreateProject(
+  public static (Project, List<Document>, AnalyzerOptions) CreateProject(
     (string, string)[] sources,
     (string, string)[]? globalOptions,
     string projectName,
@@ -77,6 +90,7 @@ public static class Compilations {
       .AddMetadataReferences(
         assemblies.Select(a => MetadataReference.CreateFromFile(a.Location))
       );
+    var documents = new List<Document>();
     foreach (var source in sources) {
       var fileName = CreateFileName(defaultPrefix, source.Item1);
       var document = project.AddDocument(
@@ -84,6 +98,7 @@ public static class Compilations {
         source.Item2,
         filePath: fileName
       );
+      documents.Add(document);
       project = document.Project;
     }
     var analyzerOptions = project.AnalyzerOptions;
@@ -93,7 +108,7 @@ public static class Compilations {
         new MyOptionsProvider(globalOptions)
       );
     }
-    return (project, analyzerOptions);
+    return (project, documents, analyzerOptions);
   }
 
   public static string CreateFileName(string prefix, string file) =>

@@ -15,7 +15,7 @@ public class NotificationAnalyzerBenchmarkWithViolations {
   [IterationSetup]
   public static void CreateEnvironment() {
     var sources = new List<(string name, string content)>();
-    for (var i = 0; i < Constants.SOURCES_COUNT; ++i) {
+    for (var i = 0; i < Constants.ANALYZER_SOURCES_COUNT; ++i) {
       var name = $"Node{i}";
       sources.Add(
         (
@@ -71,8 +71,8 @@ public class NotificationAnalyzerBenchmarkWithViolations {
       throw new InvalidOperationException($"Baseline analysis should have 0 compiler diagnostics (got {analysisResult.CompilationDiagnostics.Count})");
     }
     var diagnostics = analysisResult.GetAllDiagnostics(analysisResult.Analyzers[0]);
-    if (diagnostics.Length != Constants.SOURCES_COUNT) {
-      throw new InvalidOperationException($"Baseline analysis should have {Constants.SOURCES_COUNT} analyzer diagnostics (got {diagnostics.Length})");
+    if (diagnostics.Length != Constants.ANALYZER_SOURCES_COUNT) {
+      throw new InvalidOperationException($"Baseline analysis should have {Constants.ANALYZER_SOURCES_COUNT} analyzer diagnostics (got {diagnostics.Length})");
     }
   }
 }

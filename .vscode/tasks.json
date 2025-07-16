@@ -90,10 +90,6 @@
         "Chickensoft.AutoInject.Analyzers.PerformanceTests.csproj",
         "--",
         "--memory",
-        // "--filter",
-        // "'*'",
-        "--exporters",
-        "html",
       ],
       "presentation": {
         "echo": true,

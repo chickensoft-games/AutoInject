@@ -55,10 +55,6 @@ public class NotifyFixBenchmark {
       [new AutoInjectNotifyMissingAnalyzer()],
       options
     );
-    var compilationWithBaselineAnalyzers = compilation.WithAnalyzers(
-      [new BaselineAnalyzer()],
-      options
-    );
 
     _analysisResult = compilationWithAnalyzers
       .GetAnalysisResultAsync(CancellationToken.None)
@@ -76,7 +72,7 @@ public class NotifyFixBenchmark {
     }
     var diagnostics = _analysisResult.GetAllDiagnostics(_analysisResult.Analyzers[0]);
     if (diagnostics.Length != Constants.FIX_SOURCES_COUNT) {
-      throw new InvalidOperationException($"Analysis should have {Constants.ANALYZER_SOURCES_COUNT} analyzer diagnostics (got {diagnostics.Length})");
+      throw new InvalidOperationException($"Analysis should have {Constants.FIX_SOURCES_COUNT} analyzer diagnostics (got {diagnostics.Length})");
     }
 
     for (var i = 0; i < diagnostics.Length; ++i) {
@@ -101,7 +97,7 @@ public class NotifyFixBenchmark {
     }
     var diagnostics = _analysisResult.GetAllDiagnostics(_analysisResult.Analyzers[0]);
     if (diagnostics.Length != Constants.FIX_SOURCES_COUNT) {
-      throw new InvalidOperationException($"Analysis should have {Constants.ANALYZER_SOURCES_COUNT} analyzer diagnostics (got {diagnostics.Length})");
+      throw new InvalidOperationException($"Analysis should have {Constants.FIX_SOURCES_COUNT} analyzer diagnostics (got {diagnostics.Length})");
     }
 
     for (var i = 0; i < diagnostics.Length; ++i) {

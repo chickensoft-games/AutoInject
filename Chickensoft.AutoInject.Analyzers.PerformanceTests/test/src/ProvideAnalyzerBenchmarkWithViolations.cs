@@ -45,7 +45,7 @@ public class ProvideAnalyzerBenchmarkWithViolations {
   }
 
   [Benchmark(Baseline = true)]
-  public async Task ProvideWithViolationsBaseline() {
+  public async Task ProvideAnalyzerWithViolationsBaseline() {
     var analysisResult = await _baselineCompilation.GetAnalysisResultAsync(CancellationToken.None);
     if (analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {analysisResult.Analyzers.Length})");
@@ -60,7 +60,7 @@ public class ProvideAnalyzerBenchmarkWithViolations {
   }
 
   [Benchmark]
-  public async Task ProvideWithViolations() {
+  public async Task ProvideAnalyzerWithViolations() {
     var analysisResult = await _compilation.GetAnalysisResultAsync(CancellationToken.None);
     if (analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {analysisResult.Analyzers.Length})");

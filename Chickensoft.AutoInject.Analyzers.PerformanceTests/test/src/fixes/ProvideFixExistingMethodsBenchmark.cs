@@ -90,7 +90,7 @@ public class ProvideFixExistingMethodsBenchmark {
   }
 
   [Benchmark]
-  public async Task ProvideFixExistingSetupDiagnostics() {
+  public async Task ProvideFixExistingSetup() {
     if (_analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {_analysisResult.Analyzers.Length})");
     }
@@ -131,7 +131,7 @@ public class ProvideFixExistingMethodsBenchmark {
   }
 
   [Benchmark]
-  public async Task ProvideFixExistingOnReadyDiagnostics() {
+  public async Task ProvideFixExistingOnReady() {
     if (_analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {_analysisResult.Analyzers.Length})");
     }
@@ -172,7 +172,7 @@ public class ProvideFixExistingMethodsBenchmark {
   }
 
   [Benchmark]
-  public async Task ProvideFixExistingReadyDiagnostics() {
+  public async Task ProvideFixExistingReady() {
     if (_analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {_analysisResult.Analyzers.Length})");
     }

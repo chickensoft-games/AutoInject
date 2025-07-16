@@ -88,7 +88,7 @@ public class NotifyFixBenchmark {
   }
 
   [Benchmark]
-  public async Task NotifyFixDiagnostics() {
+  public async Task NotifyFix() {
     if (_analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {_analysisResult.Analyzers.Length})");
     }

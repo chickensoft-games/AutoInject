@@ -14,7 +14,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-public class NotificationFixBenchmark {
+public class NotifyFixBenchmark {
   private static List<Document> _documents = [];
   private static AnalysisResult _analysisResult = default!;
 
@@ -30,6 +30,7 @@ public class NotificationFixBenchmark {
           [Meta(typeof(IAutoNode))]
           public class {{name}}
           {
+            public override void _Notification(int what) { }
           }
           """
         )
@@ -51,7 +52,7 @@ public class NotificationFixBenchmark {
       .GetResult()
         ?? throw new InvalidOperationException("Got null compilation");
     var compilationWithAnalyzers = compilation.WithAnalyzers(
-      [new AutoInjectNotificationOverrideMissingAnalyzer()],
+      [new AutoInjectNotifyMissingAnalyzer()],
       options
     );
     var compilationWithBaselineAnalyzers = compilation.WithAnalyzers(
@@ -66,7 +67,7 @@ public class NotificationFixBenchmark {
   }
 
   [Benchmark(Baseline = true)]
-  public async Task NotificationFixBaseline() {
+  public async Task NotifyFixBaseline() {
     if (_analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {_analysisResult.Analyzers.Length})");
     }
@@ -91,7 +92,7 @@ public class NotificationFixBenchmark {
   }
 
   [Benchmark]
-  public async Task NotificationFixDiagnostics() {
+  public async Task NotifyFixDiagnostics() {
     if (_analysisResult.Analyzers.Length != 1) {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {_analysisResult.Analyzers.Length})");
     }
@@ -106,7 +107,7 @@ public class NotificationFixBenchmark {
     for (var i = 0; i < diagnostics.Length; ++i) {
       var actionBuilder = ImmutableArray.CreateBuilder<CodeAction>();
       var context = new CodeFixContext(_documents[i], diagnostics[i], (a, d) => actionBuilder.Add(a), CancellationToken.None);
-      var codeFixProvider = new AutoInjectNotificationOverrideFixProvider();
+      var codeFixProvider = new AutoInjectNotifyMissingFixProvider();
       await codeFixProvider.RegisterCodeFixesAsync(context);
       var actions = actionBuilder.ToImmutable();
       if (actions.Length != 1) {

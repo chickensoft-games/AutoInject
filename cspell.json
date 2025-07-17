@@ -49,6 +49,7 @@
     "OPTOUT",
     "paramref",
     "pascalcase",
+    "pdbonly",
     "Postinitialize",
     "Predelete",
     "renovatebot",

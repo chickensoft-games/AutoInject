@@ -10,6 +10,7 @@ obj/
 .DS_Store
 nupkg/
 !Chickensoft.AutoInject/nupkg/.gitkeep
+BenchmarkDotNet.Artifacts/
 
 # User-specific files
 *.suo

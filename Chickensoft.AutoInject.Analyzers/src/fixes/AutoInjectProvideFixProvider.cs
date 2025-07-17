@@ -133,7 +133,6 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
           createChangedDocument: c =>
             MethodModifier.AddCallToMethod(
               context.Document,
-              typeDeclaration,
               existingMethod,
               "Provide",
               c

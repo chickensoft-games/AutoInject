@@ -10,7 +10,6 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Formatting;
 using Utils;
 
 [
@@ -21,6 +20,8 @@ using Utils;
   Shared
 ]
 public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
+  private static readonly InvocationExpressionSyntax _notifyInvocation =
+    MethodModifier.ThisMemberCallExpression(Constants.NOTIFY_METHOD_NAME, []);
   private static readonly ImmutableArray<string> _fixableDiagnosticIds =
     [Diagnostics.MissingAutoInjectNotifyDescriptor.Id];
 
@@ -64,17 +65,16 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
   }
 
   private static async Task<Document> AddAutoInjectNotifyCallAsync(
-      Document document,
-      TypeDeclarationSyntax typeDeclaration,
-      CancellationToken cancellationToken) {
-    const string methodNameToFind = "_Notification";
-
+    Document document,
+    TypeDeclarationSyntax typeDeclaration,
+    CancellationToken cancellationToken
+  ) {
     // Find the method with the specified name and a single parameter of type int
     var methodAndParameter = typeDeclaration.Members
       .OfType<MethodDeclarationSyntax>()
       .Where(
         m =>
-          m.Identifier.ValueText == methodNameToFind
+          m.Identifier.ValueText == Constants.NOTIFICATION_METHOD_NAME
             && m.ParameterList.Parameters.Count == 1
       )
       .Select(
@@ -105,17 +105,8 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
     // to changes in the parameter name
     var actualParameterName = parameterSyntax.Identifier.ValueText;
 
-    // Construct the statement to add
-    const string methodToInvokeName = "Notify";
-
     var statementToAdd = SyntaxFactory.ExpressionStatement(
-        SyntaxFactory.InvocationExpression(
-          SyntaxFactory.MemberAccessExpression(
-            SyntaxKind.SimpleMemberAccessExpression,
-            SyntaxFactory.ThisExpression(),
-            SyntaxFactory.IdentifierName(methodToInvokeName)
-          )
-        )
+        _notifyInvocation
         .WithArgumentList(
           SyntaxFactory.ArgumentList(
             SyntaxFactory.SingletonSeparatedList(
@@ -125,8 +116,7 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
             )
           )
         )
-      )
-      .WithAdditionalAnnotations(Formatter.Annotation);
+      );
 
     // Add the statement to the method body
     return await MethodModifier.AddStatementToMethodBodyAsync(

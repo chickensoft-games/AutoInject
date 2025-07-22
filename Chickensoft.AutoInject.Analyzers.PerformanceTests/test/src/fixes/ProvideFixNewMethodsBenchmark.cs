@@ -115,7 +115,7 @@ public class ProvideFixNewMethodsBenchmark {
         codeFixProvider,
         FixAllScope.Document,
         AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
-          AutoInjectProvideFixProvider.SETUP_METHOD_NAME,
+          Analyzers.Utils.Constants.SETUP_METHOD_NAME,
           false
         ),
         fixAllProvider.GetSupportedFixAllDiagnosticIds(codeFixProvider),
@@ -156,7 +156,7 @@ public class ProvideFixNewMethodsBenchmark {
         codeFixProvider,
         FixAllScope.Document,
         AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
-          AutoInjectProvideFixProvider.ONREADY_METHOD_NAME,
+          Analyzers.Utils.Constants.ONREADY_METHOD_NAME,
           false
         ),
         fixAllProvider.GetSupportedFixAllDiagnosticIds(codeFixProvider),
@@ -197,7 +197,7 @@ public class ProvideFixNewMethodsBenchmark {
         codeFixProvider,
         FixAllScope.Document,
         AutoInjectProvideFixProvider.GetCodeFixEquivalenceKey(
-          AutoInjectProvideFixProvider.READY_OVERRIDE_METHOD_NAME,
+          Analyzers.Utils.Constants.READY_METHOD_NAME,
           false
         ),
         fixAllProvider.GetSupportedFixAllDiagnosticIds(codeFixProvider),

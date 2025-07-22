@@ -12,19 +12,34 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Formatting;
-using Microsoft.CodeAnalysis.Simplification;
+using Microsoft.CodeAnalysis.Editing;
 using Utils;
 
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AutoInjectProvideFixProvider))]
+[
+  ExportCodeFixProvider(
+    LanguageNames.CSharp,
+    Name = nameof(AutoInjectProvideFixProvider)
+  )
+]
 [Shared]
 public class AutoInjectProvideFixProvider : CodeFixProvider {
+  private static readonly SyntaxToken _publicKeyword =
+    SyntaxFactory.Token(SyntaxKind.PublicKeyword);
+  private static readonly SyntaxToken _overrideKeyword =
+    SyntaxFactory.Token(SyntaxKind.OverrideKeyword);
+  private static readonly MethodDeclarationSyntax _setupMethodDeclaration =
+    NewMethod(Constants.SETUP_METHOD_NAME, [_publicKeyword]);
+  private static readonly MethodDeclarationSyntax _onReadyMethodDeclaration =
+    NewMethod(Constants.ONREADY_METHOD_NAME, [_publicKeyword]);
+  private static readonly MethodDeclarationSyntax _readyMethodDeclaration =
+    NewMethod(
+      Constants.READY_METHOD_NAME,
+      [_publicKeyword, _overrideKeyword]
+    );
+  private static readonly ExpressionStatementSyntax _provideCall =
+    MethodModifier.ThisMemberCallStatement(Constants.PROVIDE_METHOD_NAME, []);
   private static readonly ImmutableArray<string> _fixableDiagnosticIds =
     [Diagnostics.MissingAutoInjectProvideDescriptor.Id];
-
-  public const string SETUP_METHOD_NAME = "Setup";
-  public const string ONREADY_METHOD_NAME = "OnReady";
-  public const string READY_OVERRIDE_METHOD_NAME = "_Ready";
 
   public sealed override ImmutableArray<string> FixableDiagnosticIds =>
     _fixableDiagnosticIds;
@@ -61,35 +76,32 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
     // Setup() Method Fixes
     RegisterMethodFixesAsync(
       context, typeDeclaration, diagnostic,
-      SETUP_METHOD_NAME,
+      Constants.SETUP_METHOD_NAME,
+      _setupMethodDeclaration,
       m =>
-        m.Identifier.Text == SETUP_METHOD_NAME
-          && m.Modifiers.Any(SyntaxKind.PublicKeyword),
-      SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+        m.Identifier.Text == Constants.SETUP_METHOD_NAME
+          && m.Modifiers.Any(SyntaxKind.PublicKeyword)
     );
 
     // OnReady() Method Fixes
     RegisterMethodFixesAsync(
       context, typeDeclaration, diagnostic,
-      ONREADY_METHOD_NAME,
+      Constants.ONREADY_METHOD_NAME,
+      _onReadyMethodDeclaration,
       m =>
-        m.Identifier.Text == ONREADY_METHOD_NAME
-          && m.Modifiers.Any(SyntaxKind.PublicKeyword),
-      SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword))
+        m.Identifier.Text == Constants.ONREADY_METHOD_NAME
+          && m.Modifiers.Any(SyntaxKind.PublicKeyword)
     );
 
     // _Ready() Method Fixes
     RegisterMethodFixesAsync(
       context, typeDeclaration, diagnostic,
-      READY_OVERRIDE_METHOD_NAME,
+      Constants.READY_METHOD_NAME,
+      _readyMethodDeclaration,
       m =>
-        m.Identifier.Text == READY_OVERRIDE_METHOD_NAME
+        m.Identifier.Text == Constants.READY_METHOD_NAME
           && m.Modifiers.Any(SyntaxKind.PublicKeyword)
-          && m.Modifiers.Any(SyntaxKind.OverrideKeyword),
-      SyntaxFactory.TokenList(
-        SyntaxFactory.Token(SyntaxKind.PublicKeyword),
-        SyntaxFactory.Token(SyntaxKind.OverrideKeyword)
-      )
+          && m.Modifiers.Any(SyntaxKind.OverrideKeyword)
     );
   }
 
@@ -117,8 +129,8 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
     TypeDeclarationSyntax typeDeclaration,
     Diagnostic diagnostic,
     string methodName,
-    Func<MethodDeclarationSyntax, bool> findPredicate,
-    IEnumerable<SyntaxToken> creationModifiers
+    MethodDeclarationSyntax newMethod,
+    Func<MethodDeclarationSyntax, bool> findPredicate
   ) {
     var existingMethod = typeDeclaration.Members
       .OfType<MethodDeclarationSyntax>()
@@ -131,10 +143,10 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
           title:
             $"Add \"this.Provide();\" to existing \"{methodName}()\" method",
           createChangedDocument: c =>
-            MethodModifier.AddCallToMethod(
+            MethodModifier.AddStatementToMethodBodyAsync(
               context.Document,
               existingMethod,
-              "Provide",
+              _provideCall,
               c
             ),
           equivalenceKey: GetCodeFixEquivalenceKey(methodName, true)
@@ -152,8 +164,7 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
             AddNewMethodAsync(
               context.Document,
               typeDeclaration,
-              methodName,
-              creationModifiers,
+              newMethod,
               c
             ),
           equivalenceKey: GetCodeFixEquivalenceKey(methodName, false)
@@ -164,13 +175,21 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
   }
 
   private static async Task<Document> AddNewMethodAsync(
-      Document document,
-      TypeDeclarationSyntax typeDeclaration,
-      string identifier,
-      IEnumerable<SyntaxToken> creationModifiers,
-      CancellationToken cancellationToken) {
-    // Create the new method
-    var mewMethod = SyntaxFactory
+    Document document,
+    TypeDeclarationSyntax typeDeclaration,
+    MethodDeclarationSyntax newMethod,
+    CancellationToken cancellationToken
+  ) {
+    var editor = await DocumentEditor.CreateAsync(document, cancellationToken);
+    editor.AddMember(typeDeclaration, newMethod);
+    return editor.GetChangedDocument();
+  }
+
+  private static MethodDeclarationSyntax NewMethod(
+    string identifier,
+    IEnumerable<SyntaxToken> creationModifiers
+  ) =>
+    SyntaxFactory
       .MethodDeclaration(
         SyntaxFactory.PredefinedType(
           SyntaxFactory.Token(SyntaxKind.VoidKeyword)
@@ -183,24 +202,7 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
           SyntaxFactory.SingletonList(
             SyntaxFactory.ParseStatement(
               Constants.PROVIDE_NEW_METHOD_BODY)
-                .WithAdditionalAnnotations(
-                  Formatter.Annotation,
-                  Simplifier.Annotation
-                )
           )
         )
       );
-
-    // Add the new method to the class
-    var newTypeDeclaration = typeDeclaration.AddMembers(mewMethod);
-    // Replace the old type declaration with the new one
-    var root = await document.GetSyntaxRootAsync(cancellationToken);
-    if (root is null) {
-      return document;
-    }
-
-    var newRoot = root.ReplaceNode(typeDeclaration, newTypeDeclaration);
-    // Return the updated document
-    return document.WithSyntaxRoot(newRoot);
-  }
 }

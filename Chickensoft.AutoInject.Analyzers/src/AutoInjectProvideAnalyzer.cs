@@ -33,7 +33,7 @@ public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
     );
   }
 
-  private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context) {
+  private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context) {
     var classDeclaration = (ClassDeclarationSyntax)context.Node;
 
     if (classDeclaration.BaseList is null) {

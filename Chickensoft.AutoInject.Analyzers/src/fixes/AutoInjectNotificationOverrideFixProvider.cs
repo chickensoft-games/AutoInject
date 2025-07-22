@@ -10,8 +10,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Formatting;
-using Microsoft.CodeAnalysis.Simplification;
+using Microsoft.CodeAnalysis.Editing;
 using Utils;
 
 [
@@ -22,6 +21,41 @@ using Utils;
   Shared
 ]
 public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
+  private static readonly MethodDeclarationSyntax _notificationDeclaration =
+    SyntaxFactory.MethodDeclaration(
+      SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+      Constants.NOTIFICATION_METHOD_NAME
+    )
+    .WithModifiers(
+      SyntaxFactory.TokenList(
+        SyntaxFactory.Token(SyntaxKind.PublicKeyword),
+        SyntaxFactory.Token(SyntaxKind.OverrideKeyword)
+      )
+    )
+    .WithParameterList(
+      SyntaxFactory.ParameterList(
+        SyntaxFactory.SingletonSeparatedList(
+          SyntaxFactory
+            .Parameter(SyntaxFactory.Identifier(Constants.WHAT_PARAMETER_NAME))
+            .WithType(
+              SyntaxFactory.PredefinedType(
+                SyntaxFactory.Token(SyntaxKind.IntKeyword)
+              )
+            )
+        )
+      )
+    )
+    .WithExpressionBody(
+      SyntaxFactory
+        .ArrowExpressionClause(
+          MethodModifier.ThisMemberCallExpression(
+            Constants.NOTIFY_METHOD_NAME,
+            [Constants.WHAT_PARAMETER_NAME]
+          )
+        )
+    )
+    .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
+
   private static readonly ImmutableArray<string> _fixableDiagnosticIds =
     [Diagnostics.MissingAutoInjectNotificationOverrideDescriptor.Id];
 
@@ -32,10 +66,12 @@ public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
     WellKnownFixAllProviders.BatchFixer;
 
   public sealed override async Task RegisterCodeFixesAsync(
-      CodeFixContext context) {
+    CodeFixContext context
+  ) {
     var root = await context.Document
       .GetSyntaxRootAsync(context.CancellationToken)
       .ConfigureAwait(false);
+
     if (root is null) {
       return;
     }
@@ -45,8 +81,7 @@ public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
 
     // Find the type declaration identified by the diagnostic
     var typeDeclaration = root
-      .FindToken(diagnosticSpan.Start)
-      .Parent?
+      .FindNode(diagnosticSpan)
       .AncestorsAndSelf()
       .OfType<TypeDeclarationSyntax>()
       .FirstOrDefault();
@@ -55,93 +90,28 @@ public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
     }
 
     context.RegisterCodeFix(
+      // new AutoInjectNotificationOverrideCodeAction(context.Document, diagnostic),
       CodeAction.Create(
-        title: "Add \"public override void _Notification(int what) => this.Notify(what);\" method",
-        createChangedDocument: c =>
+        "Add \"public override void _Notification(int what) => this.Notify(what);\" method",
+        cancellationToken =>
           AddAutoInjectNotificationOverrideAsync(
             context.Document,
             typeDeclaration,
-            c
+            cancellationToken
           ),
-        equivalenceKey: nameof(AutoInjectNotificationOverrideFixProvider)
+        nameof(AutoInjectNotificationOverrideFixProvider)
       ),
       diagnostic
     );
   }
 
   private static async Task<Document> AddAutoInjectNotificationOverrideAsync(
-      Document document,
-      TypeDeclarationSyntax typeDeclaration,
-      CancellationToken cancellationToken) {
-
-    var methodDeclaration = SyntaxFactory.MethodDeclaration(
-        SyntaxFactory.PredefinedType(
-          SyntaxFactory.Token(SyntaxKind.VoidKeyword)
-        ),
-        "_Notification"
-      )
-      .WithModifiers(
-        SyntaxFactory.TokenList(
-          SyntaxFactory.Token(SyntaxKind.PublicKeyword),
-          SyntaxFactory.Token(SyntaxKind.OverrideKeyword)
-        )
-      )
-      .WithParameterList(
-        SyntaxFactory.ParameterList(
-          SyntaxFactory.SingletonSeparatedList(
-            SyntaxFactory
-              .Parameter(SyntaxFactory.Identifier("what"))
-              .WithType(
-                SyntaxFactory.PredefinedType(
-                  SyntaxFactory.Token(SyntaxKind.IntKeyword)
-                )
-              )
-          )
-        )
-      );
-
-    var expressionBody = SyntaxFactory
-      .InvocationExpression(
-        SyntaxFactory.MemberAccessExpression(
-          SyntaxKind.SimpleMemberAccessExpression,
-          SyntaxFactory.ThisExpression(),
-          SyntaxFactory.IdentifierName("Notify")
-        )
-      )
-      .WithArgumentList(
-        SyntaxFactory.ArgumentList(
-          SyntaxFactory.SingletonSeparatedList(
-            SyntaxFactory.Argument(SyntaxFactory.IdentifierName("what"))
-          )
-        )
-      );
-
-    var arrowExpressionClause = SyntaxFactory
-      .ArrowExpressionClause(expressionBody)
-      .WithAdditionalAnnotations(Formatter.Annotation, Simplifier.Annotation);
-
-    methodDeclaration = methodDeclaration
-      .WithExpressionBody(arrowExpressionClause)
-      .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
-
-    // Insert the new method at the beginning of the class members
-    var existingMembers = typeDeclaration.Members;
-    var newMembers = existingMembers.Insert(0, methodDeclaration);
-
-    // Update the type declaration with the new list of members
-    var newTypeDeclaration = typeDeclaration.WithMembers(newMembers);
-
-    // Get the current root and replace the type declaration
-    var root = await document
-      .GetSyntaxRootAsync(cancellationToken)
-      .ConfigureAwait(false);
-    if (root is null) {
-      return document;
-    }
-
-    var newRoot = root.ReplaceNode(typeDeclaration, newTypeDeclaration);
-
-    // Return the updated document.
-    return document.WithSyntaxRoot(newRoot);
+    Document document,
+    TypeDeclarationSyntax typeDeclaration,
+    CancellationToken cancellationToken
+  ) {
+    var editor = await DocumentEditor.CreateAsync(document, cancellationToken);
+    editor.InsertMembers(typeDeclaration, 0, [_notificationDeclaration]);
+    return editor.GetChangedDocument();
   }
 }

@@ -119,8 +119,10 @@ public class NotificationFixBenchmark {
         CancellationToken.None
       );
       var action = await fixAllProvider.GetFixAsync(fixAllContext).ConfigureAwait(false);
-      var operations = await action!.GetOperationsAsync(CancellationToken.None).ConfigureAwait(false);
-      var solution = operations.OfType<ApplyChangesOperation>().Single().ChangedSolution;
+      if (action is not null) {
+        var operations = await action!.GetOperationsAsync(CancellationToken.None).ConfigureAwait(false);
+        var solution = operations.OfType<ApplyChangesOperation>().Single().ChangedSolution;
+      }
     }
   }
 }

@@ -28,7 +28,13 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
+// disabling RS1038 is necessary no matter how much the analyzer says it's not
+#pragma warning disable IDE0079
+// we're only using Workspaces in the code fixes, not the analyzers
+#pragma warning disable RS1038
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
+#pragma warning restore RS1038
+#pragma warning restore IDE0079
 public class BaselineAnalyzer : DiagnosticAnalyzer {
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [];
 

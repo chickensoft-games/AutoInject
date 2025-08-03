@@ -23,7 +23,7 @@
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
 
-    <PackageReference Include="Chickensoft.GoDotTest" Version="1.7.5" />
+    <PackageReference Include="Chickensoft.GoDotTest" Version="1.7.6" />
     <PackageReference Include="Chickensoft.GodotTestDriver" Version="3.1.23" />
     <PackageReference Include="Chickensoft.GodotNodeInterfaces" Version="2.4.26" />
     <PackageReference Include="Chickensoft.Introspection" Version="3.0.2" />

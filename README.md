@@ -84,7 +84,7 @@ public partial class MyNode : Node {
 
 AutoInject is a source-only package that uses the [Introspection] source generator. AutoInject provides two mixins: `IDependent` and `IProvider` that must be applied with the Introspection generator's `[Meta]`.
 
-You'll need to include `Chickensoft.Introspection`, `Chickensoft.Introspection.Generator`, and `Chickensoft.AutoInject` in your project. All of the packages are extremely lightweight.
+You'll need to include `Chickensoft.GodotNodeInterfaces`, `Chickensoft.Introspection`, `Chickensoft.Introspection.Generator`, and `Chickensoft.AutoInject` in your project. All of the packages are extremely lightweight.
 
 Simply add the following to your project's `.csproj` file. Be sure to specify the appropriate versions for each package by checking on [Nuget](https://www.nuget.org/packages?q=Chickensoft).
 

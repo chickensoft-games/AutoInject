@@ -2,7 +2,7 @@
 
 [![Chickensoft Badge][chickensoft-badge]][chickensoft-website] [![Discord][discord-badge]][discord] ![line coverage][line-coverage] ![branch coverage][branch-coverage]
 
-Node-based dependency injection for C# Godot scripts at build-time, including utilities for automatic node-binding, additional lifecycle hooks, and .net-inspired notification callbacks.
+Reflection-free node-based dependency injection for C# Godot scripts, including utilities for automatic node-binding, additional lifecycle hooks, and .net-inspired notification callbacks.
 
 ---
 

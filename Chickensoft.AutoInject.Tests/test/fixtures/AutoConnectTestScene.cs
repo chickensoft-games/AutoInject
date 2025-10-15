@@ -9,6 +9,8 @@ using Godot;
 public partial class AutoConnectTestScene : Node2D {
   public override void _Notification(int what) => this.Notify(what);
 
+  public static Node2D MyNode2D { get; } = new Node2D();
+
   [Node("Path/To/MyNode")]
   public INode2D MyNode { get; set; } = default!;
 
@@ -24,6 +26,14 @@ public partial class AutoConnectTestScene : Node2D {
 #pragma warning disable IDE1006
   [Node]
   internal INode2D _my_unique_node { get; set; } = default!;
+
+  [Node]
+  public Node2D AlreadySetNode { get; set; } = MyNode2D;
+
+  private Node2D _notGettableNodeField = default!;
+
+  [Node]
+  public Node2D NotGettableNode { set => _notGettableNodeField = value; }
 
   [Other]
   public INode2D SomeOtherNodeReference { get; set; } = default!;

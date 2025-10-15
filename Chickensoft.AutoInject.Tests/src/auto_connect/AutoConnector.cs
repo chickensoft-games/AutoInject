@@ -29,7 +29,9 @@ public static class AutoConnector {
       if (
         !property.Attributes.TryGetValue(
           typeof(NodeAttribute), out var nodeAttributes
-        )
+        ) ||
+        property.Getter is not { } getter ||
+        getter.Invoke(node) is not null
       ) {
         continue;
       }

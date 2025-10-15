@@ -52,4 +52,8 @@ public partial class AutoConnectTest(Node testScene) : TestClass(testScene) {
     IAutoConnect node = new NotAGodotNode();
     Should.NotThrow(() => node._AddStateIfNeeded());
   }
+
+  [Test]
+  public void DoesNotOverwriteNonNullProperties() =>
+    _scene.AlreadySetNode.ShouldBeSameAs(AutoConnectTestScene.MyNode2D);
 }

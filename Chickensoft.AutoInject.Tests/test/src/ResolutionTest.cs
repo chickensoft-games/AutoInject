@@ -108,7 +108,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
     var fixture = new Fixture(TestScene.GetTree());
 
     objA.AddChild(objB);
-    objA.AddChild(depObj);
+    objB.AddChild(depObj);
 
     await fixture.AddToRoot(objA);
 

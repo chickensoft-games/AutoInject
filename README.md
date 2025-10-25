@@ -53,7 +53,8 @@ using Godot;
 
 // Apply all of the AutoInject mixins at once:
 [Meta(typeof(IAutoNode))]
-public partial class MyNode : Node {
+public partial class MyNode : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 }
 ```
@@ -68,7 +69,8 @@ Alternatively, you can use just the mixins you need from this project.
   typeof(IProvider),
   typeof(IDependent)
 )]
-public partial class MyNode : Node {
+public partial class MyNode : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 }
 ```
@@ -137,7 +139,8 @@ using Chickensoft.Introspection;
 using Godot;
 
 [Meta(typeof(IAutoNode))]
-public partial class MyProvider : Node, IProvide<string> {
+public partial class MyProvider : Node, IProvide<string>
+{
   public override void _Notification(int what) => this.Notify(what);
 
   string IProvide<string>.Value() => "Value"
@@ -145,7 +148,8 @@ public partial class MyProvider : Node, IProvide<string> {
   // Call the this.Provide() method once your dependencies have been initialized.
   public void OnReady() => this.Provide();
 
-  public void OnProvided() {
+  public void OnProvided()
+  {
     // You can optionally implement this method. It gets called once you call
     // this.Provide() to inform AutoInject that the provided values are now
     // available.
@@ -166,13 +170,15 @@ using Chickensoft.Introspection;
 using Godot;
 
 [Meta(typeof(IAutoNode))]
-public partial class StringDependent : Node {
+public partial class StringDependent : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
   public string MyDependency => this.DependOn<string>();
 
-  public void OnResolved() {
+  public void OnResolved()
+  {
     // All of my dependencies are now available! Do whatever you want with
     // them here.
   }
@@ -200,23 +206,27 @@ Instead of subscribing to a parent node's events, consider subscribing to events
 
 ```csharp
 [Meta(typeof(IAutoNode))]
-public partial class MyDependent : Node {
+public partial class MyDependent : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
   public MyValue Value => this.DependOn<MyValue>();
 
-  public void OnResolved() {
+  public void OnResolved()
+  {
     // Setup subscriptions once dependencies are valid.
     MyValue.OnSomeEvent += ValueUpdated
   }
 
-  public void OnTreeExit() {
+  public void OnTreeExit()
+  {
     // Clean up subscriptions here!
     MyValue.OnSomeEvent -= ValueUpdated
   }
 
-  public void ValueUpdated() {
+  public void ValueUpdated()
+  {
     // Do something in response to the value we depend on changing.
   }
 }
@@ -237,7 +247,8 @@ Sometimes, when testing, you may wish to "fake" the value of a dependency. Faked
 
 ```csharp
   [Test]
-  public void FakesDependency() {
+  public void FakesDependency()
+  {
     // Some dependent
     var dependent = new MyNode();
 
@@ -314,7 +325,8 @@ using Chickensoft.Introspection;
 using Godot;
 
 [Meta(typeof(IAutoConnect))]
-public partial class MyNode : Node2D {
+public partial class MyNode : Node2D
+{
   public override void _Notification(int what) => this.Notify(what);
 
   [Node("Path/To/SomeNode")]
@@ -350,7 +362,8 @@ using Moq;
 using Shouldly;
 
 #pragma warning disable CA1001
-public class MyNodeTest(Node testScene) : TestClass(testScene) {
+public class MyNodeTest(Node testScene) : TestClass(testScene)
+{
   private Fixture _fixture = default!;
   private MyNode _scene = default!;
 
@@ -359,7 +372,8 @@ public class MyNodeTest(Node testScene) : TestClass(testScene) {
   private Mock<INode2D> _otherUniqueNode = default!;
 
   [Setup]
-  public async Task Setup() {
+  public async Task Setup()
+  {
     _fixture = new(TestScene.GetTree());
 
     _someNode = new();
@@ -367,7 +381,8 @@ public class MyNodeTest(Node testScene) : TestClass(testScene) {
     _otherUniqueNode = new();
 
     _scene = new MyNode();
-    _scene.FakeNodeTree(new() {
+    _scene.FakeNodeTree(new()
+    {
       ["Path/To/SomeNode"] = _someNode.Object,
       ["%MyUniqueNode"] = _myUniqueNode.Object,
       ["%OtherUniqueName"] = _otherUniqueNode.Object,
@@ -380,7 +395,8 @@ public class MyNodeTest(Node testScene) : TestClass(testScene) {
   public async Task Cleanup() => await _fixture.Cleanup();
 
   [Test]
-  public void UsesFakeNodeTree() {
+  public void UsesFakeNodeTree()
+  {
     // Making a new instance of a node without instantiating a scene doesn't
     // trigger NotificationSceneInstantiated, so if we want to make sure our
     // AutoNodes get hooked up and use the FakeNodeTree, we need to do it manually.
@@ -406,12 +422,14 @@ using Chickensoft.Introspection;
 using Godot;
 
 [Meta(typeof(IAutoInit), typeof(IAutoOn))]
-public partial class MyNode : Node2D {
+public partial class MyNode : Node2D
+{
   public override void _Notification(int what) => this.Notify(what);
 
   public IMyObject Obj { get; set; } = default!;
 
-  public void Initialize() {
+  public void Initialize()
+  {
     // Initialize is called from the Ready notification if our IsTesting
     // property (added by IAutoInit) is false.
 
@@ -419,7 +437,8 @@ public partial class MyNode : Node2D {
     Obj = new MyObject();
   }
 
-  public void OnReady() {
+  public void OnReady()
+  {
     // Guaranteed to be called after Initialize()
 
     // Use object we setup in Initialize() method (or, if we're running in a
@@ -432,7 +451,8 @@ public partial class MyNode : Node2D {
 Likewise, when creating a node during a unit test, you can set the `IsTesting` property to `true` to prevent the `Initialize()` method from being called.
 
 ```csharp
-var myNode = new MyNode() {
+var myNode = new MyNode()
+{
   Obj = mock.Object
 };
 
@@ -469,7 +489,8 @@ using Chickensoft.Introspection;
 using Godot;
 
 [Meta(typeof(IAutoOn))]
-public partial class MyNode : Node2D {
+public partial class MyNode : Node2D
+{
   public override void _Notification(int what) => this.Notify(what);
 
   public void OnReady() {

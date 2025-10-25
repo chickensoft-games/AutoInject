@@ -8,14 +8,17 @@ using BenchmarkDotNet.Attributes;
 using Chickensoft.AutoInject.Analyzers.PerformanceTests.Utils;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-public class NotificationAnalyzerBenchmark {
+public class NotificationAnalyzerBenchmark
+{
   private static CompilationWithAnalyzers _baselineCompilation = default!;
   private static CompilationWithAnalyzers _compilation = default!;
 
   [IterationSetup]
-  public static void CreateEnvironment() {
+  public static void CreateEnvironment()
+  {
     var sources = new List<(string name, string content)>();
-    for (var i = 0; i < Constants.ANALYZER_SOURCES_COUNT; ++i) {
+    for (var i = 0; i < Constants.ANALYZER_SOURCES_COUNT; ++i)
+    {
       var name = $"Node{i}";
       sources.Add(
         (
@@ -37,7 +40,8 @@ public class NotificationAnalyzerBenchmark {
     };
 
     var (compilation, options) = Compilations.CreateCompilation([.. sources], properties).GetAwaiter().GetResult();
-    if (compilation is null) {
+    if (compilation is null)
+    {
       throw new InvalidOperationException("Got null compilation");
     }
     _baselineCompilation = compilation.WithAnalyzers([new BaselineAnalyzer()], options);
@@ -45,31 +49,39 @@ public class NotificationAnalyzerBenchmark {
   }
 
   [Benchmark(Baseline = true)]
-  public async Task NotificationAnalyzerNoViolationsBaseline() {
+  public async Task NotificationAnalyzerNoViolationsBaseline()
+  {
     var analysisResult = await _baselineCompilation.GetAnalysisResultAsync(CancellationToken.None);
-    if (analysisResult.Analyzers.Length != 1) {
+    if (analysisResult.Analyzers.Length != 1)
+    {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {analysisResult.Analyzers.Length})");
     }
-    if (analysisResult.CompilationDiagnostics.Count != 0) {
+    if (analysisResult.CompilationDiagnostics.Count != 0)
+    {
       throw new InvalidOperationException($"Analysis should have 0 compiler diagnostics (got {analysisResult.CompilationDiagnostics.Count})");
     }
     var diagnostics = analysisResult.GetAllDiagnostics(analysisResult.Analyzers[0]);
-    if (diagnostics.Length != 0) {
+    if (diagnostics.Length != 0)
+    {
       throw new InvalidOperationException($"Analysis should have 0 analyzer diagnostics (got {diagnostics.Length})");
     }
   }
 
   [Benchmark]
-  public async Task NotificationAnalyzerNoViolations() {
+  public async Task NotificationAnalyzerNoViolations()
+  {
     var analysisResult = await _compilation.GetAnalysisResultAsync(CancellationToken.None);
-    if (analysisResult.Analyzers.Length != 1) {
+    if (analysisResult.Analyzers.Length != 1)
+    {
       throw new InvalidOperationException($"Analysis should have 1 analyzer (got {analysisResult.Analyzers.Length})");
     }
-    if (analysisResult.CompilationDiagnostics.Count != 0) {
+    if (analysisResult.CompilationDiagnostics.Count != 0)
+    {
       throw new InvalidOperationException($"Analysis should have 0 compiler diagnostics (got {analysisResult.CompilationDiagnostics.Count})");
     }
     var diagnostics = analysisResult.GetAllDiagnostics(analysisResult.Analyzers[0]);
-    if (diagnostics.Length != 0) {
+    if (diagnostics.Length != 0)
+    {
       throw new InvalidOperationException($"Analysis should have 0 analyzer diagnostics (got {diagnostics.Length})");
     }
   }

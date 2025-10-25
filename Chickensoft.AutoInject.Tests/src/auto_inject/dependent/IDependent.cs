@@ -15,9 +15,12 @@ using System.Runtime.CompilerServices;
 /// resolve dependencies marked with the [Dependency] attribute.
 /// </summary>
 [Mixin]
-public interface IDependent : IMixin<IDependent>, IAutoInit, IReadyAware {
-  DependentState DependentState {
-    get {
+public interface IDependent : IMixin<IDependent>, IAutoInit, IReadyAware
+{
+  DependentState DependentState
+  {
+    get
+    {
       AddStateIfNeeded();
       return MixinState.Get<DependentState>();
     }
@@ -42,20 +45,25 @@ public interface IDependent : IMixin<IDependent>, IAutoInit, IReadyAware {
   void IReadyAware.OnBeforeReady() { }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void IReadyAware.OnAfterReady() {
-    if (DependentState.PleaseCallSetup) {
+  void IReadyAware.OnAfterReady()
+  {
+    if (DependentState.PleaseCallSetup)
+    {
       Setup();
       DependentState.PleaseCallSetup = false;
     }
-    if (DependentState.PleaseCallOnResolved) {
+    if (DependentState.PleaseCallOnResolved)
+    {
       OnResolved();
       DependentState.PleaseCallOnResolved = false;
     }
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private void AddStateIfNeeded() {
-    if (MixinState.Has<DependentState>()) { return; }
+  private void AddStateIfNeeded()
+  {
+    if (MixinState.Has<DependentState>())
+    { return; }
 
     MixinState.Overwrite(new DependentState());
   }
@@ -65,8 +73,10 @@ public interface IDependent : IMixin<IDependent>, IAutoInit, IReadyAware {
   // Specifying "new void" makes this hide the existing handler, which works
   // since the introspection generator calls us as ((IDependent)obj).Handler()
   // rather than ((IMixin<IDependent>)obj).Handler().
-  public new void Handler() {
-    if (this is not Node node) {
+  new void Handler()
+  {
+    if (this is not Node node)
+    {
       return;
     }
 
@@ -77,7 +87,8 @@ public interface IDependent : IMixin<IDependent>, IAutoInit, IReadyAware {
       this is IIntrospectiveRef
        introspective &&
       !introspective.HasMixin(typeof(IAutoInit))
-    ) {
+    )
+    {
       // Developer didn't give us the IAutoInit mixin, but all dependents are
       // required to also be IAutoInit. So we'll invoke it for them manually.
       (this as IAutoInit).Handler();
@@ -96,7 +107,8 @@ public interface IDependent : IMixin<IDependent>, IAutoInit, IReadyAware {
   /// </summary>
   /// <param name="value">Dependency value (probably a mock or a fake).</param>
   /// <typeparam name="T">Dependency type.</typeparam>
-  public void FakeDependency<T>(T value) where T : notnull {
+  void FakeDependency<T>(T value) where T : notnull
+  {
     AddStateIfNeeded();
     MixinState.Get<DependentState>().ProviderFakes[typeof(T)] =
       new DependencyResolver.DefaultProvider<T>(value);

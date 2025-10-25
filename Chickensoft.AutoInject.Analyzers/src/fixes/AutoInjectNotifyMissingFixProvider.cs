@@ -19,7 +19,8 @@ using Utils;
   ),
   Shared
 ]
-public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
+public class AutoInjectNotifyMissingFixProvider : CodeFixProvider
+{
   private static readonly InvocationExpressionSyntax _notifyInvocation =
     MethodModifier.ThisMemberCallExpression(Constants.NOTIFY_METHOD_NAME, []);
   private static readonly ImmutableArray<string> _fixableDiagnosticIds =
@@ -32,11 +33,13 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
     WellKnownFixAllProviders.BatchFixer;
 
   public sealed override async Task RegisterCodeFixesAsync(
-      CodeFixContext context) {
+      CodeFixContext context)
+  {
     var root = await context.Document
       .GetSyntaxRootAsync(context.CancellationToken)
       .ConfigureAwait(false);
-    if (root is null) {
+    if (root is null)
+    {
       return;
     }
 
@@ -49,7 +52,8 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
       .Parent?
       .AncestorsAndSelf()
       .OfType<TypeDeclarationSyntax>().FirstOrDefault();
-    if (typeDeclaration is null) {
+    if (typeDeclaration is null)
+    {
       return;
     }
 
@@ -68,7 +72,8 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
     Document document,
     TypeDeclarationSyntax typeDeclaration,
     CancellationToken cancellationToken
-  ) {
+  )
+  {
     // Find the method with the specified name and a single parameter of type int
     var methodAndParameter = typeDeclaration.Members
       .OfType<MethodDeclarationSyntax>()
@@ -78,7 +83,8 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
             && m.ParameterList.Parameters.Count == 1
       )
       .Select(
-        m => new {
+        m => new
+        {
           Method = m,
           Parameter = m
             .ParameterList
@@ -95,7 +101,8 @@ public class AutoInjectNotifyMissingFixProvider : CodeFixProvider {
     var originalMethodNode = methodAndParameter?.Method;
     var parameterSyntax = methodAndParameter?.Parameter;
 
-    if (originalMethodNode is null || parameterSyntax is null) {
+    if (originalMethodNode is null || parameterSyntax is null)
+    {
       // Expected method not found or parameter is missing
       return document;
     }

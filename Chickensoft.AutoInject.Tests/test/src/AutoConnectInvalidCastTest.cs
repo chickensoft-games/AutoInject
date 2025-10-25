@@ -1,16 +1,18 @@
 namespace Chickensoft.AutoInject.Tests;
 
 using System;
+using Chickensoft.AutoInject.Tests.Fixtures;
 using Chickensoft.GodotNodeInterfaces;
 using Chickensoft.GoDotTest;
-using Chickensoft.AutoInject.Tests.Fixtures;
 using Godot;
 using Moq;
 using Shouldly;
 
-public class AutoConnectInvalidCastTest(Node testScene) : TestClass(testScene) {
+public class AutoConnectInvalidCastTest(Node testScene) : TestClass(testScene)
+{
   [Test]
-  public void ThrowsOnIncorrectNodeType() {
+  public void ThrowsOnIncorrectNodeType()
+  {
     var scene = GD.Load<PackedScene>(
       "res://test/fixtures/AutoConnectInvalidCastTestScene.tscn"
     );
@@ -22,7 +24,8 @@ public class AutoConnectInvalidCastTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void ThrowsIfFakedChildNodeIsWrongType() {
+  public void ThrowsIfFakedChildNodeIsWrongType()
+  {
     var scene = new AutoConnectInvalidCastTestScene();
     scene.FakeNodeTree(new() { ["Node3D"] = new Mock<INode3D>().Object });
 
@@ -32,7 +35,8 @@ public class AutoConnectInvalidCastTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void ThrowsIfNoNode() {
+  public void ThrowsIfNoNode()
+  {
     var scene = new AutoConnectInvalidCastTestScene();
     Should.Throw<InvalidOperationException>(
       () => scene._Notification((int)Node.NotificationEnterTree)
@@ -40,10 +44,12 @@ public class AutoConnectInvalidCastTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void ThrowsIfTypeIsWrong() {
+  public void ThrowsIfTypeIsWrong()
+  {
     var scene = new AutoConnectInvalidCastTestScene();
 
-    var node = new Control {
+    var node = new Control
+    {
       Name = "Node3D"
     };
     scene.AddChild(node);

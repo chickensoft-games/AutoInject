@@ -5,17 +5,23 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 
 public static partial class CSharpAnalyzerVerifier<TAnalyzer>
-       where TAnalyzer : DiagnosticAnalyzer, new() {
-  public class Test : CSharpAnalyzerTest<TAnalyzer, DefaultVerifier> {
-    public Test() {
+       where TAnalyzer : DiagnosticAnalyzer, new()
+{
+  public class Test : CSharpAnalyzerTest<TAnalyzer, DefaultVerifier>
+  {
+    public Test()
+    {
       SolutionTransforms.Add(
-        (solution, projectId) => {
+        (solution, projectId) =>
+        {
           var project = solution.GetProject(projectId);
-          if (project is null) {
+          if (project is null)
+          {
             return solution;
           }
           var compilationOptions = project.CompilationOptions;
-          if (compilationOptions is null) {
+          if (compilationOptions is null)
+          {
             return solution;
           }
           compilationOptions = compilationOptions.WithSpecificDiagnosticOptions(

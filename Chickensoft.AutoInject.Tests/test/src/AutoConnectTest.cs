@@ -1,15 +1,17 @@
 namespace Chickensoft.AutoInject.Tests;
 
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Chickensoft.GoDotTest;
 using Chickensoft.AutoInject.Tests.Fixtures;
+using Chickensoft.GoDotTest;
+using Chickensoft.Introspection;
 using Godot;
 using GodotTestDriver;
 using Shouldly;
-using System;
-using Chickensoft.Introspection;
 
-public partial class AutoConnectTest(Node testScene) : TestClass(testScene) {
+public partial class AutoConnectTest(Node testScene) : TestClass(testScene)
+{
   private Fixture _fixture = default!;
   private AutoConnectTestScene _scene = default!;
 
@@ -17,7 +19,8 @@ public partial class AutoConnectTest(Node testScene) : TestClass(testScene) {
   public partial class NotAGodotNode { }
 
   [Setup]
-  public async Task Setup() {
+  public async Task Setup()
+  {
     _fixture = new Fixture(TestScene.GetTree());
     _scene = await _fixture.LoadAndAddScene<AutoConnectTestScene>();
   }
@@ -26,7 +29,8 @@ public partial class AutoConnectTest(Node testScene) : TestClass(testScene) {
   public async Task Cleanup() => await _fixture.Cleanup();
 
   [Test]
-  public void ConnectsNodesCorrectlyWhenInstantiated() {
+  public void ConnectsNodesCorrectlyWhenInstantiated()
+  {
     _scene.MyNode.ShouldNotBeNull();
     _scene.MyNodeOriginal.ShouldNotBeNull();
     _scene.MyUniqueNode.ShouldNotBeNull();
@@ -36,19 +40,29 @@ public partial class AutoConnectTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void NonAutoConnectNodeThrows() {
+  public void NonAutoConnectNodeThrows()
+  {
     var node = new Node();
     Should.Throw<InvalidOperationException>(() => node.FakeNodeTree(null));
   }
 
   [Test]
-  public void FakeNodesDoesNothingIfGivenNull() {
+  public void FakeNodesDoesNothingIfGivenNull()
+  {
     IAutoConnect node = new AutoConnectTestScene();
     Should.NotThrow(() => node.FakeNodes = null);
   }
 
+  [
+    SuppressMessage(
+      "Performance",
+      "CA1859",
+      Justification = "Testing the interface"
+    )
+  ]
   [Test]
-  public void AddStateIfNeededDoesNothingIfNotAGodotNode() {
+  public void AddStateIfNeededDoesNothingIfNotAGodotNode()
+  {
     IAutoConnect node = new NotAGodotNode();
     Should.NotThrow(() => node._AddStateIfNeeded());
   }

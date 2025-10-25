@@ -9,9 +9,11 @@ using Chickensoft.GodotTestDriver;
 using Godot;
 using Shouldly;
 
-public class ResolutionTest(Node testScene) : TestClass(testScene) {
+public class ResolutionTest(Node testScene) : TestClass(testScene)
+{
   [Test]
-  public void Provides() {
+  public void Provides()
+  {
     var value = "Hello, world!";
     var provider = new StringProvider() { Value = value };
 
@@ -23,7 +25,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void ProviderResetsOnTreeExit() {
+  public void ProviderResetsOnTreeExit()
+  {
     var value = "Hello, world!";
     var obj = new StringProvider() { Value = value };
     var provider = obj as IBaseProvider;
@@ -38,7 +41,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void ResolvesDependencyWhenProviderIsAlreadyInitialized() {
+  public void ResolvesDependencyWhenProviderIsAlreadyInitialized()
+  {
     var value = "Hello, world!";
     var obj = new StringProvider() { Value = value };
     var provider = obj as IBaseProvider;
@@ -63,7 +67,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public async Task ResolvesDependencyAfterProviderIsResolved() {
+  public async Task ResolvesDependencyAfterProviderIsResolved()
+  {
     var value = "Hello, world!";
     var obj = new StringProvider() { Value = value };
     var provider = obj as IBaseProvider;
@@ -90,7 +95,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public async Task FindsDependenciesAcrossAncestors() {
+  public async Task FindsDependenciesAcrossAncestors()
+  {
     var value = "Hello, world!";
 
     var objA = new StringProvider() { Value = value };
@@ -124,7 +130,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void ThrowsWhenNoProviderFound() {
+  public void ThrowsWhenNoProviderFound()
+  {
     var dependent = new StringDependent();
 
     Should.Throw<ProviderNotFoundException>(
@@ -133,9 +140,11 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void UsesReferenceFallbackValueWhenNoProviderFound() {
+  public void UsesReferenceFallbackValueWhenNoProviderFound()
+  {
     var fallback = new Resource();
-    var dependent = new ReferenceDependentFallback {
+    var dependent = new ReferenceDependentFallback
+    {
       FallbackValue = fallback
     };
 
@@ -146,7 +155,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void DependsOnValueType() {
+  public void DependsOnValueType()
+  {
     var value = 10;
     var depObj = new IntDependent() { FallbackValue = () => value };
     var dependent = depObj as IDependent;
@@ -166,7 +176,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
 
   [Test]
   public void ThrowsIfFallbackProducesNullAfterPreviousValueIsGarbageCollected(
-  ) {
+  )
+  {
     var currentFallback = 0;
     var replacementValue = new object();
     var fallbacks = new List<object?>() { new(), null, replacementValue };
@@ -175,7 +186,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
 
     // Fallback will be called 3 times in this test. First will be non-null,
     // second will be null, third will be non-null and different from the first.
-    var depObj = new WeakReferenceDependent() {
+    var depObj = new WeakReferenceDependent()
+    {
       Fallback = () => fallbacks[currentFallback++]!
     };
 
@@ -216,9 +228,11 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void ThrowsOnDependencyTableThatWasTamperedWith() {
+  public void ThrowsOnDependencyTableThatWasTamperedWith()
+  {
     var fallback = "Hello, world!";
-    var depObj = new StringDependentFallback {
+    var depObj = new StringDependentFallback
+    {
       FallbackValue = fallback
     };
     var dependent = depObj as IDependent;
@@ -233,7 +247,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void DependentCancelsPendingIfRemovedFromTree() {
+  public void DependentCancelsPendingIfRemovedFromTree()
+  {
     var provider = new StringProvider();
     var depObj = new StringDependent();
     var dependent = depObj as IDependent;
@@ -254,7 +269,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void AccessingDependencyBeforeProvidedEvenIfCreatedThrows() {
+  public void AccessingDependencyBeforeProvidedEvenIfCreatedThrows()
+  {
     // Accessing a dependency that might already be available (but the provider
     // hasn't called Provide() yet) should throw an exception.
 
@@ -268,7 +284,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void DependentWithNoDependenciesHasOnResolvedCalled() {
+  public void DependentWithNoDependenciesHasOnResolvedCalled()
+  {
     var provider = new StringProvider();
     var dependent = new NoDependenciesDependent();
 
@@ -280,7 +297,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void FakesDependency() {
+  public void FakesDependency()
+  {
     var dependent = new FakedDependent();
 
     var fakeValue = "I'm fake!";
@@ -296,23 +314,29 @@ public class ResolutionTest(Node testScene) : TestClass(testScene) {
     TestScene.RemoveChild(dependent);
   }
 
-  public class BadProvider : IBaseProvider {
+  public class BadProvider : IBaseProvider
+  {
     public ProviderState ProviderState { get; }
 
-    public BadProvider() {
-      ProviderState = new ProviderState {
+    public BadProvider()
+    {
+      ProviderState = new ProviderState
+      {
         IsInitialized = true
       };
     }
   }
 
-  public static class Utils {
+  public static class Utils
+  {
     public static WeakReference CreateWeakReference() => new(new object());
 
-    public static void ClearWeakReference(WeakReference weakReference) {
+    public static void ClearWeakReference(WeakReference weakReference)
+    {
       weakReference.Target = null;
 
-      while (weakReference.Target is not null) {
+      while (weakReference.Target is not null)
+      {
         GC.Collect();
         GC.WaitForPendingFinalizers();
       }

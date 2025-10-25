@@ -4,7 +4,8 @@ using System;
 #pragma warning disable IDE0005
 using Chickensoft.AutoInject;
 
-public static class DependentExtensions {
+public static class DependentExtensions
+{
   /// <inheritdoc
   ///   cref="DependencyResolver.DependOn{TValue}(IDependent, Func{TValue}?)" />
   public static TValue DependOn<TValue>(

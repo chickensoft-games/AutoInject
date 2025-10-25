@@ -13,33 +13,43 @@ using System.Collections.Generic;
 /// declared node references to their corresponding instances in the scene tree.
 /// </summary>
 [Mixin]
-public interface IAutoConnect : IMixin<IAutoConnect>, IFakeNodeTreeEnabled {
+public interface IAutoConnect : IMixin<IAutoConnect>, IFakeNodeTreeEnabled
+{
 
-  FakeNodeTree? IFakeNodeTreeEnabled.FakeNodes {
-    get {
+  FakeNodeTree? IFakeNodeTreeEnabled.FakeNodes
+  {
+    get
+    {
       _AddStateIfNeeded();
       return MixinState.Get<FakeNodeTree>();
     }
-    set {
-      if (value is { } tree) {
+    set
+    {
+      if (value is { })
+      {
         MixinState.Overwrite(value);
       }
     }
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  void IMixin<IAutoConnect>.Handler() {
+  void IMixin<IAutoConnect>.Handler()
+  {
     var what = MixinState.Get<NotificationState>().Notification;
 
-    if (what == Node.NotificationEnterTree) {
+    if (what == Node.NotificationEnterTree)
+    {
       AutoConnector.ConnectNodes(Types.Graph.GetProperties(GetType()), this);
     }
   }
 
 #pragma warning disable IDE1006 // Naming Styles
-  public void _AddStateIfNeeded(Dictionary<string, INode>? nodes = null) {
-    if (this is not Node node) { return; }
-    if (!MixinState.Has<FakeNodeTree>()) {
+  void _AddStateIfNeeded(Dictionary<string, INode>? nodes = null)
+  {
+    if (this is not Node node)
+    { return; }
+    if (!MixinState.Has<FakeNodeTree>())
+    {
       MixinState.Overwrite(new FakeNodeTree(node, nodes));
     }
   }

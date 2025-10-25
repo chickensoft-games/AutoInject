@@ -17,7 +17,8 @@ using Microsoft.CodeAnalysis.Testing;
 )]
 public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         where TAnalyzer : DiagnosticAnalyzer, new()
-        where TCodeFix : CodeFixProvider, new() {
+        where TCodeFix : CodeFixProvider, new()
+{
   /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.Diagnostic()"/>
   public static DiagnosticResult Diagnostic() =>
       CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>
@@ -33,12 +34,15 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
       CSharpCodeFixVerifier<TAnalyzer, TCodeFix, DefaultVerifier>
         .Diagnostic(descriptor);
 
-  public static Test CreateTest(string source, string? fixedSource = null) {
-    var test = new Test {
+  public static Test CreateTest(string source, string? fixedSource = null)
+  {
+    var test = new Test
+    {
       TestCode = source,
     };
 
-    if (fixedSource is not null) {
+    if (fixedSource is not null)
+    {
       test.FixedCode = fixedSource;
     }
 
@@ -64,7 +68,8 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
   /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
   public static async Task VerifyAnalyzerAsync(
       string source,
-      params DiagnosticResult[] expected) {
+      params DiagnosticResult[] expected)
+  {
     var test = CreateTest(source);
 
     test.ExpectedDiagnostics.AddRange(expected);
@@ -101,10 +106,12 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
       string source,
       DiagnosticResult[] expected,
       string fixedSource,
-      string? codeFixEquivalenceKey) {
+      string? codeFixEquivalenceKey)
+  {
     var test = CreateTest(source, fixedSource);
 
-    if (codeFixEquivalenceKey is not null) {
+    if (codeFixEquivalenceKey is not null)
+    {
       test.CodeActionEquivalenceKey = codeFixEquivalenceKey;
     }
 

@@ -7,7 +7,8 @@ using Godot;
 // Provider nodes created to be used as test subjects.
 
 [Meta(typeof(IAutoOn), typeof(IProvider))]
-public partial class StringProvider : Node, IProvide<string> {
+public partial class StringProvider : Node, IProvide<string>
+{
   public override void _Notification(int what) => this.Notify(what);
 
   string IProvide<string>.Value() => Value;
@@ -21,7 +22,8 @@ public partial class StringProvider : Node, IProvide<string> {
 }
 
 [Meta(typeof(IAutoOn), typeof(IProvider))]
-public partial class IntProvider : Node, IProvide<int> {
+public partial class IntProvider : Node, IProvide<int>
+{
   public override void _Notification(int what) => this.Notify(what);
 
   int IProvide<int>.Value() => Value;

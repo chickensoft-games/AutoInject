@@ -15,14 +15,16 @@ using Microsoft.CodeAnalysis.Diagnostics;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 #pragma warning restore RS1038
 #pragma warning restore IDE0079
-public class AutoInjectNotifyMissingAnalyzer : DiagnosticAnalyzer {
+public class AutoInjectNotifyMissingAnalyzer : DiagnosticAnalyzer
+{
   private static readonly ImmutableArray<DiagnosticDescriptor> _supportedDiagnostics =
     [Diagnostics.MissingAutoInjectNotifyDescriptor];
 
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
     _supportedDiagnostics;
 
-  public override void Initialize(AnalysisContext context) {
+  public override void Initialize(AnalysisContext context)
+  {
     context.EnableConcurrentExecution();
 
     context.ConfigureGeneratedCodeAnalysis(
@@ -35,7 +37,8 @@ public class AutoInjectNotifyMissingAnalyzer : DiagnosticAnalyzer {
     );
   }
 
-  private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context) {
+  private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
+  {
     var classDeclaration = (ClassDeclarationSyntax)context.Node;
 
     var attribute = AnalyzerTools.GetAutoInjectMetaAttribute(
@@ -43,7 +46,8 @@ public class AutoInjectNotifyMissingAnalyzer : DiagnosticAnalyzer {
       Constants.AutoInjectMetaNames.Contains
     );
 
-    if (attribute is null) {
+    if (attribute is null)
+    {
       return;
     }
 
@@ -54,14 +58,16 @@ public class AutoInjectNotifyMissingAnalyzer : DiagnosticAnalyzer {
       Constants.NOTIFICATION_METHOD_NAME
     );
 
-    if (notificationOverride is not null) {
+    if (notificationOverride is not null)
+    {
       // Check if the class calls "this.Notify()" in the _Notification override.
       var hasNotify = AnalyzerTools.HasThisCall(
         notificationOverride,
         Constants.NOTIFY_METHOD_NAME
       );
 
-      if (!hasNotify) {
+      if (!hasNotify)
+      {
         // Report missing Notify call
         context.ReportDiagnostic(
           Diagnostics.MissingAutoInjectNotify(

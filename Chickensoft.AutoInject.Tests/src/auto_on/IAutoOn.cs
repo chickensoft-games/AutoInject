@@ -9,20 +9,24 @@ using Godot;
 /// <see cref="OnReady" />, <see cref="OnProcess(double)" />, etc.
 /// </summary>
 [Mixin]
-public interface IAutoOn : IMixin<IAutoOn> {
+public interface IAutoOn : IMixin<IAutoOn>
+{
   // Handler doesn't do anything, since
   // <see cref="NotificationExtensions.Notify(GodotObject, int)" />
   // automatically calls InvokeNotificationMethods after invoking mixins.
   // This ensures callbacks always run after mixins.
   void IMixin<IAutoOn>.Handler() { }
 
-  public static void InvokeNotificationMethods(object? obj, int what) {
-    if (obj is not IAutoOn autoNode || obj is not Node node) { return; }
+  static void InvokeNotificationMethods(object? obj, int what)
+  {
+    if (obj is not IAutoOn autoNode || obj is not Node node)
+    { return; }
 
     // Invoke Godot callbacks
     autoNode.OnNotification(what);
 
-    switch (what) {
+    switch (what)
+    {
       case (int)GodotObject.NotificationPostinitialize:
         autoNode.OnPostinitialize();
         break;
@@ -102,7 +106,8 @@ public interface IAutoOn : IMixin<IAutoOn> {
         autoNode.OnChildOrderChanged();
         break;
       case (int)Node.NotificationReady:
-        if (node is IReadyAware readyAware) {
+        if (node is IReadyAware readyAware)
+        {
           readyAware.OnBeforeReady();
           autoNode.OnReady();
           readyAware.OnAfterReady();

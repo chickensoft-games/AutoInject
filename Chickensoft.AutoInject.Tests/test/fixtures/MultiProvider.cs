@@ -6,7 +6,8 @@ using Chickensoft.Introspection;
 using Godot;
 
 [Meta(typeof(IAutoOn), typeof(IProvider))]
-public partial class MultiProvider : Node2D, IProvide<int>, IProvide<string> {
+public partial class MultiProvider : Node2D, IProvide<int>, IProvide<string>
+{
   public override void _Notification(int what) => this.Notify(what);
 
   int IProvide<int>.Value() => IntValue;
@@ -14,7 +15,8 @@ public partial class MultiProvider : Node2D, IProvide<int>, IProvide<string> {
 
   public MultiDependent Child { get; private set; } = default!;
 
-  public override void _Ready() {
+  public override void _Ready()
+  {
     Child = new MultiDependent();
     AddChild(Child);
 

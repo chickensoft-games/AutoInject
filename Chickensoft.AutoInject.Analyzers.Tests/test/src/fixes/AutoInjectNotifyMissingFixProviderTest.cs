@@ -5,13 +5,11 @@ using Chickensoft.AutoInject.Analyzers.Utils;
 using Xunit;
 using VerifyCS = Verifiers.CSharpCodeFixVerifier<AutoInjectNotifyMissingAnalyzer, Fixes.AutoInjectNotifyMissingFixProvider>;
 
-public class AutoInjectNotifyMissingFixProviderTest {
+public class AutoInjectNotifyMissingFixProviderTest
+{
   [Fact]
-  public async Task DoesNotOfferDiagnosticIfNotificationOverrideExistsAndCallsNotify() {
-    var diagnosticID = Diagnostics
-      .MissingAutoInjectNotificationOverrideDescriptor
-      .Id;
-
+  public async Task DoesNotOfferDiagnosticIfNotificationOverrideExistsAndCallsNotify()
+  {
     var testCode = $$"""
     using Chickensoft.AutoInject;
     using Chickensoft.Introspection;
@@ -30,11 +28,8 @@ public class AutoInjectNotifyMissingFixProviderTest {
   }
 
   [Fact]
-  public async Task DoesNotOfferDiagnosticIfNotifyCallExistsOutsideOverride() {
-    var diagnosticID = Diagnostics
-      .MissingAutoInjectNotificationOverrideDescriptor
-      .Id;
-
+  public async Task DoesNotOfferDiagnosticIfNotifyCallExistsOutsideOverride()
+  {
     var testCode = $$"""
     using Chickensoft.AutoInject;
     using Chickensoft.Introspection;
@@ -53,7 +48,8 @@ public class AutoInjectNotifyMissingFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingNotifyCallByAddingToOverride() {
+  public async Task FixesMissingNotifyCallByAddingToOverride()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectNotifyDescriptor
       .Id;

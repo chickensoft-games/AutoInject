@@ -1,6 +1,7 @@
 namespace Chickensoft.AutoInject.Analyzers.Utils;
 
-public static class Constants {
+public static class Constants
+{
   public const string META_ATTRIBUTE_NAME = "Meta";
   public const string PROVIDE_METHOD_NAME = "Provide";
   public const string NOTIFY_METHOD_NAME = "Notify";

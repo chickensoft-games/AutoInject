@@ -13,13 +13,15 @@ using System.Globalization;
 /// <summary>
 /// Actual implementation of the dependency resolver.
 /// </summary>
-public static class DependencyResolver {
+public static class DependencyResolver
+{
   /// <summary>
   /// A type receiver for use with introspective node's reflection metadata.
   /// This is given a class at construction time and used to determine if the
   /// class can provide a value of a given type.
   /// </summary>
-  private sealed class ProviderValidator : ITypeReceiver {
+  private sealed class ProviderValidator : ITypeReceiver
+  {
     /// <summary>Provider to validate.</summary>
     public IBaseProvider Provider { get; set; }
 
@@ -28,7 +30,8 @@ public static class DependencyResolver {
     /// </summary>
     public bool Result { get; set; }
 
-    public ProviderValidator() {
+    public ProviderValidator()
+    {
       Provider = default!;
     }
 
@@ -45,7 +48,8 @@ public static class DependencyResolver {
   [ThreadStatic]
   private static readonly ProviderValidator _validator;
 
-  static DependencyResolver() {
+  static DependencyResolver()
+  {
     _validator = new();
   }
 
@@ -66,9 +70,12 @@ public static class DependencyResolver {
   /// <returns>Members that represent dependencies.</returns>
   private static IEnumerable<PropertyMetadata> GetDependenciesToResolve(
     IEnumerable<PropertyMetadata> properties
-  ) {
-    foreach (var property in properties) {
-      if (property.Attributes.ContainsKey(typeof(DependencyAttribute))) {
+  )
+  {
+    foreach (var property in properties)
+    {
+      if (property.Attributes.ContainsKey(typeof(DependencyAttribute)))
+      {
         yield return property;
       }
     }
@@ -86,11 +93,14 @@ public static class DependencyResolver {
     int what,
     IDependent dependent,
     IEnumerable<PropertyMetadata> properties
-  ) {
+  )
+  {
     var state = dependent.MixinState.Get<DependentState>();
-    if (what == Node.NotificationExitTree) {
+    if (what == Node.NotificationExitTree)
+    {
       dependent.MixinState.Get<DependentState>().ShouldResolveDependencies = true;
-      foreach (var pending in state.Pending.Values) {
+      foreach (var pending in state.Pending.Values)
+      {
         pending.Unsubscribe();
       }
       state.Pending.Clear();
@@ -98,7 +108,8 @@ public static class DependencyResolver {
     if (
         what == Node.NotificationReady &&
         state.ShouldResolveDependencies
-      ) {
+      )
+    {
       Resolve(dependent, properties);
     }
   }
@@ -124,12 +135,14 @@ public static class DependencyResolver {
   /// is accessed before the provider has called Provide().</exception>
   public static TValue DependOn<TValue>(
     IDependent dependent, Func<TValue>? fallback = default
-  ) where TValue : notnull {
+  ) where TValue : notnull
+  {
     // First, check dependency fakes. Using a faked value takes priority over
     // all the other dependency resolution methods.
     var state = dependent.MixinState.Get<DependentState>();
     if (state.ProviderFakes.TryGetValue(typeof(TValue), out var fakeProvider)
-      && fakeProvider is DefaultProvider<TValue> faker) {
+      && fakeProvider is DefaultProvider<TValue> faker)
+    {
       return faker.Value();
     }
 
@@ -139,18 +152,23 @@ public static class DependencyResolver {
     if (state.Dependencies.TryGetValue(
         typeof(TValue), out var providerNode
       )
-    ) {
-      if (!providerNode.ProviderState.IsInitialized) {
+    )
+    {
+      if (!providerNode.ProviderState.IsInitialized)
+      {
         throw new ProviderNotInitializedException(typeof(TValue));
       }
-      if (providerNode is IProvide<TValue> provider) {
+      if (providerNode is IProvide<TValue> provider)
+      {
         return provider.Value();
       }
-      else if (providerNode is DefaultProvider<TValue> defaultProvider) {
+      else if (providerNode is DefaultProvider<TValue> defaultProvider)
+      {
         return defaultProvider.Value();
       }
     }
-    else if (fallback is not null) {
+    else if (fallback is not null)
+    {
       // See if we were given a fallback.
       var value = fallback();
       var provider = new DefaultProvider<TValue>(value, fallback);
@@ -172,7 +190,8 @@ public static class DependencyResolver {
   private static void Resolve(
     IDependent dependent,
     IEnumerable<PropertyMetadata> properties
-  ) {
+  )
+  {
     var state = dependent.MixinState.Get<DependentState>();
     // Clear any previously resolved dependencies — if the ancestor tree hasn't
     // changed above us, we will just end up re-resolving them as they were.
@@ -188,10 +207,13 @@ public static class DependencyResolver {
     var foundDependencies = new HashSet<PropertyMetadata>();
     var providersInitializing = 0;
 
-    void resolve() {
-      if (self.IsNodeReady()) {
+    void resolve()
+    {
+      if (self.IsNodeReady())
+      {
         // Godot node is already ready.
-        if (!dependent.IsTesting) {
+        if (!dependent.IsTesting)
+        {
           dependent.Setup();
         }
         dependent.OnResolved();
@@ -201,33 +223,40 @@ public static class DependencyResolver {
       // Godot node is not ready yet, so we will wait for OnReady before
       // calling Setup() and OnResolved().
 
-      if (!dependent.IsTesting) {
+      if (!dependent.IsTesting)
+      {
         state.PleaseCallSetup = true;
       }
       state.PleaseCallOnResolved = true;
     }
 
-    void onProviderInitialized(IBaseProvider provider) {
+    void onProviderInitialized(IBaseProvider provider)
+    {
       providersInitializing--;
 
-      lock (state.Pending) {
+      lock (state.Pending)
+      {
         state.Pending[provider].Unsubscribe();
         state.Pending.Remove(provider);
       }
 
-      if (providersInitializing == 0) {
+      if (providersInitializing == 0)
+      {
         resolve();
       }
     }
 
-    while (node != null && shouldResolve) {
+    while (node != null && shouldResolve)
+    {
       foundDependencies.Clear();
 
-      if (node is IBaseProvider provider) {
+      if (node is IBaseProvider provider)
+      {
         // For each provider node ancestor, check each of our remaining
         // dependencies to see if the provider node is the type needed
         // to satisfy the dependency.
-        foreach (var property in remainingDependencies) {
+        foreach (var property in remainingDependencies)
+        {
           Validator.Provider = provider;
 
           // Use the generated introspection metadata to determine if
@@ -235,7 +264,8 @@ public static class DependencyResolver {
           property.TypeNode.GenericTypeGetter(Validator);
           var isCorrectProvider = Validator.Result;
 
-          if (isCorrectProvider) {
+          if (isCorrectProvider)
+          {
             // Add the provider to our internal dependency table.
             state.Dependencies.Add(
               property.TypeNode.ClosedType, provider
@@ -251,7 +281,8 @@ public static class DependencyResolver {
             if (
               !provider.ProviderState.IsInitialized &&
               !state.Pending.ContainsKey(provider)
-            ) {
+            )
+            {
               state.Pending[provider] =
                 new PendingProvider(provider, onProviderInitialized);
               provider.ProviderState.OnInitialized += onProviderInitialized;
@@ -264,18 +295,21 @@ public static class DependencyResolver {
       // Remove the dependencies we've resolved.
       remainingDependencies.ExceptWith(foundDependencies);
 
-      if (remainingDependencies.Count == 0) {
+      if (remainingDependencies.Count == 0)
+      {
         // Found all dependencies, exit loop.
         shouldResolve = false;
       }
-      else {
+      else
+      {
         // Still need to find dependencies — continue up the tree until
         // this returns null.
         node = node.GetParent();
       }
     }
 
-    if (state.Pending.Count == 0) {
+    if (state.Pending.Count == 0)
+    {
       // Inform dependent that dependencies have been resolved.
       resolve();
     }
@@ -285,7 +319,8 @@ public static class DependencyResolver {
     // for fallback values.
   }
 
-  public class DefaultProvider<TValue> : IBaseProvider {
+  public class DefaultProvider<TValue> : IBaseProvider
+  {
     internal object _value;
     private readonly Func<TValue?> _fallback;
     public ProviderState ProviderState { get; }
@@ -295,7 +330,8 @@ public static class DependencyResolver {
     // assembly is being unloaded or reloaded; such as in the case of
     // rebuilding within the Godot Editor if you've instantiated a node
     // and run it as a tool script.
-    public DefaultProvider(object value, Func<TValue?>? fallback = default) {
+    public DefaultProvider(object value, Func<TValue?>? fallback = default)
+    {
       _fallback = fallback ?? (() => (TValue?)value);
 
       _value = value.GetType().IsValueType
@@ -305,10 +341,13 @@ public static class DependencyResolver {
       ProviderState = new() { IsInitialized = true };
     }
 
-    public TValue Value() {
-      if (_value is WeakReference weakReference) {
+    public TValue Value()
+    {
+      if (_value is WeakReference weakReference)
+      {
         // Try to return a reference type.
-        if (weakReference.Target is TValue target) {
+        if (weakReference.Target is TValue target)
+        {
           return target;
         }
 

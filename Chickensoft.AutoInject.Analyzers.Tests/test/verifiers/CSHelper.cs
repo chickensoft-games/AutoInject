@@ -5,7 +5,8 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-internal static class CSharpVerifierHelper {
+internal static class CSharpVerifierHelper
+{
   /// <summary>
   /// By default, the compiler reports diagnostics for nullable reference types at
   /// <see cref="DiagnosticSeverity.Warning"/>, and the analyzer test framework defaults to only validating
@@ -16,7 +17,8 @@ internal static class CSharpVerifierHelper {
   internal static ImmutableDictionary<string, ReportDiagnostic> NullableWarnings { get; } =
     GetNullableWarningsFromCompiler();
 
-  private static ImmutableDictionary<string, ReportDiagnostic> GetNullableWarningsFromCompiler() {
+  private static ImmutableDictionary<string, ReportDiagnostic> GetNullableWarningsFromCompiler()
+  {
     string[] args = ["/warnaserror:nullable"];
     var commandLineArguments = CSharpCommandLineParser.Default.Parse(
       args,

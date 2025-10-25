@@ -12,7 +12,8 @@ using Chickensoft.AutoInject;
 /// property will be converted to PascalCase (with any leading
 /// underscores removed) and used as a unique node identifier</param>
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-public class NodeAttribute(string? path = null) : Attribute {
+public class NodeAttribute(string? path = null) : Attribute
+{
   /// <summary>
   /// Explicit node path or unique identifier that the tagged property or field
   /// should reference. If not provided (or null), the name of the property or

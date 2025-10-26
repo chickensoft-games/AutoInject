@@ -1,13 +1,15 @@
 namespace Chickensoft.AutoInject.Tests;
 
-using Chickensoft.GoDotTest;
 using Chickensoft.AutoInject.Tests.Fixtures;
+using Chickensoft.GoDotTest;
 using Godot;
 using Shouldly;
 
-public class AutoConnectMissingTest(Node testScene) : TestClass(testScene) {
+public class AutoConnectMissingTest(Node testScene) : TestClass(testScene)
+{
   [Test]
-  public void ThrowsOnMissingNode() {
+  public void ThrowsOnMissingNode()
+  {
     var scene = GD.Load<PackedScene>("res://test/fixtures/AutoConnectMissingTestScene.tscn");
     // AutoNode will actually throw an InvalidOperationException
     // during the scene instantiation, but for whatever reason that doesn't

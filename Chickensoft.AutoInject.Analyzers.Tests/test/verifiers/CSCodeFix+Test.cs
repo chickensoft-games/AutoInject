@@ -7,17 +7,23 @@ using Microsoft.CodeAnalysis.Testing;
 
 public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         where TAnalyzer : DiagnosticAnalyzer, new()
-        where TCodeFix : CodeFixProvider, new() {
-  public class Test : CSharpCodeFixTest<TAnalyzer, TCodeFix, DefaultVerifier> {
-    public Test() {
+        where TCodeFix : CodeFixProvider, new()
+{
+  public class Test : CSharpCodeFixTest<TAnalyzer, TCodeFix, DefaultVerifier>
+  {
+    public Test()
+    {
       SolutionTransforms.Add(
-        (solution, projectId) => {
+        (solution, projectId) =>
+        {
           var project = solution.GetProject(projectId);
-          if (project is null) {
+          if (project is null)
+          {
             return solution;
           }
           var compilationOptions = project.CompilationOptions;
-          if (compilationOptions is null) {
+          if (compilationOptions is null)
+          {
             return solution;
           }
           compilationOptions = compilationOptions.WithSpecificDiagnosticOptions(

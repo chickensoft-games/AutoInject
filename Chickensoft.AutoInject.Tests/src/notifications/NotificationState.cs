@@ -1,6 +1,7 @@
 namespace Chickensoft.AutoInject;
 
-public class NotificationState {
+public class NotificationState
+{
   /// <summary>
   /// Most recently received Godot object notification.
   /// </summary>

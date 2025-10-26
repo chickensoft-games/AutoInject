@@ -4,17 +4,20 @@ using System.Runtime.CompilerServices;
 using Chickensoft.Introspection;
 using Godot;
 
-public static class NotificationExtensions {
+public static class NotificationExtensions
+{
   /// <summary>
   /// Notify mixins applied to a Godot object that a notification has been
   /// received.
   /// </summary>
   /// <param name="obj">Godot object.</param>
   /// <param name="what">Godot object notification.</param>
-  public static void Notify(this GodotObject obj, int what) {
+  public static void Notify(this GodotObject obj, int what)
+  {
     obj.__SetupNotificationStateIfNeeded();
 
-    if (obj is not IIntrospectiveRef introspective) {
+    if (obj is not IIntrospectiveRef introspective)
+    {
       return;
     }
 
@@ -25,21 +28,26 @@ public static class NotificationExtensions {
     // Invoke each mixin's handler method.
     introspective.InvokeMixins();
 
+
     // If we're an IAutoOn, invoke the notification methods like OnReady,
     // OnProcess, etc. We specifically do this last.
-    if (obj is IAutoOn autoOn) {
+    if (obj is IAutoOn)
+    {
       IAutoOn.InvokeNotificationMethods(introspective, what);
     }
   }
 
 #pragma warning disable IDE1006
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static void __SetupNotificationStateIfNeeded(this GodotObject obj) {
-    if (obj is not IIntrospectiveRef introspective) {
+  public static void __SetupNotificationStateIfNeeded(this GodotObject obj)
+  {
+    if (obj is not IIntrospectiveRef introspective)
+    {
       return;
     }
 
-    if (!introspective.MixinState.Has<NotificationState>()) {
+    if (!introspective.MixinState.Has<NotificationState>())
+    {
       introspective.MixinState.Overwrite(new NotificationState());
     }
   }

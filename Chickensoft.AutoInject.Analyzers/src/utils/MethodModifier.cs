@@ -9,7 +9,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 
-public static class MethodModifier {
+public static class MethodModifier
+{
   /// <summary>
   /// Creates a this.method call expression syntax node for the given method
   /// name.
@@ -23,7 +24,8 @@ public static class MethodModifier {
   public static InvocationExpressionSyntax ThisMemberCallExpression(
     string methodToCallName,
     IEnumerable<string> argumentNames
-  ) {
+  )
+  {
     var invocation = SyntaxFactory.InvocationExpression(
         SyntaxFactory.MemberAccessExpression(
           SyntaxKind.SimpleMemberAccessExpression,
@@ -31,7 +33,8 @@ public static class MethodModifier {
           SyntaxFactory.IdentifierName(methodToCallName)
         )
     );
-    if (argumentNames.Any()) {
+    if (argumentNames.Any())
+    {
       invocation = invocation.WithArgumentList(
         SyntaxFactory.ArgumentList(
           SyntaxFactory.SeparatedList(
@@ -81,16 +84,20 @@ public static class MethodModifier {
     MethodDeclarationSyntax originalMethodNode,
     StatementSyntax statementToAdd,
     CancellationToken cancellationToken
-  ) {
+  )
+  {
     var editor = await DocumentEditor.CreateAsync(document, cancellationToken);
 
     List<SyntaxNode> statements = [];
-    if (originalMethodNode.Body is not null) {
+    if (originalMethodNode.Body is not null)
+    {
       statements.AddRange(editor.Generator.GetStatements(originalMethodNode));
     }
-    else {
+    else
+    {
       var exprBodyExpr = editor.Generator.GetExpression(originalMethodNode) as ExpressionSyntax;
-      if (exprBodyExpr is not null) {
+      if (exprBodyExpr is not null)
+      {
         var statementFromExpr = SyntaxFactory.ExpressionStatement(exprBodyExpr);
         // Make sure to preserve the trailing trivia from the original method's semicolon token
         // If we don't do this we will lose any code comments or whitespace that was after the semicolon
@@ -98,10 +105,12 @@ public static class MethodModifier {
         if (
           !originalMethodSemicolon.IsKind(SyntaxKind.None)
             && !originalMethodSemicolon.IsMissing
-        ) {
+        )
+        {
           var originalSemicolonTrailingTrivia = originalMethodSemicolon
             .TrailingTrivia;
-          if (originalSemicolonTrailingTrivia.Any()) {
+          if (originalSemicolonTrailingTrivia.Any())
+          {
             statementFromExpr = statementFromExpr
               .WithSemicolonToken(
                 statementFromExpr

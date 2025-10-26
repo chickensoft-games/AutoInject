@@ -1,16 +1,19 @@
 namespace Chickensoft.AutoInject.Tests;
-using Chickensoft.GoDotTest;
+
 using Chickensoft.AutoInject.Tests.Fixtures;
+using Chickensoft.GoDotTest;
+using Chickensoft.Introspection;
 using Godot;
 using Shouldly;
-using Chickensoft.Introspection;
 
-public partial class AutoInitTest(Node testScene) : TestClass(testScene) {
+public partial class AutoInitTest(Node testScene) : TestClass(testScene)
+{
   [Meta(typeof(IAutoInit))]
   public partial class NotAGodotNode { }
 
   [Test]
-  public void SetsUpNode() {
+  public void SetsUpNode()
+  {
     var node = new AutoInitTestNode();
 
     node._Notification((int)Node.NotificationReady);
@@ -19,14 +22,16 @@ public partial class AutoInitTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void DefaultImplementationDoesNothing() {
+  public void DefaultImplementationDoesNothing()
+  {
     var node = new AutoInitTestNodeNoImplementation();
 
     node._Notification((int)Node.NotificationReady);
   }
 
   [Test]
-  public void IsTestingCreatesStateIfSetFirst() {
+  public void IsTestingCreatesStateIfSetFirst()
+  {
     var node = new AutoInitTestNode();
     (node as IAutoInit).IsTesting = true;
     // Should do nothing on a non-ready notification
@@ -34,13 +39,15 @@ public partial class AutoInitTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void HandlerDoesNotWorkIfNotGodotNode() => Should.NotThrow(() => {
+  public void HandlerDoesNotWorkIfNotGodotNode() => Should.NotThrow(() =>
+  {
     var node = new NotAGodotNode();
     (node as IAutoInit).Handler();
   });
 
   [Test]
-  public void AutoNodeMixinOnlyCallsInitializeOnce() {
+  public void AutoNodeMixinOnlyCallsInitializeOnce()
+  {
     var node = new AutoInitTestAutoNode();
 
     node._Notification((int)Node.NotificationReady);

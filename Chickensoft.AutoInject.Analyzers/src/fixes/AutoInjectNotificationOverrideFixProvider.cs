@@ -20,7 +20,8 @@ using Utils;
   ),
   Shared
 ]
-public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
+public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider
+{
   private static readonly MethodDeclarationSyntax _notificationDeclaration =
     SyntaxFactory.MethodDeclaration(
       SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
@@ -67,12 +68,14 @@ public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
 
   public sealed override async Task RegisterCodeFixesAsync(
     CodeFixContext context
-  ) {
+  )
+  {
     var root = await context.Document
       .GetSyntaxRootAsync(context.CancellationToken)
       .ConfigureAwait(false);
 
-    if (root is null) {
+    if (root is null)
+    {
       return;
     }
 
@@ -85,7 +88,8 @@ public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
       .AncestorsAndSelf()
       .OfType<TypeDeclarationSyntax>()
       .FirstOrDefault();
-    if (typeDeclaration is null) {
+    if (typeDeclaration is null)
+    {
       return;
     }
 
@@ -109,7 +113,8 @@ public class AutoInjectNotificationOverrideFixProvider : CodeFixProvider {
     Document document,
     TypeDeclarationSyntax typeDeclaration,
     CancellationToken cancellationToken
-  ) {
+  )
+  {
     var editor = await DocumentEditor.CreateAsync(document, cancellationToken);
     editor.InsertMembers(typeDeclaration, 0, [_notificationDeclaration]);
     return editor.GetChangedDocument();

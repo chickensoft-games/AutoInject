@@ -35,10 +35,12 @@ using Microsoft.CodeAnalysis.Diagnostics;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 #pragma warning restore RS1038
 #pragma warning restore IDE0079
-public class BaselineAnalyzer : DiagnosticAnalyzer {
+public class BaselineAnalyzer : DiagnosticAnalyzer
+{
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => [];
 
-  public override void Initialize(AnalysisContext context) {
+  public override void Initialize(AnalysisContext context)
+  {
     context.EnableConcurrentExecution();
     context.ConfigureGeneratedCodeAnalysis(
       GeneratedCodeAnalysisFlags.Analyze

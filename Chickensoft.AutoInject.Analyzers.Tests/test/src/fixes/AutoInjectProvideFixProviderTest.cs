@@ -9,10 +9,12 @@ using VerifyCS = Verifiers.CSharpCodeFixVerifier<AutoInjectProvideAnalyzer, Fixe
 // It's nontrivial to get Introspection source generation to run during the
 // test, so we fake some of the things that would ordinarily rely on it (e.g.,
 // AutoInject types, some extension methods)
-public class AutoInjectProvideFixProviderTest {
+public class AutoInjectProvideFixProviderTest
+{
   #region NoDiagnostic
   [Fact]
-  public async Task DoesNotOfferDiagnosticIfProvideIsCalled() {
+  public async Task DoesNotOfferDiagnosticIfProvideIsCalled()
+  {
     var testCode = $$"""
     using Chickensoft.Introspection;
     using Godot;
@@ -47,7 +49,8 @@ public class AutoInjectProvideFixProviderTest {
 
   #region AddingMethods
   [Fact]
-  public async Task FixesMissingProvideCallByAddingSetup() {
+  public async Task FixesMissingProvideCallByAddingSetup()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -123,7 +126,8 @@ public class AutoInjectProvideFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByAddingOnReady() {
+  public async Task FixesMissingProvideCallByAddingOnReady()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -199,7 +203,8 @@ public class AutoInjectProvideFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByAddingReadyOverride() {
+  public async Task FixesMissingProvideCallByAddingReadyOverride()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -277,7 +282,8 @@ public class AutoInjectProvideFixProviderTest {
 
   #region ImprovingExistingMethods
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingEmptySetup() {
+  public async Task FixesMissingProvideCallByImprovingExistingEmptySetup()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -352,7 +358,8 @@ public class AutoInjectProvideFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingNonEmptySetup() {
+  public async Task FixesMissingProvideCallByImprovingExistingNonEmptySetup()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -433,7 +440,8 @@ public class AutoInjectProvideFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingExpressionBodiedSetup() {
+  public async Task FixesMissingProvideCallByImprovingExistingExpressionBodiedSetup()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -512,7 +520,8 @@ public class AutoInjectProvideFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingEmptyOnReady() {
+  public async Task FixesMissingProvideCallByImprovingExistingEmptyOnReady()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -587,7 +596,8 @@ public class AutoInjectProvideFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingNonEmptyOnReady() {
+  public async Task FixesMissingProvideCallByImprovingExistingNonEmptyOnReady()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -667,7 +677,8 @@ public class AutoInjectProvideFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingExpressionBodiedOnReady() {
+  public async Task FixesMissingProvideCallByImprovingExistingExpressionBodiedOnReady()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -746,7 +757,8 @@ public class AutoInjectProvideFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingEmptyReadyOverride() {
+  public async Task FixesMissingProvideCallByImprovingExistingEmptyReadyOverride()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -821,7 +833,8 @@ public class AutoInjectProvideFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingNonEmptyReadyOverride() {
+  public async Task FixesMissingProvideCallByImprovingExistingNonEmptyReadyOverride()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;
@@ -902,7 +915,8 @@ public class AutoInjectProvideFixProviderTest {
   }
 
   [Fact]
-  public async Task FixesMissingProvideCallByImprovingExistingExpressionBodiedReadyOverride() {
+  public async Task FixesMissingProvideCallByImprovingExistingExpressionBodiedReadyOverride()
+  {
     var diagnosticID = Diagnostics
       .MissingAutoInjectProvideDescriptor
       .Id;

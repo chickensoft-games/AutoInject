@@ -5,7 +5,8 @@ using Chickensoft.Introspection;
 using Godot;
 
 [Meta(typeof(IAutoOn), typeof(IDependent))]
-public partial class StringDependent : Node {
+public partial class StringDependent : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
@@ -16,14 +17,16 @@ public partial class StringDependent : Node {
 
   public void OnReady() { }
 
-  public void OnResolved() {
+  public void OnResolved()
+  {
     OnResolvedCalled = true;
     ResolvedValue = MyDependency;
   }
 }
 
 [Meta(typeof(IAutoOn), typeof(IDependent))]
-public partial class FakedDependent : Node {
+public partial class FakedDependent : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
@@ -32,14 +35,16 @@ public partial class FakedDependent : Node {
   public bool OnResolvedCalled { get; private set; }
   public string ResolvedValue { get; set; } = "";
 
-  public void OnResolved() {
+  public void OnResolved()
+  {
     OnResolvedCalled = true;
     ResolvedValue = MyDependency;
   }
 }
 
 [Meta(typeof(IAutoOn), typeof(IDependent))]
-public partial class StringDependentFallback : Node {
+public partial class StringDependentFallback : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
@@ -51,14 +56,16 @@ public partial class StringDependentFallback : Node {
 
   public void OnReady() { }
 
-  public void OnResolved() {
+  public void OnResolved()
+  {
     OnResolvedCalled = true;
     ResolvedValue = MyDependency;
   }
 }
 
 [Meta(typeof(IAutoOn), typeof(IDependent))]
-public partial class WeakReferenceDependent : Node {
+public partial class WeakReferenceDependent : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
@@ -73,7 +80,8 @@ public partial class WeakReferenceDependent : Node {
 }
 
 [Meta(typeof(IAutoOn), typeof(IDependent))]
-public partial class ReferenceDependentFallback : Node {
+public partial class ReferenceDependentFallback : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
@@ -85,14 +93,16 @@ public partial class ReferenceDependentFallback : Node {
 
   public void OnReady() { }
 
-  public void OnResolved() {
+  public void OnResolved()
+  {
     OnResolvedCalled = true;
     ResolvedValue = MyDependency;
   }
 }
 
 [Meta(typeof(IAutoOn), typeof(IDependent))]
-public partial class IntDependent : Node {
+public partial class IntDependent : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
@@ -104,14 +114,16 @@ public partial class IntDependent : Node {
 
   public void OnReady() { }
 
-  public void OnResolved() {
+  public void OnResolved()
+  {
     OnResolvedCalled = true;
     ResolvedValue = MyDependency;
   }
 }
 
 [Meta(typeof(IAutoOn), typeof(IDependent))]
-public partial class MultiDependent : Node {
+public partial class MultiDependent : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 
   [Dependency]
@@ -126,7 +138,8 @@ public partial class MultiDependent : Node {
   public bool ReadyCalled { get; set; }
   public void OnReady() => ReadyCalled = true;
 
-  public void OnResolved() {
+  public void OnResolved()
+  {
     OnResolvedCalled = true;
     IntResolvedValue = IntDependency;
     StringResolvedValue = StringDependency;
@@ -134,7 +147,8 @@ public partial class MultiDependent : Node {
 }
 
 [Meta(typeof(IAutoOn), typeof(IDependent))]
-public partial class NoDependenciesDependent : Node {
+public partial class NoDependenciesDependent : Node
+{
   public override void _Notification(int what) => this.Notify(what);
 
   public bool OnResolvedCalled { get; private set; }

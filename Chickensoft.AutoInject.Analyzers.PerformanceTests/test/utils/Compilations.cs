@@ -34,12 +34,14 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Host.Mef;
 
-public static class Compilations {
+public static class Compilations
+{
   public static async Task<(Compilation?, AnalyzerOptions)> CreateCompilation(
     (string, string)[] sources,
     (string, string)[] globalOptions
-  ) {
-    var (project, documents, options) = CreateProject(
+  )
+  {
+    var (project, _, options) = CreateProject(
       sources,
       globalOptions
     );
@@ -70,7 +72,8 @@ public static class Compilations {
     string defaultPrefix,
     CompilationOptions compilationOptions,
     ParseOptions parseOptions
-  ) {
+  )
+  {
     var projectId = ProjectId.CreateNewId(debugName: projectName);
     var assemblies = AppDomain.CurrentDomain.GetAssemblies()
               .Where(
@@ -91,7 +94,8 @@ public static class Compilations {
         assemblies.Select(a => MetadataReference.CreateFromFile(a.Location))
       );
     var documents = new List<Document>();
-    foreach (var source in sources) {
+    foreach (var source in sources)
+    {
       var fileName = CreateFileName(defaultPrefix, source.Item1);
       var document = project.AddDocument(
         fileName,
@@ -102,7 +106,8 @@ public static class Compilations {
       project = document.Project;
     }
     var analyzerOptions = project.AnalyzerOptions;
-    if (globalOptions is not null) {
+    if (globalOptions is not null)
+    {
       analyzerOptions = new AnalyzerOptions(
         [],
         new MyOptionsProvider(globalOptions)
@@ -115,10 +120,12 @@ public static class Compilations {
     $"{prefix}{file}.cs";
 }
 
-public sealed class MyOptionsProvider : AnalyzerConfigOptionsProvider {
+public sealed class MyOptionsProvider : AnalyzerConfigOptionsProvider
+{
   public override AnalyzerConfigOptions GlobalOptions { get; }
 
-  public MyOptionsProvider((string, string)[] options) {
+  public MyOptionsProvider((string, string)[] options)
+  {
     GlobalOptions = new MyOptions(options);
   }
 
@@ -128,12 +135,15 @@ public sealed class MyOptionsProvider : AnalyzerConfigOptionsProvider {
     GlobalOptions;
 }
 
-public sealed class MyOptions : AnalyzerConfigOptions {
+public sealed class MyOptions : AnalyzerConfigOptions
+{
   private readonly Dictionary<string, string> _options;
 
-  public MyOptions((string, string)[] options) {
+  public MyOptions((string, string)[] options)
+  {
     _options = [];
-    foreach (var option in options) {
+    foreach (var option in options)
+    {
       _options[option.Item1] = option.Item2;
     }
   }

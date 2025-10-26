@@ -19,14 +19,16 @@ using Utils;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 #pragma warning restore RS1038
 #pragma warning restore IDE0079
-public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
+public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer
+{
   private static readonly ImmutableArray<DiagnosticDescriptor> _supportedDiagnostics =
     [Diagnostics.MissingAutoInjectProvideDescriptor];
 
   public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
     _supportedDiagnostics;
 
-  public override void Initialize(AnalysisContext context) {
+  public override void Initialize(AnalysisContext context)
+  {
     context.EnableConcurrentExecution();
 
     context.ConfigureGeneratedCodeAnalysis(
@@ -39,10 +41,12 @@ public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
     );
   }
 
-  private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context) {
+  private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
+  {
     var classDeclaration = (ClassDeclarationSyntax)context.Node;
 
-    if (classDeclaration.BaseList is null) {
+    if (classDeclaration.BaseList is null)
+    {
       return;
     }
 
@@ -55,7 +59,8 @@ public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
             && genericName.Identifier.ValueText == Constants.PROVIDER_INTERFACE_NAME
       );
 
-    if (iProvideBaseType is null) {
+    if (iProvideBaseType is null)
+    {
       return;
     }
 
@@ -65,7 +70,8 @@ public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
       Constants.ProviderMetaNames.Contains
     );
 
-    if (attribute is null) {
+    if (attribute is null)
+    {
       return;
     }
 
@@ -75,7 +81,8 @@ public class AutoInjectProvideAnalyzer : DiagnosticAnalyzer {
       Constants.PROVIDE_METHOD_NAME
     );
 
-    if (hasProvide) {
+    if (hasProvide)
+    {
       return;
     }
 

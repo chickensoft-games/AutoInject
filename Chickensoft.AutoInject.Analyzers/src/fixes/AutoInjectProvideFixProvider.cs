@@ -22,7 +22,8 @@ using Utils;
   )
 ]
 [Shared]
-public class AutoInjectProvideFixProvider : CodeFixProvider {
+public class AutoInjectProvideFixProvider : CodeFixProvider
+{
   private static readonly SyntaxToken _publicKeyword =
     SyntaxFactory.Token(SyntaxKind.PublicKeyword);
   private static readonly SyntaxToken _overrideKeyword =
@@ -48,11 +49,13 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
     WellKnownFixAllProviders.BatchFixer;
 
   public sealed override async Task RegisterCodeFixesAsync(
-      CodeFixContext context) {
+      CodeFixContext context)
+  {
     var root = await context.Document
       .GetSyntaxRootAsync(context.CancellationToken)
       .ConfigureAwait(false);
-    if (root is null) {
+    if (root is null)
+    {
       return;
     }
 
@@ -66,7 +69,8 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
       .AncestorsAndSelf()
       .OfType<TypeDeclarationSyntax>()
       .FirstOrDefault();
-    if (typeDeclaration is null) {
+    if (typeDeclaration is null)
+    {
       return;
     }
 
@@ -107,7 +111,8 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
 
   public static string GetCodeFixEquivalenceKey(
       string methodName,
-      bool methodExists) {
+      bool methodExists)
+  {
     var operation = methodExists ? "CreateNew" : "AddCallTo";
     return $"{nameof(AutoInjectProvideFixProvider)}_{operation}_{methodName}";
   }
@@ -131,12 +136,14 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
     string methodName,
     MethodDeclarationSyntax newMethod,
     Func<MethodDeclarationSyntax, bool> findPredicate
-  ) {
+  )
+  {
     var existingMethod = typeDeclaration.Members
       .OfType<MethodDeclarationSyntax>()
       .FirstOrDefault(findPredicate);
 
-    if (existingMethod is not null) {
+    if (existingMethod is not null)
+    {
       // Method exists, offer to add a call to it
       context.RegisterCodeFix(
         CodeAction.Create(
@@ -154,7 +161,8 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
         diagnostic
       );
     }
-    else {
+    else
+    {
       // Method does not exist, offer to create it
       context.RegisterCodeFix(
         CodeAction.Create(
@@ -179,7 +187,8 @@ public class AutoInjectProvideFixProvider : CodeFixProvider {
     TypeDeclarationSyntax typeDeclaration,
     MethodDeclarationSyntax newMethod,
     CancellationToken cancellationToken
-  ) {
+  )
+  {
     var editor = await DocumentEditor.CreateAsync(document, cancellationToken);
     editor.AddMember(typeDeclaration, newMethod);
     return editor.GetChangedDocument();

@@ -10,7 +10,8 @@ using Chickensoft.AutoInject;
 /// <summary>
 /// Provider state used internally when resolving dependencies.
 /// </summary>
-public class ProviderState {
+public class ProviderState
+{
   /// <summary>Whether the provider has initialized all of its values.</summary>
   public bool IsInitialized { get; set; }
 
@@ -35,8 +36,10 @@ public class ProviderState {
   /// </summary>
   /// <param name="what">Godot node notification.</param>
   /// <param name="provider">Provider node.</param>
-  public static void OnProvider(int what, IProvider provider) {
-    if (what == Node.NotificationExitTree) {
+  public static void OnProvider(int what, IProvider provider)
+  {
+    if (what == Node.NotificationExitTree)
+    {
       provider.ProviderState.IsInitialized = false;
     }
   }
@@ -47,7 +50,8 @@ public class ProviderState {
   /// nodes that the provider has finished initializing.
   /// </summary>
   /// <param name="provider"></param>
-  public static void Provide(IProvider provider) {
+  public static void Provide(IProvider provider)
+  {
     provider.ProviderState.IsInitialized = true;
     provider.ProviderState.Announce(provider);
     provider.OnProvided();

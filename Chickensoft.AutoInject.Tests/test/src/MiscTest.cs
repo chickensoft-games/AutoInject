@@ -10,9 +10,11 @@ using Shouldly;
 [Meta(typeof(IAutoOn), typeof(IDependent))]
 public partial class TestDependent { }
 
-public class MiscTest(Node testScene) : TestClass(testScene) {
+public class MiscTest(Node testScene) : TestClass(testScene)
+{
   [Test]
-  public void DependencyPendingCancels() {
+  public void DependencyPendingCancels()
+  {
     var obj = new StringProvider();
     var provider = obj as IBaseProvider;
     var initialized = false;
@@ -32,21 +34,24 @@ public class MiscTest(Node testScene) : TestClass(testScene) {
   }
 
   [Test]
-  public void ProviderNotFoundException() {
+  public void ProviderNotFoundException()
+  {
     var exception = new ProviderNotFoundException(typeof(ObsoleteAttribute));
 
     exception.Message.ShouldContain(nameof(ObsoleteAttribute));
   }
 
   [Test]
-  public void IDependentOnResolvedDoesNothing() {
+  public void IDependentOnResolvedDoesNothing()
+  {
     var dependent = new TestDependent();
 
     Should.NotThrow(() => ((IDependent)dependent).OnResolved());
   }
 
   [Test]
-  public void DefaultProviderState() {
+  public void DefaultProviderState()
+  {
     var defaultProvider = new DependencyResolver.DefaultProvider<string>("hi");
     defaultProvider.ProviderState.ShouldNotBeNull();
   }

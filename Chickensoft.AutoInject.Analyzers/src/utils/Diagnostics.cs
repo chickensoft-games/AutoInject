@@ -2,7 +2,8 @@ namespace Chickensoft.AutoInject.Analyzers.Utils;
 
 using Microsoft.CodeAnalysis;
 
-public static class Diagnostics {
+public static class Diagnostics
+{
   private const string ERR_PREFIX = "AUTO_INJECT";
   private const string ERR_CATEGORY = "Chickensoft.AutoInject.Analyzers";
 

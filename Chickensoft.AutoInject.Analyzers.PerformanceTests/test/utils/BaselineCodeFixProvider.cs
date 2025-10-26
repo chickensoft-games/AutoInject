@@ -6,7 +6,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(BaselineCodeFixProvider))]
-public class BaselineCodeFixProvider : CodeFixProvider {
+public class BaselineCodeFixProvider : CodeFixProvider
+{
   private static readonly ImmutableArray<string> _diagnosticIds = [];
 
   public override FixAllProvider GetFixAllProvider() =>

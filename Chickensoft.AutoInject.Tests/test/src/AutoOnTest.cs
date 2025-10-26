@@ -5,7 +5,8 @@ using Chickensoft.Introspection;
 using Godot;
 using Shouldly;
 
-public partial class AutoOnTest(Node testScene) : TestClass(testScene) {
+public partial class AutoOnTest(Node testScene) : TestClass(testScene)
+{
   [Meta(typeof(IAutoOn))]
   public partial class AutoOnTestNode : Node { }
 
@@ -15,25 +16,29 @@ public partial class AutoOnTest(Node testScene) : TestClass(testScene) {
   public class NotAutoOn { }
 
   [Test]
-  public void DoesNothingIfNotAGodotNode() {
+  public void DoesNothingIfNotAGodotNode()
+  {
     var node = new NotAGodotNode();
 
     Should.NotThrow(() => IAutoOn.InvokeNotificationMethods(node, 1));
   }
 
   [Test]
-  public void DOesNothingIfNotAutoOn() {
+  public void DOesNothingIfNotAutoOn()
+  {
     var node = new NotAutoOn();
 
     Should.NotThrow(() => IAutoOn.InvokeNotificationMethods(node, 1));
   }
 
   [Test]
-  public void InvokesHandlerForNotification() {
+  public void InvokesHandlerForNotification()
+  {
     var node = new AutoOnTestNode();
     IAutoOn autoNode = node;
 
-    Should.NotThrow(() => {
+    Should.NotThrow(() =>
+    {
       IAutoOn.InvokeNotificationMethods(
         autoNode, (int)GodotObject.NotificationPostinitialize
       );

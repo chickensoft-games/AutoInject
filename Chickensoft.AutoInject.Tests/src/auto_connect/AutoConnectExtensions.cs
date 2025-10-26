@@ -7,7 +7,8 @@ using Chickensoft.AutoInject;
 using Godot;
 using System.Collections.Generic;
 
-public static class AutoConnectExtensions {
+public static class AutoConnectExtensions
+{
   /// <summary>
   /// Initialize the fake node tree for unit testing.
   /// </summary>
@@ -16,8 +17,10 @@ public static class AutoConnectExtensions {
   /// <exception cref="InvalidOperationException" />
   public static void FakeNodeTree(
     this Node node, Dictionary<string, INode>? nodes
-  ) {
-    if (node is not IAutoConnect autoConnect) {
+  )
+  {
+    if (node is not IAutoConnect autoConnect)
+    {
       throw new InvalidOperationException(
         "Cannot create a fake node tree on a node without the AutoConnect " +
         "mixin."

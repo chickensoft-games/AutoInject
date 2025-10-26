@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
 
-public class DiagnosticProvider : FixAllContext.DiagnosticProvider {
+public class DiagnosticProvider : FixAllContext.DiagnosticProvider
+{
   private readonly Project _project;
   private readonly IEnumerable<Diagnostic> _diagnostics;
 
   public DiagnosticProvider(
     Project project,
     IEnumerable<Diagnostic> diagnostics
-  ) {
+  )
+  {
     _project = project;
     _diagnostics = diagnostics;
   }

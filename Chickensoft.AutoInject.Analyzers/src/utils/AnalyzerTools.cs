@@ -6,7 +6,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-public static class AnalyzerTools {
+public static class AnalyzerTools
+{
   public static AttributeSyntax? GetAutoInjectMetaAttribute(
     ClassDeclarationSyntax classDeclaration,
     Func<string, bool> isMetaName
@@ -20,7 +21,8 @@ public static class AnalyzerTools {
             && attr.Name.ToString() == Constants.META_ATTRIBUTE_NAME
             && attr.ArgumentList.Arguments.Any(
               arg =>
-                arg.Expression is TypeOfExpressionSyntax {
+                arg.Expression is TypeOfExpressionSyntax
+                {
                   Type: IdentifierNameSyntax identifierName
                 }
                   && isMetaName(identifierName.Identifier.ValueText)
@@ -50,7 +52,8 @@ public static class AnalyzerTools {
       .OfType<InvocationExpressionSyntax>()
       .Any(
         invocation =>
-          invocation.Expression is MemberAccessExpressionSyntax {
+          invocation.Expression is MemberAccessExpressionSyntax
+          {
             Expression: ThisExpressionSyntax
           } memberInvocation
             && memberInvocation.Name.Identifier.ValueText == methodName

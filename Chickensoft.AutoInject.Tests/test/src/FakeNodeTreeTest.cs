@@ -8,8 +8,10 @@ using Godot;
 using Moq;
 using Shouldly;
 
-public class FakeNodeTreeTest : TestClass {
-  public FakeNodeTreeTest(Node testScene) : base(testScene) {
+public class FakeNodeTreeTest : TestClass
+{
+  public FakeNodeTreeTest(Node testScene) : base(testScene)
+  {
     var a = new Mock<INode>();
     var b = new Mock<INode>();
     var c = new Mock<INode>();
@@ -27,7 +29,8 @@ public class FakeNodeTreeTest : TestClass {
   public INode C { get; }
 
   [Test]
-  public void InitializesAndGetsChildrenAndShowsHasChildren() {
+  public void InitializesAndGetsChildrenAndShowsHasChildren()
+  {
     var children = new Dictionary<string, INode>() { ["A"] = A, ["B"] = B };
     var tree = new FakeNodeTree(TestScene, children);
 
@@ -37,21 +40,24 @@ public class FakeNodeTreeTest : TestClass {
 
     tree.GetChildCount().ShouldBe(2);
 
-    tree.GetAllNodes().ShouldBe(new Dictionary<string, INode>() {
+    tree.GetAllNodes().ShouldBe(new Dictionary<string, INode>()
+    {
       ["A"] = A,
       ["B"] = B
     });
   }
 
   [Test]
-  public void InitializesWithNothing() {
+  public void InitializesWithNothing()
+  {
     var tree = new FakeNodeTree(TestScene);
 
     tree.GetChildren().ShouldBeEmpty();
   }
 
   [Test]
-  public void AddChildWorks() {
+  public void AddChildWorks()
+  {
     var children = new Dictionary<string, INode>() { ["A"] = A, ["B"] = B };
     var tree = new FakeNodeTree(TestScene, children);
 
@@ -65,14 +71,16 @@ public class FakeNodeTreeTest : TestClass {
   }
 
   [Test]
-  public void AddChildGeneratesNameForNodeIfNeeded() {
+  public void AddChildGeneratesNameForNodeIfNeeded()
+  {
     var tree = new FakeNodeTree(TestScene);
     tree.AddChild(B);
     tree.GetNode(B.GetType().Name + "@0").ShouldBe(B);
   }
 
   [Test]
-  public void GetNodeReturnsNode() {
+  public void GetNodeReturnsNode()
+  {
     var children = new Dictionary<string, INode>() { ["A"] = A, ["B"] = B };
     var tree = new FakeNodeTree(TestScene, children);
 
@@ -84,7 +92,8 @@ public class FakeNodeTreeTest : TestClass {
   }
 
   [Test]
-  public void FindChildReturnsMatchingNode() {
+  public void FindChildReturnsMatchingNode()
+  {
     var children = new Dictionary<string, INode>() { ["A"] = A, ["B"] = B, ["C"] = C };
     var tree = new FakeNodeTree(TestScene, children);
 
@@ -93,7 +102,8 @@ public class FakeNodeTreeTest : TestClass {
   }
 
   [Test]
-  public void FindChildReturnsNullOnNoMatch() {
+  public void FindChildReturnsNullOnNoMatch()
+  {
     var children = new Dictionary<string, INode>() { ["A"] = A, ["B"] = B, ["C"] = C };
     var tree = new FakeNodeTree(TestScene, children);
 
@@ -102,7 +112,8 @@ public class FakeNodeTreeTest : TestClass {
   }
 
   [Test]
-  public void FindChildrenReturnsMatchingNodes() {
+  public void FindChildrenReturnsMatchingNodes()
+  {
     var children = new Dictionary<string, INode>() { ["Apple"] = A, ["Banana"] = B, ["Cherry"] = C };
     var tree = new FakeNodeTree(TestScene, children);
 
@@ -111,7 +122,8 @@ public class FakeNodeTreeTest : TestClass {
   }
 
   [Test]
-  public void GetChildReturnsNodeByIndex() {
+  public void GetChildReturnsNodeByIndex()
+  {
     var children = new Dictionary<string, INode>() { ["A"] = A, ["B"] = B, ["C"] = C };
     var tree = new FakeNodeTree(TestScene, children);
 
@@ -122,14 +134,16 @@ public class FakeNodeTreeTest : TestClass {
   }
 
   [Test]
-  public void GetChildThrowsOnInvalidIndex() {
+  public void GetChildThrowsOnInvalidIndex()
+  {
     var tree = new FakeNodeTree(TestScene);
 
     Should.Throw<ArgumentOutOfRangeException>(() => tree.GetChild<INode>(0));
   }
 
   [Test]
-  public void GetChildUsesNegativeIndexToGetFromEnd() {
+  public void GetChildUsesNegativeIndexToGetFromEnd()
+  {
     var children = new Dictionary<string, INode>() { ["A"] = A, ["B"] = B, ["C"] = C };
     var tree = new FakeNodeTree(TestScene, children);
 
@@ -138,7 +152,8 @@ public class FakeNodeTreeTest : TestClass {
   }
 
   [Test]
-  public void RemoveChildRemovesNode() {
+  public void RemoveChildRemovesNode()
+  {
     var children = new Dictionary<string, INode>() { ["A"] = A, ["B"] = B, ["C"] = C };
     var tree = new FakeNodeTree(TestScene, children);
 

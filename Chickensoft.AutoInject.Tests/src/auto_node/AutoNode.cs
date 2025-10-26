@@ -16,10 +16,12 @@ using Chickensoft.Introspection;
 /// </para>
 /// </summary>
 public interface IAutoNode : IMixin<IAutoNode>,
-IAutoOn, IAutoConnect, IAutoInit, IProvider, IDependent {
+IAutoOn, IAutoConnect, IAutoInit, IProvider, IDependent
+{
   void IMixin<IAutoNode>.Handler() { }
 
-  new void Handler() {
+  new void Handler()
+  {
     // IAutoOn isn't called since its handler does nothing.
     (this as IAutoConnect).Handler();
     // IDependent invokes IAutoInit, so we don't invoke it directly.

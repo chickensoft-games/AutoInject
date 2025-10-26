@@ -9,8 +9,10 @@ using Godot;
 using Chickensoft.Introspection;
 using System.Collections.Generic;
 
-public static class AutoConnector {
-  public class TypeChecker : ITypeReceiver {
+public static class AutoConnector
+{
+  public class TypeChecker : ITypeReceiver
+  {
     public object Value { get; set; } = default!;
 
     public bool Result { get; private set; }
@@ -23,16 +25,19 @@ public static class AutoConnector {
   public static void ConnectNodes(
       IEnumerable<PropertyMetadata> properties,
       IAutoConnect autoConnect
-    ) {
+    )
+  {
     var node = (Node)autoConnect;
-    foreach (var property in properties) {
+    foreach (var property in properties)
+    {
       if (
         !property.Attributes.TryGetValue(
           typeof(NodeAttribute), out var nodeAttributes
         ) ||
         property.Getter is not { } getter ||
         getter.Invoke(node) is not null
-      ) {
+      )
+      {
         continue;
       }
       var nodeAttribute = (NodeAttribute)nodeAttributes[0];
@@ -45,7 +50,8 @@ public static class AutoConnector {
       // Faked nodes take precedence over real nodes.
       //
       // FakeNodes will never be null on an AutoConnect node, actually.
-      if (autoConnect.FakeNodes!.GetNode(path) is { } fakeNode) {
+      if (autoConnect.FakeNodes!.GetNode(path) is { } fakeNode)
+      {
         // We found a faked node for this path. Make sure it's the expected
         // type.
         _checker.Value = fakeNode;
@@ -54,7 +60,8 @@ public static class AutoConnector {
 
         var satisfiesFakeType = _checker.Result;
 
-        if (!satisfiesFakeType) {
+        if (!satisfiesFakeType)
+        {
           e = new InvalidOperationException(
             $"Found a faked node at '{path}' of type " +
             $"'{fakeNode.GetType().Name}' that is not the expected type " +
@@ -65,7 +72,8 @@ public static class AutoConnector {
           throw e;
         }
         // Faked node satisfies the expected type :)
-        if (property.Setter is { } setter) {
+        if (property.Setter is { } setter)
+        {
           setter(node, fakeNode);
         }
 
@@ -75,7 +83,8 @@ public static class AutoConnector {
       // We're dealing with what should be an actual node in the tree.
       var potentialChild = node.GetNodeOrNull(path);
 
-      if (potentialChild is not Node child) {
+      if (potentialChild is not Node child)
+      {
         e = new InvalidOperationException(
           $"AutoConnect: Node at '{path}' does not exist in either the real " +
           $"or fake subtree for '{node.Name}' member '{property.Name}' of " +
@@ -91,10 +100,12 @@ public static class AutoConnector {
       property.TypeNode.GenericTypeGetter(_checker);
       var originalNodeSatisfiesType = _checker.Result;
 
-      if (originalNodeSatisfiesType) {
+      if (originalNodeSatisfiesType)
+      {
         // Property expected a vanilla Godot node type and it matched, so we
         // set it and leave.
-        if (property.Setter is { } setter) {
+        if (property.Setter is { } setter)
+        {
           setter(node, child);
         }
         continue;
@@ -111,8 +122,10 @@ public static class AutoConnector {
       property.TypeNode.GenericTypeGetter(_checker);
       var adaptedChildSatisfiesType = _checker.Result;
 
-      if (adaptedChildSatisfiesType) {
-        if (property.Setter is { } setter) {
+      if (adaptedChildSatisfiesType)
+      {
+        if (property.Setter is { } setter)
+        {
           setter(node, adaptedChild);
         }
         continue;
@@ -145,17 +158,20 @@ public static class AutoConnector {
   /// </summary>
   /// <param name="input">Input string.</param>
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  public static string AsciiToPascalCase(string input) {
+  public static string AsciiToPascalCase(string input)
+  {
     var span = input.AsSpan();
     Span<char> output = stackalloc char[span.Length + 1];
     var outputIndex = 1;
 
     output[0] = '%';
 
-    for (var i = 1; i < span.Length + 1; i++) {
+    for (var i = 1; i < span.Length + 1; i++)
+    {
       var c = span[i - 1];
 
-      if (c == '_') { continue; }
+      if (c == '_')
+      { continue; }
 
       output[outputIndex++] = i == 1 || span[i - 2] == '_'
         ? (char)(c & 0xDF)

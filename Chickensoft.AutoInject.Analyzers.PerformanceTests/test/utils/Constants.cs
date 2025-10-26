@@ -24,7 +24,8 @@ namespace Chickensoft.AutoInject.Analyzers.PerformanceTests.Utils;
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-public static class Constants {
+public static class Constants
+{
   public const int FIX_SOURCES_COUNT = 100;
   public const int ANALYZER_SOURCES_COUNT = 10000;
   public const string PROJECT_NAME = "TestProject";

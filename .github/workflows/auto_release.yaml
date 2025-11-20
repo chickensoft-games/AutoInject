@@ -31,7 +31,7 @@ jobs:
       should_release: ${{ steps.release.outputs.should_release }}
     steps:
       - name: 🧾 Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           lfs: true
           submodules: 'recursive'

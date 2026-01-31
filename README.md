@@ -510,6 +510,10 @@ public partial class MyNode : Node2D
 > ```csharp
 > SetPhysicsProcess(true);
 > ```
+> The same is true for overriding `_Process`. In that case Godot automatically enables processing. In order to use `OnProcess` you have to manually call:
+> ```csharp
+> SetProcess(true);
+> ```
 
 ## 🦾 IAutoNode
 

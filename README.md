@@ -503,6 +503,18 @@ public partial class MyNode : Node2D
 }
 ```
 
+> [!WARNING]
+> Godot detects when you override `_PhysicsProcess` and automatically enables physics for that node.
+> 
+> That won't happen when using `OnPhysicsProcess` so you have to manually turn on physics by calling:
+> ```csharp
+> SetPhysicsProcess(true);
+> ```
+> The same is true for overriding `_Process`. In that case Godot automatically enables processing. In order to use `OnProcess` you have to manually call:
+> ```csharp
+> SetProcess(true);
+> ```
+
 ## 🦾 IAutoNode
 
 The `IAutoNode` mixin simply applies all of the mixins provided by AutoInject to a node script at once.

@@ -495,6 +495,7 @@ public partial class MyNode : Node2D
 
   public void OnReady() {
     // Called when the node enters the scene tree.
+    SetProcess(true);
   }
 
   public void OnProcess(double delta) {

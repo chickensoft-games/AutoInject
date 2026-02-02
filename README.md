@@ -495,6 +495,7 @@ public partial class MyNode : Node2D
 
   public void OnReady() {
     // Called when the node enters the scene tree.
+    SetProcess(true);
   }
 
   public void OnProcess(double delta) {
@@ -502,6 +503,18 @@ public partial class MyNode : Node2D
   }
 }
 ```
+
+> [!WARNING]
+> Godot detects when you override `_PhysicsProcess` and automatically enables physics for that node.
+> 
+> That won't happen when using `OnPhysicsProcess` so you have to manually turn on physics by calling:
+> ```csharp
+> SetPhysicsProcess(true);
+> ```
+> The same is true for overriding `_Process`. In that case Godot automatically enables processing. In order to use `OnProcess` you have to manually call:
+> ```csharp
+> SetProcess(true);
+> ```
 
 ## 🦾 IAutoNode
 

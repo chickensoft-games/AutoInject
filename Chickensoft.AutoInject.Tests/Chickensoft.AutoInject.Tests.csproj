@@ -1,4 +1,4 @@
-<Project Sdk="Godot.NET.Sdk">
+<Project Sdk="Godot.NET.Sdk/4.6.0">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
@@ -11,7 +11,7 @@
     <!-- To show generated files -->
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>.generated</CompilerGeneratedFilesOutputPath>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
@@ -28,5 +28,13 @@
     <PackageReference Include="Chickensoft.GodotNodeInterfaces" Version="2.4.60" />
     <PackageReference Include="Chickensoft.Introspection" Version="3.0.2" />
     <PackageReference Include="Chickensoft.Introspection.Generator" Version="3.0.2" PrivateAssets="all" OutputItemType="analyzer" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="**\.gdignore" />
+    <Content Include="**\.gitignore" />
+    <Content Include="**\*.godot" />
+    <Content Include="**\*.json" />
+    <Content Include="**\*.tscn" />
+    <Content Include="**\*.uid" />
   </ItemGroup>
 </Project>

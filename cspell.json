@@ -27,6 +27,7 @@
     "devbuild",
     "endregion",
     "Finalizers",
+    "gdignore",
     "globaltool",
     "godotengine",
     "godotpackage",

@@ -347,6 +347,9 @@ public partial class MyNode : Node2D
 
 AutoConnect integrates seamlessly with [GodotNodeInterfaces] to facilitate unit testing Godot node scripts by allowing you to fake the node tree during testing.
 
+> [!IMPORTANT]
+> Starting in GodotNodeInterfaces v3 (AutoInject 2.10.0+), to use the fake node tree in your tests, you must set the static property `Chickensoft.GodotNodeInterfaces.RuntimeContext.IsTesting` to `true` when running tests. See the [Migrating](https://github.com/chickensoft-games/GodotNodeInterfaces?tab=readme-ov-file#migrating) section of the GodotNodeInterfaces README for details.
+
 We can easily write a test for the example above by substituting mock nodes:
 
 ```csharp

@@ -14,7 +14,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   [Test]
   public void Provides()
   {
-    const string value = "Hello, world!";
+    var value = "Hello, world!";
     var provider = new StringProvider() { Value = value };
 
     ((IProvide<string>)provider).Value().ShouldBe(value);
@@ -29,7 +29,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   [Test]
   public void ProviderResetsOnTreeExit()
   {
-    const string value = "Hello, world!";
+    var value = "Hello, world!";
     var obj = new StringProvider() { Value = value };
     var provider = obj as IBaseProvider;
 
@@ -47,7 +47,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   [Test]
   public void ResolvesDependencyWhenProviderIsAlreadyInitialized()
   {
-    const string value = "Hello, world!";
+    var value = "Hello, world!";
     var obj = new StringProvider() { Value = value };
     var provider = obj as IBaseProvider;
     var dependent = new StringDependent();
@@ -73,7 +73,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   [Test]
   public async Task ResolvesDependencyAfterProviderIsResolved()
   {
-    const string value = "Hello, world!";
+    var value = "Hello, world!";
     var obj = new StringProvider() { Value = value };
     var provider = obj as IBaseProvider;
     var dependent = new StringDependent();
@@ -101,7 +101,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   [Test]
   public async Task FindsDependenciesAcrossAncestors()
   {
-    const string value = "Hello, world!";
+    var value = "Hello, world!";
 
     var objA = new StringProvider() { Value = value };
     var providerA = objA as IBaseProvider;
@@ -166,7 +166,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   [Test]
   public void DependsOnValueType()
   {
-    const int value = 10;
+    var value = 10;
     var depObj = new IntDependent() { FallbackValue = static () => value };
     var dependent = depObj as IDependent;
 
@@ -241,7 +241,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   [Test]
   public void ThrowsOnDependencyTableThatWasTamperedWith()
   {
-    const string fallback = "Hello, world!";
+    var fallback = "Hello, world!";
     var depObj = new StringDependentFallback
     {
       FallbackValue = fallback
@@ -322,7 +322,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   {
     var dependent = new FakedDependent();
 
-    const string fakeValue = "I'm fake!";
+    var fakeValue = "I'm fake!";
     dependent.FakeDependency(fakeValue);
 
     TestScene.AddChild(dependent);

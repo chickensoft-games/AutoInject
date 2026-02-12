@@ -11,7 +11,7 @@ using Shouldly;
 public partial class AutoNodeTest(Node testScene) : TestClass(testScene)
 {
   [Meta(typeof(IAutoNode))]
-  public partial class NotAGodotNode : GodotObject;
+  public partial class NotAGodotNode : GodotObject { }
 
 
   [Test]
@@ -30,7 +30,7 @@ public partial class AutoNodeTest(Node testScene) : TestClass(testScene)
     )
   ]
   [Test]
-  public void CallsOtherMixins() => Should.NotThrow(static () =>
+  public void CallsOtherMixins() => Should.NotThrow(() =>
   {
 
     var node = new NotAGodotNode();

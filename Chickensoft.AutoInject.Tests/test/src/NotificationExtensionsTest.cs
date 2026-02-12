@@ -6,7 +6,7 @@ using Shouldly;
 
 
 
-public class NotificationExtensionsTest(
+public partial class NotificationExtensionsTest(
   Node testScene
 ) : TestClass(testScene)
 {

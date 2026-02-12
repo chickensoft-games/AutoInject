@@ -9,7 +9,7 @@ using Shouldly;
 public partial class AutoInitTest(Node testScene) : TestClass(testScene)
 {
   [Meta(typeof(IAutoInit))]
-  public partial class NotAGodotNode;
+  public partial class NotAGodotNode { }
 
   [Test]
   public void SetsUpNode()
@@ -45,7 +45,7 @@ public partial class AutoInitTest(Node testScene) : TestClass(testScene)
   }
 
   [Test]
-  public void HandlerDoesNotWorkIfNotGodotNode() => Should.NotThrow(static () =>
+  public void HandlerDoesNotWorkIfNotGodotNode() => Should.NotThrow(() =>
   {
     var node = new NotAGodotNode();
     (node as IAutoInit).Handler();

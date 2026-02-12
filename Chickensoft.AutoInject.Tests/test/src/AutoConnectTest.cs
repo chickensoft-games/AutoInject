@@ -18,7 +18,7 @@ public partial class AutoConnectTest(Node testScene) : TestClass(testScene)
   private AutoConnectTestScene _scene = default!;
 
   [Meta(typeof(IAutoConnect))]
-  public partial class NotAGodotNode;
+  public partial class NotAGodotNode { }
 
   [Setup]
   public async Task Setup()

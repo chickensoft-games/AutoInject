@@ -6,7 +6,7 @@ using Shouldly;
 
 
 
-public partial class NotificationExtensionsTest(
+public class NotificationExtensionsTest(
   Node testScene
 ) : TestClass(testScene)
 {
@@ -16,5 +16,7 @@ public partial class NotificationExtensionsTest(
     var node = new Node();
 
     Should.NotThrow(() => node.Notify(1));
+
+    node.QueueFree();
   }
 }

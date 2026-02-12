@@ -8,12 +8,12 @@ using Shouldly;
 public partial class AutoOnTest(Node testScene) : TestClass(testScene)
 {
   [Meta(typeof(IAutoOn))]
-  public partial class AutoOnTestNode : Node { }
+  public partial class AutoOnTestNode : Node;
 
   [Meta(typeof(IAutoOn))]
-  public partial class NotAGodotNode { }
+  public partial class NotAGodotNode;
 
-  public class NotAutoOn { }
+  public class NotAutoOn;
 
   [Test]
   public void DoesNothingIfNotAGodotNode()
@@ -169,5 +169,7 @@ public partial class AutoOnTest(Node testScene) : TestClass(testScene)
         autoNode, (int)Node.NotificationSceneInstantiated
       );
     });
+
+    node.QueueFree();
   }
 }

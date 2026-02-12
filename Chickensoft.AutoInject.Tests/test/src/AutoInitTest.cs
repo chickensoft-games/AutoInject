@@ -9,7 +9,7 @@ using Shouldly;
 public partial class AutoInitTest(Node testScene) : TestClass(testScene)
 {
   [Meta(typeof(IAutoInit))]
-  public partial class NotAGodotNode { }
+  public partial class NotAGodotNode;
 
   [Test]
   public void SetsUpNode()
@@ -19,6 +19,8 @@ public partial class AutoInitTest(Node testScene) : TestClass(testScene)
     node._Notification((int)Node.NotificationReady);
 
     node.Called.ShouldBe(1);
+
+    node.QueueFree();
   }
 
   [Test]
@@ -27,6 +29,8 @@ public partial class AutoInitTest(Node testScene) : TestClass(testScene)
     var node = new AutoInitTestNodeNoImplementation();
 
     node._Notification((int)Node.NotificationReady);
+
+    node.QueueFree();
   }
 
   [Test]
@@ -36,10 +40,12 @@ public partial class AutoInitTest(Node testScene) : TestClass(testScene)
     (node as IAutoInit).IsTesting = true;
     // Should do nothing on a non-ready notification
     node._Notification((int)Node.NotificationEnterTree);
+
+    node.QueueFree();
   }
 
   [Test]
-  public void HandlerDoesNotWorkIfNotGodotNode() => Should.NotThrow(() =>
+  public void HandlerDoesNotWorkIfNotGodotNode() => Should.NotThrow(static () =>
   {
     var node = new NotAGodotNode();
     (node as IAutoInit).Handler();
@@ -53,5 +59,7 @@ public partial class AutoInitTest(Node testScene) : TestClass(testScene)
     node._Notification((int)Node.NotificationReady);
 
     node.Called.ShouldBe(1);
+
+    node.QueueFree();
   }
 }

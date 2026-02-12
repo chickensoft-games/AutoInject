@@ -14,7 +14,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   [Test]
   public void Provides()
   {
-    var value = "Hello, world!";
+    const string value = "Hello, world!";
     var provider = new StringProvider() { Value = value };
 
     ((IProvide<string>)provider).Value().ShouldBe(value);
@@ -22,12 +22,14 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
     provider._Notification((int)Node.NotificationReady);
 
     provider.OnProvidedCalled.ShouldBeTrue();
+
+    provider.QueueFree();
   }
 
   [Test]
   public void ProviderResetsOnTreeExit()
   {
-    var value = "Hello, world!";
+    const string value = "Hello, world!";
     var obj = new StringProvider() { Value = value };
     var provider = obj as IBaseProvider;
 
@@ -38,12 +40,14 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
 
     obj._Notification((int)Node.NotificationExitTree);
     provider.ProviderState.IsInitialized.ShouldBeFalse();
+
+    obj.QueueFree();
   }
 
   [Test]
   public void ResolvesDependencyWhenProviderIsAlreadyInitialized()
   {
-    var value = "Hello, world!";
+    const string value = "Hello, world!";
     var obj = new StringProvider() { Value = value };
     var provider = obj as IBaseProvider;
     var dependent = new StringDependent();
@@ -69,7 +73,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   [Test]
   public async Task ResolvesDependencyAfterProviderIsResolved()
   {
-    var value = "Hello, world!";
+    const string value = "Hello, world!";
     var obj = new StringProvider() { Value = value };
     var provider = obj as IBaseProvider;
     var dependent = new StringDependent();
@@ -97,7 +101,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   [Test]
   public async Task FindsDependenciesAcrossAncestors()
   {
-    var value = "Hello, world!";
+    const string value = "Hello, world!";
 
     var objA = new StringProvider() { Value = value };
     var providerA = objA as IBaseProvider;
@@ -137,6 +141,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
     Should.Throw<ProviderNotFoundException>(
       () => dependent._Notification((int)Node.NotificationReady)
     );
+
+    dependent.QueueFree();
   }
 
   [Test]
@@ -152,13 +158,16 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
 
     dependent.ResolvedValue.ShouldBe(fallback);
     dependent.MyDependency.ShouldBe(fallback);
+
+    dependent.QueueFree();
+    fallback.Dispose();
   }
 
   [Test]
   public void DependsOnValueType()
   {
-    var value = 10;
-    var depObj = new IntDependent() { FallbackValue = () => value };
+    const int value = 10;
+    var depObj = new IntDependent() { FallbackValue = static () => value };
     var dependent = depObj as IDependent;
 
     depObj._Notification((int)Node.NotificationReady);
@@ -225,12 +234,14 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
     // Now that the fallback returns a valid value, the dependency should
     // be resolved once again.
     depObj.MyDependency.ShouldBeSameAs(replacementValue);
+
+    depObj.QueueFree();
   }
 
   [Test]
   public void ThrowsOnDependencyTableThatWasTamperedWith()
   {
-    var fallback = "Hello, world!";
+    const string fallback = "Hello, world!";
     var depObj = new StringDependentFallback
     {
       FallbackValue = fallback
@@ -244,6 +255,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
     Should.Throw<ProviderNotFoundException>(
       () => depObj.MyDependency.ShouldBe(fallback)
     );
+
+    depObj.QueueFree();
   }
 
   [Test]
@@ -281,6 +294,10 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
 
     dependent._Notification((int)Node.NotificationReady);
     Should.Throw<ProviderNotInitializedException>(() => dependent.MyDependency);
+
+    provider.RemoveChild(dependent);
+    dependent.QueueFree();
+    provider.QueueFree();
   }
 
   [Test]
@@ -294,6 +311,10 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
     dependent._Notification((int)Node.NotificationReady);
 
     dependent.OnResolvedCalled.ShouldBeTrue();
+
+    provider.RemoveChild(dependent);
+    dependent.QueueFree();
+    provider.QueueFree();
   }
 
   [Test]
@@ -301,7 +322,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   {
     var dependent = new FakedDependent();
 
-    var fakeValue = "I'm fake!";
+    const string fakeValue = "I'm fake!";
     dependent.FakeDependency(fakeValue);
 
     TestScene.AddChild(dependent);
@@ -312,6 +333,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
     dependent.MyDependency.ShouldBe(fakeValue);
 
     TestScene.RemoveChild(dependent);
+    dependent.QueueFree();
   }
 
   public class BadProvider : IBaseProvider

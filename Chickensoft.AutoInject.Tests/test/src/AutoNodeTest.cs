@@ -6,10 +6,12 @@ using Chickensoft.Introspection;
 using Godot;
 using Shouldly;
 
+// Future work: This test suite still has memory leak issues.
+
 public partial class AutoNodeTest(Node testScene) : TestClass(testScene)
 {
   [Meta(typeof(IAutoNode))]
-  public partial class NotAGodotNode : GodotObject { }
+  public partial class NotAGodotNode : GodotObject;
 
 
   [Test]
@@ -28,7 +30,7 @@ public partial class AutoNodeTest(Node testScene) : TestClass(testScene)
     )
   ]
   [Test]
-  public void CallsOtherMixins() => Should.NotThrow(() =>
+  public void CallsOtherMixins() => Should.NotThrow(static () =>
   {
 
     var node = new NotAGodotNode();

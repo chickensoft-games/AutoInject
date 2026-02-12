@@ -10,13 +10,15 @@ using Godot;
 using GodotTestDriver;
 using Shouldly;
 
+// Future work: This test suite still has memory leak issues.
+
 public partial class AutoConnectTest(Node testScene) : TestClass(testScene)
 {
   private Fixture _fixture = default!;
   private AutoConnectTestScene _scene = default!;
 
   [Meta(typeof(IAutoConnect))]
-  public partial class NotAGodotNode { }
+  public partial class NotAGodotNode;
 
   [Setup]
   public async Task Setup()
@@ -26,7 +28,15 @@ public partial class AutoConnectTest(Node testScene) : TestClass(testScene)
   }
 
   [Cleanup]
-  public async Task Cleanup() => await _fixture.Cleanup();
+  public async Task Cleanup()
+  {
+    await _fixture.Cleanup();
+    foreach (var child in _scene.GetChildren())
+    {
+      child?.QueueFree();
+    }
+    _scene?.QueueFree();
+  }
 
   [Test]
   public void ConnectsNodesCorrectlyWhenInstantiated()
@@ -44,13 +54,17 @@ public partial class AutoConnectTest(Node testScene) : TestClass(testScene)
   {
     var node = new Node();
     Should.Throw<InvalidOperationException>(() => node.FakeNodeTree(null));
+
+    node.QueueFree();
   }
 
   [Test]
   public void FakeNodesDoesNothingIfGivenNull()
   {
-    IAutoConnect node = new AutoConnectTestScene();
-    Should.NotThrow(() => node.FakeNodes = null);
+    var node = new AutoConnectTestScene();
+    Should.NotThrow(() => ((IAutoConnect)node).FakeNodes = null);
+
+    node.QueueFree();
   }
 
   [

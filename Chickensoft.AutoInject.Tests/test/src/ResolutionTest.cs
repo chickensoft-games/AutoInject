@@ -167,7 +167,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   public void DependsOnValueType()
   {
     var value = 10;
-    var depObj = new IntDependent() { FallbackValue = static () => value };
+    var depObj = new IntDependent() { FallbackValue = () => value };
     var dependent = depObj as IDependent;
 
     depObj._Notification((int)Node.NotificationReady);

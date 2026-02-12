@@ -134,11 +134,11 @@ public class FakeNodeTreeTest : TestClass
   }
 
   [Test]
-  public void GetChildThrowsOnInvalidIndex()
+  public void GetChildReturnsNullOnInvalidIndex()
   {
     var tree = new FakeNodeTree(TestScene);
 
-    Should.Throw<ArgumentOutOfRangeException>(() => tree.GetChild<INode>(0));
+    tree.GetChild<INode>(0).ShouldBeNull();
   }
 
   [Test]

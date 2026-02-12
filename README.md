@@ -99,6 +99,9 @@ Simply add the following to your project's `.csproj` file. Be sure to specify th
 </ItemGroup>
 ```
 
+> [!IMPORTANT]
+> Starting in GodotNodeInterfaces v3 (AutoInject 2.10.0+), to use the fake node tree in your tests, you must set the static property `Chickensoft.GodotNodeInterfaces.RuntimeContext.IsTesting` to `true` when running tests. See the [Migrating](https://github.com/chickensoft-games/GodotNodeInterfaces?tab=readme-ov-file#migrating) section of the GodotNodeInterfaces README for details.
+
 You can also add `Chickensoft.AutoInject.Analyzers` to your project to get additional checks and code fixes for AutoInject, such as ensuring that you override `_Notification` and call `this.Provide()` from your provider nodes.
 
 ```xml

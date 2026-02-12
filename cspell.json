@@ -3,8 +3,10 @@
     "**/*.*"
   ],
   "ignorePaths": [
+    "**/cspell.json",
     "**/*.tscn",
     "**/*.import",
+    "**/*.uid",
     "Chickensoft.AutoInject.Tests/badges/**/*.*",
     "Chickensoft.AutoInject.Tests/coverage/**/*.*",
     "Chickensoft.AutoInject.Tests/.godot/**/*.*",
@@ -27,6 +29,7 @@
     "devbuild",
     "endregion",
     "Finalizers",
+    "gdignore",
     "globaltool",
     "godotengine",
     "godotpackage",

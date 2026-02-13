@@ -16,5 +16,7 @@ public class AutoConnectMissingTest(Node testScene) : TestClass(testScene)
     // happen on our call stack. So we just make sure the node is null after :/
     var node = scene.InstantiateOrNull<AutoConnectMissingTestScene>();
     node.MyNode.ShouldBeNull();
+
+    node?.QueueFree();
   }
 }

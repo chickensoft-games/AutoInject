@@ -6,6 +6,8 @@ using Chickensoft.Introspection;
 using Godot;
 using Shouldly;
 
+// Future work: This test suite still has memory leak issues.
+
 public partial class AutoNodeTest(Node testScene) : TestClass(testScene)
 {
   [Meta(typeof(IAutoNode))]

@@ -40,7 +40,11 @@ public class MyNodeTest(Node testScene) : TestClass(testScene)
   }
 
   [Cleanup]
-  public async Task Cleanup() => await _fixture.Cleanup();
+  public async Task Cleanup()
+  {
+    await _fixture.Cleanup();
+    _scene?.QueueFree();
+  }
 
   [Test]
   public void UsesFakeNodeTree()

@@ -21,6 +21,8 @@ public class AutoConnectInvalidCastTest(Node testScene) : TestClass(testScene)
     // happen on our call stack. So we just make sure the node is null after :/
     var node = scene.Instantiate<AutoConnectInvalidCastTestScene>();
     node.Node.ShouldBeNull();
+
+    node.QueueFree();
   }
 
   [Test]
@@ -32,6 +34,8 @@ public class AutoConnectInvalidCastTest(Node testScene) : TestClass(testScene)
     Should.Throw<InvalidOperationException>(
       () => scene._Notification((int)Node.NotificationEnterTree)
     );
+
+    scene.QueueFree();
   }
 
   [Test]
@@ -41,6 +45,8 @@ public class AutoConnectInvalidCastTest(Node testScene) : TestClass(testScene)
     Should.Throw<InvalidOperationException>(
       () => scene._Notification((int)Node.NotificationEnterTree)
     );
+
+    scene.QueueFree();
   }
 
   [Test]
@@ -57,5 +63,8 @@ public class AutoConnectInvalidCastTest(Node testScene) : TestClass(testScene)
     Should.Throw<InvalidOperationException>(
       () => scene._Notification((int)Node.NotificationEnterTree)
     );
+
+    node.QueueFree();
+    scene.QueueFree();
   }
 }

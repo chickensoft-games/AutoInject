@@ -16,5 +16,7 @@ public partial class NotificationExtensionsTest(
     var node = new Node();
 
     Should.NotThrow(() => node.Notify(1));
+
+    node.QueueFree();
   }
 }

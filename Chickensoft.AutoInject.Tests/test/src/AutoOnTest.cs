@@ -169,5 +169,7 @@ public partial class AutoOnTest(Node testScene) : TestClass(testScene)
         autoNode, (int)Node.NotificationSceneInstantiated
       );
     });
+
+    node.QueueFree();
   }
 }

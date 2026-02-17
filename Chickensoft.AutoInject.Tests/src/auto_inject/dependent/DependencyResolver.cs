@@ -95,10 +95,10 @@ public static class DependencyResolver
     IEnumerable<PropertyMetadata> properties
   )
   {
-    var state = dependent.MixinState.Get<DependentState>();
+    var state = dependent.DependentState;
     if (what == Node.NotificationExitTree)
     {
-      dependent.MixinState.Get<DependentState>().ShouldResolveDependencies = true;
+      state.ShouldResolveDependencies = true;
       foreach (var pending in state.Pending.Values)
       {
         pending.Unsubscribe();
@@ -139,7 +139,7 @@ public static class DependencyResolver
   {
     // First, check dependency fakes. Using a faked value takes priority over
     // all the other dependency resolution methods.
-    var state = dependent.MixinState.Get<DependentState>();
+    var state = dependent.DependentState;
     if (state.ProviderFakes.TryGetValue(typeof(TValue), out var fakeProvider)
       && fakeProvider is DefaultProvider<TValue> faker)
     {
@@ -192,7 +192,7 @@ public static class DependencyResolver
     IEnumerable<PropertyMetadata> properties
   )
   {
-    var state = dependent.MixinState.Get<DependentState>();
+    var state = dependent.DependentState;
     // Clear any previously resolved dependencies — if the ancestor tree hasn't
     // changed above us, we will just end up re-resolving them as they were.
     state.Dependencies.Clear();

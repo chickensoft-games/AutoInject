@@ -36,7 +36,7 @@ public static class DependencyResolver
     }
 
 #nullable disable
-    public void Receive<T>() => Result = Provider is IProvide<T>;
+    public void Receive<T>() => Result = Provider is IProvide<T> or IProvideAny;
 #nullable restore
   }
 

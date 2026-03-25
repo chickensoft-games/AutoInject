@@ -36,7 +36,7 @@ public static class DependencyResolver
     }
 
 #nullable disable
-    public void Receive<T>() => Result = Provider is IProvide<T>;
+    public void Receive<T>() => Result = Provider is IProvide<T> or IProvideAny;
 #nullable restore
   }
 
@@ -165,6 +165,10 @@ public static class DependencyResolver
       else if (providerNode is DefaultProvider<TValue> defaultProvider)
       {
         return defaultProvider.Value();
+      }
+      else if (providerNode is IProvideAny anyProvider)
+      {
+        return anyProvider.Value<TValue>();
       }
     }
     else if (fallback is not null)

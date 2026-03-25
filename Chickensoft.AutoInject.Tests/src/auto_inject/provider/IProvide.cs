@@ -21,3 +21,12 @@ public interface IProvide<T> : IProvider where T : notnull {
   /// <summary>Value that is provided by the provider.</summary>
   T Value();
 }
+
+/// <summary>
+/// A provider of a value of any type.
+/// </summary>
+public interface IProvideAny : IProvider {
+  /// <summary>Value that is provided by the provider.</summary>
+  /// <typeparam name="T">The type of value provided.</typeparam>
+  T Value<T>();
+}

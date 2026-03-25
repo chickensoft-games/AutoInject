@@ -1,5 +1,7 @@
 namespace Chickensoft.AutoInject.Tests.Subjects;
 
+using System;
+using System.Collections.Generic;
 using Chickensoft.AutoInject;
 using Chickensoft.Introspection;
 using Godot;
@@ -32,6 +34,23 @@ public partial class IntProvider : Node, IProvide<int>
 
   public bool OnProvidedCalled { get; private set; }
   public int Value { get; set; }
+
+  public void OnProvided() => OnProvidedCalled = true;
+}
+
+[Meta(typeof(IAutoOn), typeof(IProvider))]
+public partial class AnyProvider : Node, IProvideAny
+{
+  public override void _Notification(int what) => this.Notify(what);
+
+  T IProvideAny.Value<T>() => Values.TryGetValue(typeof(T), out var value)
+    ? (T)value : throw new ProviderNotFoundException(typeof(T));
+
+  public void OnReady() => this.Provide();
+
+  public bool OnProvidedCalled { get; private set; }
+
+  public Dictionary<Type, object> Values { get; set; }
 
   public void OnProvided() => OnProvidedCalled = true;
 }

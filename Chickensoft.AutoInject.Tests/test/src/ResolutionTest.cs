@@ -27,6 +27,25 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   }
 
   [Test]
+  public void ProvidesAny()
+  {
+    var value = "Hello, world!";
+    var provider = new AnyProvider() {
+      Values = new Dictionary<Type, object> {
+        {typeof(string), value}
+      }
+    };
+
+    ((IProvideAny)provider).Value<string>().ShouldBe(value);
+
+    provider._Notification((int)Node.NotificationReady);
+
+    provider.OnProvidedCalled.ShouldBeTrue();
+
+    provider.QueueFree();
+  }
+
+  [Test]
   public void ProviderResetsOnTreeExit()
   {
     var value = "Hello, world!";

@@ -166,6 +166,10 @@ public static class DependencyResolver
       {
         return defaultProvider.Value();
       }
+      else if (providerNode is IProvideAny anyProvider)
+      {
+        return anyProvider.Value<TValue>();
+      }
     }
     else if (fallback is not null)
     {

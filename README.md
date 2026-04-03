@@ -28,7 +28,7 @@ Providing nodes "top-down" over sections of the game's scene tree has a few adva
 - ✅ Dependent scripts can still be run in isolated scenes by providing default fallback values.
 - ✅ Scoping dependencies to the scene tree prevents the existence of values that are invalid above the provider node.
 - ✅ Resolution occurs in O(n), where `n` is the height of the tree above the requesting dependent node (usually only a handful of nodes to search). For deep trees, "reflecting" dependencies by re-providing them further down the tree speeds things up further.
-- ✅ Dependencies are resolved when the node enters the scene tree, allowing for O(1) access afterwards. Exiting and re-entering the scene tree triggers the dependency resolution process again.
+- ✅ Dependencies are resolved when the node enters the scene tree, allowing for O(1) access afterwards. Exiting and re-entering the scene tree triggers the dependency resolution process again (if you call `Node.RequestReady()` from either `IAutoOn.OnExitTree()` or `Node._ExitTree()`).
 - ✅ Scripts can be both dependents and providers.
 
 ## 📼 About Mixins
@@ -132,7 +132,7 @@ Once providers have initialized the values they provide, they must call the `thi
 The example below shows a node script that provides a `string` value to its descendants. Values are always provided by their type.
 
 > [!NOTE]
-> The `IProvideAny` interface will stop signals from propagating to the node's parent. This could at best mute any errors from unresolved dependencies when implemented on the root node, 
+> The `IProvideAny` interface will stop signals from propagating to the node's parent. This could at best mute any errors from unresolved dependencies when implemented on the root node,
 > and at worst stop a dependency from being resolved if it was supposed to be fetched from an ancestor.
 
 ```csharp
@@ -513,7 +513,7 @@ public partial class MyNode : Node2D
 
 > [!WARNING]
 > Godot detects when you override `_PhysicsProcess` and automatically enables physics for that node.
-> 
+>
 > That won't happen when using `OnPhysicsProcess` so you have to manually turn on physics by calling:
 > ```csharp
 > SetPhysicsProcess(true);

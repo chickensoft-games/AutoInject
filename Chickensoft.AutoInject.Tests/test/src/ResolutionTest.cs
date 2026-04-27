@@ -30,7 +30,8 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
   public void ProvidesAny()
   {
     var value = "Hello, world!";
-    var provider = new AnyProvider() {
+    var provider = new AnyProvider()
+    {
       Values = new Dictionary<Type, object> {
         {typeof(string), value}
       }
@@ -354,6 +355,37 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
     TestScene.RemoveChild(dependent);
     dependent.QueueFree();
   }
+
+  [Test]
+  public async Task ResolvesDependencyFromFallback()
+  {
+    var value = "Hello, world!";
+    var obj = new StringProvider() { Value = value };
+    var provider = obj as IBaseProvider;
+    var dependent = new StringDependent();
+    var fixture = new Fixture(TestScene.GetTree());
+    // Do not connect dependent to obj (provider) directly.
+    // Instead register provider as a fallback instance.
+    await fixture.AddToRoot(obj);
+    AutoInject.SetGlobalFallback(obj);
+
+    await fixture.AddToRoot(dependent);
+
+    ((IProvide<string>)provider).Value().ShouldBe(value);
+
+    provider.ProviderState.IsInitialized.ShouldBeTrue();
+    obj.OnProvidedCalled.ShouldBeTrue();
+
+    dependent.OnResolvedCalled.ShouldBeTrue();
+    dependent.ResolvedValue.ShouldBe(value);
+    ((IDependent)dependent).DependentState.Pending.ShouldBeEmpty();
+
+    await fixture.Cleanup();
+
+    dependent.QueueFree();
+    obj.QueueFree();
+  }
+
 
   public class BadProvider : IBaseProvider
   {

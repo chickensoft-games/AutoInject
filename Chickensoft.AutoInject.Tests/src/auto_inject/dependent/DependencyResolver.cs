@@ -309,6 +309,9 @@ public static class DependencyResolver
         // Still need to find dependencies — continue up the tree until
         // this returns null.
         node = node.GetParent();
+
+        // Possibly examine fallback instance.
+        node ??= AutoInject.GetGlobalFallback();
       }
     }
 

@@ -250,6 +250,8 @@ public static class DependencyResolver
       }
     }
 
+    var globalFallback = AutoInject.GetGlobalFallback();
+
     while (node != null && shouldResolve)
     {
       foundDependencies.Clear();
@@ -307,7 +309,6 @@ public static class DependencyResolver
       else
       {
         // Still need to find dependencies
-        var globalFallback = AutoInject.GetGlobalFallback();
         if (node == globalFallback && globalFallback != null)
         {
           // Global fallback has been examined for dependencies.

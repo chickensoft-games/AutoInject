@@ -366,7 +366,7 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
     var fixture = new Fixture(TestScene.GetTree());
     // Do not connect dependent to obj (provider) directly.
     // Instead register provider as a fallback instance.
-    await fixture.AddToRoot(obj);
+    obj._Notification((int)Node.NotificationReady);
     AutoInject.SetGlobalFallback(obj);
 
     await fixture.AddToRoot(dependent);

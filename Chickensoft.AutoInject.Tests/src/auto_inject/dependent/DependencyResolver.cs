@@ -250,6 +250,8 @@ public static class DependencyResolver
       }
     }
 
+    var globalFallback = AutoInject.GetGlobalFallback();
+
     while (node != null && shouldResolve)
     {
       foundDependencies.Clear();
@@ -306,9 +308,20 @@ public static class DependencyResolver
       }
       else
       {
-        // Still need to find dependencies — continue up the tree until
-        // this returns null.
-        node = node.GetParent();
+        // Still need to find dependencies
+        if (node == globalFallback && globalFallback != null)
+        {
+          // Global fallback has been examined for dependencies.
+          // Nothing else left to examine.
+          node = null;
+        }
+        else
+        {
+          // Continue up the tree until the root node is examined.
+          // Root node has no parent.
+          // Possibly examine fallback provider.
+          node = node.GetParent() ?? AutoInject.GetGlobalFallback();
+        }
       }
     }
 

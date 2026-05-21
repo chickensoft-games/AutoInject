@@ -24,7 +24,7 @@
     <PackageReference Include="Shouldly" Version="4.3.0" />
 
     <PackageReference Include="Chickensoft.GoDotTest" Version="2.0.35" />
-    <PackageReference Include="Chickensoft.GodotTestDriver" Version="3.1.71" />
+    <PackageReference Include="Chickensoft.GodotTestDriver" Version="3.1.72" />
     <PackageReference Include="Chickensoft.GodotNodeInterfaces" Version="3.0.16" />
     <PackageReference Include="Chickensoft.Introspection" Version="3.0.2" />
     <PackageReference Include="Chickensoft.Introspection.Generator" Version="3.0.2" PrivateAssets="all" OutputItemType="analyzer" />

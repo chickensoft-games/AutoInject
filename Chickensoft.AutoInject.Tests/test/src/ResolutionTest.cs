@@ -386,6 +386,54 @@ public class ResolutionTest(Node testScene) : TestClass(testScene)
     obj.QueueFree();
   }
 
+  [Test]
+  public void ResolvesDependencyFromAnyProvider()
+  {
+    var value = "Hello, world!";
+    var provider = new AnyProvider
+    {
+      Values = new Dictionary<Type, object> {
+        { typeof(string), value }
+      }
+    };
+    var dependent = new StringDependent();
+
+    provider.AddChild(dependent);
+
+    provider._Notification((int)Node.NotificationReady);
+    dependent._Notification((int)Node.NotificationReady);
+
+    dependent.OnResolvedCalled.ShouldBeTrue();
+    dependent.ResolvedValue.ShouldBe(value);
+
+    provider.QueueFree();
+  }
+
+  [Test]
+  public void WalksAncestorsIntoGlobalFallbackWhenNotSatisfied()
+  {
+    var fallback = new IntProvider { Value = 10 };
+    fallback._Notification((int)Node.NotificationReady);
+
+    AutoInject.SetGlobalFallback(fallback);
+
+    var parent = new Node();
+    var dependent = new StringDependent();
+    parent.AddChild(dependent);
+
+    try
+    {
+      Should.Throw<ProviderNotFoundException>(
+        () => dependent._Notification((int)Node.NotificationReady)
+      );
+    }
+    finally
+    {
+      AutoInject.SetGlobalFallback(null);
+      parent.QueueFree();
+      fallback.QueueFree();
+    }
+  }
 
   public class BadProvider : IBaseProvider
   {

@@ -211,9 +211,9 @@ public static class DependencyResolver
     var foundDependencies = new HashSet<PropertyMetadata>();
     var providersInitializing = 0;
 
-    void resolve()
+    void resolve(bool deferred = false)
     {
-      if (self.IsNodeReady())
+      if (self.IsNodeReady() && !deferred)
       {
         // Godot node is already ready.
         if (!dependent.IsTesting)
@@ -224,9 +224,7 @@ public static class DependencyResolver
         return;
       }
 
-      // Godot node is not ready yet, so we will wait for OnReady before
-      // calling Setup() and OnResolved().
-
+      // OnAfterReady will call Setup() and OnResolved().
       if (!dependent.IsTesting)
       {
         state.PleaseCallSetup = true;
@@ -327,8 +325,8 @@ public static class DependencyResolver
 
     if (state.Pending.Count == 0)
     {
-      // Inform dependent that dependencies have been resolved.
-      resolve();
+      // Dependencies are already resolved, we can notify in OnAfterReady
+      resolve(deferred: true);
     }
 
     // We *could* check to see if a provider for every dependency was found

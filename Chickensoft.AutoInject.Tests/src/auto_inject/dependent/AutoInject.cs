@@ -14,11 +14,18 @@ public static class AutoInject
   /// <param name="fallbackProviderNode">
   /// The fallback dependency provider node or null to unset.
   /// </param>
-  public static void SetGlobalFallback(Node? fallbackProviderNode) =>
+  public static void SetGlobalFallback(Node? fallbackProviderNode)
+  {
+    if (fallbackProviderNode is null)
+    {
+      Engine.GetMainLoop().RemoveMeta(FALLBACK_INSTANCE_META_KEY);
+      return;
+    }
     Engine.GetMainLoop().SetMeta(
       FALLBACK_INSTANCE_META_KEY,
-      fallbackProviderNode ?? new Variant()
+      fallbackProviderNode
     );
+  }
 
 
   /// <summary>

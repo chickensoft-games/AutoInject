@@ -1,6 +1,7 @@
 namespace Chickensoft.AutoInject.Tests.Subjects;
 
 using System;
+using System.Collections.Generic;
 using Chickensoft.Introspection;
 using Godot;
 
@@ -154,4 +155,20 @@ public partial class NoDependenciesDependent : Node
   public bool OnResolvedCalled { get; private set; }
 
   public void OnResolved() => OnResolvedCalled = true;
+}
+
+[Meta(typeof(IAutoOn), typeof(IDependent))]
+public partial class OrderTrackingDependent : Node
+{
+  public override void _Notification(int what) => this.Notify(what);
+
+  [Dependency]
+  public string MyDependency => this.DependOn<string>();
+
+  public List<string> Calls { get; } = [];
+
+  public void Initialize() => Calls.Add(nameof(Initialize));
+  public void Setup() => Calls.Add(nameof(Setup));
+  public void OnReady() => Calls.Add(nameof(OnReady));
+  public void OnResolved() => Calls.Add(nameof(OnResolved));
 }

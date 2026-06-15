@@ -223,7 +223,7 @@ public partial class MyDependent : Node
     MyValue.OnSomeEvent += ValueUpdated
   }
 
-  public void OnTreeExit()
+  public void OnExitTree()
   {
     // Clean up subscriptions here!
     MyValue.OnSomeEvent -= ValueUpdated

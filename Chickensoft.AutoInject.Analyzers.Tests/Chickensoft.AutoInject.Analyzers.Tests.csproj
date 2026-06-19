@@ -29,9 +29,9 @@
 
     <!-- These are necessary to compile test code -->
     <PackageReference Include="Chickensoft.Introspection" Version="3.0.3" />
-    <PackageReference Include="GodotSharp" Version="4.6.3" />
+    <PackageReference Include="GodotSharp" Version="4.7.0" />
 
-    <PackageReference Include="Godot.SourceGenerators" Version="4.6.3" />
+    <PackageReference Include="Godot.SourceGenerators" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>

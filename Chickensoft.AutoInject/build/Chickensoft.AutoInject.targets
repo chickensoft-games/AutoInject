@@ -1,0 +1,7 @@
+<Project>
+  <ItemGroup>
+    <Compile Update="@(Compile)">
+      <Visible Condition="'%(NuGetItemType)' == 'Compile' AND '%(NuGetPackageId)' == 'Chickensoft.AutoInject'">false</Visible>
+    </Compile>
+  </ItemGroup>
+</Project>
